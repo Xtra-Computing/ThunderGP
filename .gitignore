@@ -1,0 +1,12 @@
+*.diff
+*.log
+host_graph_fpga*
+_x
+xclbin
+.Xil
+*.str
+sdx_*
+*.json
+*.jou
+release*
+test_log*
