@@ -3,6 +3,7 @@
 
 #include "graph_fpga.h"
 
+#include "fpga_application.h"
 
 
 #define WRITE_BACK_BURST_LENGTH     (64)
@@ -171,7 +172,7 @@ void writeBackLite(int totalSize, uint16 *addr, hls::stream<burst_raw>  &input)
     burst_raw ram[WRITE_BACK_BURST_LENGTH];
 
     unsigned int counter = 0;
-    for (int loopCount = 0; loopCount < totalSize/WRITE_BACK_BURST_LENGTH/SIZE_BY_INT; loopCount++)
+    for (int loopCount = 0; loopCount < totalSize / WRITE_BACK_BURST_LENGTH / SIZE_BY_INT; loopCount++)
     {
 
         for (int i = 0; i < WRITE_BACK_BURST_LENGTH; i++)
@@ -233,12 +234,19 @@ void  cuMerge ( int               loopNum,
         for (int inner = 0; inner < 16 ; inner ++)
         {
 #pragma HLS UNROLL
-            uint_raw tmp1 = unit[0].range(31 + inner * 32, 0 + inner * 32)
-                            + unit[1].range(31 + inner * 32, 0 + inner * 32);
-            uint_raw tmp2 = unit[2].range(31 + inner * 32, 0 + inner * 32)
-                            + unit[3].range(31 + inner * 32, 0 + inner * 32);
-            uint_raw res_tmp = tmp1 + tmp2;
-            res.range(31 + inner * 32, 0 + inner * 32) = res_tmp;
+            uint_raw tmp1 = PROP_COMPUTE_STAGE4(
+                                unit[0].range(31 + inner * 32, 0 + inner * 32),
+                                unit[1].range(31 + inner * 32, 0 + inner * 32)
+                            );
+            uint_raw tmp2 = PROP_COMPUTE_STAGE4(
+                                unit[2].range(31 + inner * 32, 0 + inner * 32),
+                                unit[3].range(31 + inner * 32, 0 + inner * 32)
+                            );
+            uint_raw rtmp = PROP_COMPUTE_STAGE4(
+                                tmp1,
+                                tmp2
+                            );
+            res.range(31 + inner * 32, 0 + inner * 32) = rtmp;
         }
 
         write_to_stream(output, res);

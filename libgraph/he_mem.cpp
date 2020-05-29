@@ -116,7 +116,7 @@ int he_mem_init(cl_context &dev_context, he_mem_t * item)
         }
 #endif
     }
-    
+
     return 0;
 }
 
@@ -129,7 +129,7 @@ he_mem_t* get_he_mem(unsigned int id)
             return lut_item.p_mem;
         }
     }
-    DEBUG_PRINTF("[ERROR] get he mem error\n");
+    DEBUG_PRINTF("[ERROR] get he mem error %d \n",id);
     return NULL;
 }
 

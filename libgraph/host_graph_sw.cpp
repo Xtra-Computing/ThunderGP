@@ -34,7 +34,7 @@
 partitionDescriptor partitions[MAX_PARTITIONS_NUM];
 int partIdTable[MAX_PARTITIONS_NUM];
 
-gs_cu_t localGsKernel[SUB_PARTITION_NUM] = {
+gatherScatterDescriptor localGsKernel[] = {
     {
         .name = "readEdgesCU1",
     },
@@ -66,9 +66,20 @@ void base_mem_init(cl_context &context)
     }
 }
 
+partitionDescriptor * getPartition(int partID)
+{
+    return &partitions[partID];
+}
 
 
-void gs_mem_init(cl_context &context, gs_cu_t *gsItem, int cuIndex, void *data)
+gatherScatterDescriptor * getGatherScatter(int kernelID)
+{
+    return &localGsKernel[kernelID];
+}
+
+
+
+void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, int cuIndex, void *data)
 {
     gsItem->prop.id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET;
     gsItem->prop.name = "cu prop";
@@ -127,7 +138,7 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
 
         partitionItem->edgeProp.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 2;
         partitionItem->edgeProp.name = "partition edgeProp";
-#if 0
+#if 1
         partitionItem->edgeProp.attr = PARTITION_DDR;
 #else
         partitionItem->edgeProp.attr = ATTR_HOST_ONLY;
@@ -188,10 +199,15 @@ void processInit(
     int *vertexProp =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_PROP);
     int *outDeg =           (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
     int *vertexScore =      (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
+    unsigned int *activeVertexNum = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX_NUM);
+    unsigned int *activeVertices  = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX);
+
+
     float init_score_float = 1.0f / vertexNum;
     int init_score_int = float2int(init_score_float);
     printf("init_score %d\n", init_score_int);
 
+    /*
     for (int i = 0; i < vertexNum; i++) {
         vertexProp[i] = init_score_int;
         if (outDeg[i] > 0)
@@ -207,6 +223,13 @@ void processInit(
             vertexScore[i]  = 0;
         }
     }
+    */
+    for (int i = 0; i < (vertexNum/ (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
+        vertexScore[i]    = MAX_PROP;
+    }
+    //vertexScore[source] = 0x80000001;
+    activeVertexNum[0] = 1;
+    activeVertices[0] = source;
 
     printf("init_score original %f \n", init_score_float);
     printf("init_score original to int %d \n", init_score_int);
@@ -227,8 +250,9 @@ void partitionFunction(
     memset(partIdTable, 0, sizeof(int) * MAX_PARTITIONS_NUM);
     int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
     int *cia = (int*)get_host_mem_pointer(MEM_ID_CIA);
-    int *vertexScoreCached = (int *)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
-    unsigned int *vertexMap = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
+    int *vertexScoreCached    = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
+    int *vertexScore          = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
+    unsigned int *vertexMap   = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
     unsigned int *vertexRemap = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
 
 
@@ -249,6 +273,9 @@ void partitionFunction(
             mapedSourceIndex ++;
         }
     }
+    
+    int startIndx = getStartIndex();
+    vertexScoreCached[startIndx] = 0x80000001;
 
     processMemInit(context);
 
@@ -316,7 +343,8 @@ void partitionFunction(
                 if ((vertex_idx >= i * VERTEX_MAX) && (vertex_idx < (i + 1) * VERTEX_MAX)) {
                     edgesTuples[cur_edge_num] = vertex_idx;
                     edgeScoreMap[cur_edge_num] = mapedSourceIndex;
-                    edgeProp[cur_edge_num] = cur_edge_num; //SpMV test
+                    //edgeProp[cur_edge_num] = cur_edge_num & 0xFFFFFF; //SpMV test
+                    edgeProp[cur_edge_num] = 1;
                     cur_edge_num ++;
                 }
             }
@@ -345,7 +373,7 @@ void partitionFunction(
             partitions[partId].compressRatio = (double (mapedSourceIndex)) / vertexNum;
             DEBUG_PRINTF("ratio %d / %d is %lf \n", mapedSourceIndex, vertexNum, partitions[partId].compressRatio);
             partitions[partId].dstVertexStart = VERTEX_MAX * (i);
-            partitions[partId].dstVertexEnd   = ((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1) ;
+            partitions[partId].dstVertexEnd   = (((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : (VERTEX_MAX * (i + 1)  - 1));
             volatile int subPartitionSize = ((cur_edge_num / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
             int reOrderIndex = 0;
             if (i % 2 == 0)
@@ -369,8 +397,9 @@ void partitionFunction(
     }
 
 #define CACHE_UNIT_SIZE (4096 * 2)
-    for (int i = 0; i < blkNum; i++)
+    for (int index = 0; index < blkNum; index++)
     {
+        int i = index * SUB_PARTITION_NUM;
         int *edgeScoreMap = (int*)partitions[i].edgeMap.data;
         DEBUG_PRINTF("\n----------------------------------------------------------------------------------\n");
         DEBUG_PRINTF("[PART] partitions %d info :\n", i);
@@ -388,7 +417,7 @@ void partitionFunction(
         DEBUG_PRINTF("[PART] est. efficient %lf\n", ((float)(partitions[i].listEnd - partitions[i].listStart)) / mapedSourceIndex);
 
         DEBUG_PRINTF("[PART] compressRatio %lf \n\n", partitions[i].compressRatio);
-        
+
 
 #if SRC_VERTEX_CHECK
         int lastMapIndex = edgeScoreMap[partitions[i].listStart];

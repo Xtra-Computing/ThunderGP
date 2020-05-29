@@ -6,7 +6,6 @@
 #include "common.h"
 
 #include "graph.h"
-#include "safequeue.h"
 
 #include "he_mem.h"
 #include "he_mem_id.h"
@@ -45,7 +44,7 @@ typedef struct
     he_mem_t  prop;
     he_mem_t  propUpdate;
     he_mem_t  tmpProp;
-} gs_cu_t;
+} gatherScatterDescriptor;
 
 typedef struct
 {
@@ -76,6 +75,11 @@ typedef struct
     profile_log_t log;
 } partitionDescriptor;
 
+partitionDescriptor * getPartition(int partID);
+
+gatherScatterDescriptor * getGatherScatter(int kernelID);
+
+
 int float2int(float a);
 float int2float(int a);
 double getCurrentTimestamp(void);
@@ -83,6 +87,8 @@ double getCurrentTimestamp(void);
 void freeResources(void);
 
 Graph* createGraph(const std::string &gName, const std::string &mode);
+
+int getStartIndex(void);
 
 void mem_init(CSR * csr, cl_context &context);
 
@@ -92,20 +98,7 @@ void processInit(
     const int   &source
 );
 
-
 void processMemInit(cl_context &context);
-
-void swVerify(
-    CSR                     *csr,
-    const int               &vertexNum,
-    int                     endoffset,
-    int                     *rpa,
-    int                     *cia,
-    int                     *vertexProp,
-    int                     *vertexScore,
-    int                     *outDeg,
-    int                     *tmpVertexProp
-);
 
 void swVerifyCmodel( fpga_task_info_t task_info);
 
@@ -121,13 +114,6 @@ void partitionApplyCModel(
     cl_device_id            &device,
     int                     partId,
     unsigned int            baseScore
-);
-
-void singleThreadSWProcessing(
-    CSR                     *csr,
-    const int               &blkNum,
-    const int               &vertexNum,
-    const int               &source
 );
 
 void partitionFunction(

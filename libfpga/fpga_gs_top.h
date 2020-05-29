@@ -12,6 +12,12 @@
 #pragma HLS INTERFACE m_axi port=vertexScore offset=slave bundle=gmem1 max_read_burst_length=64 num_write_outstanding=4
 #pragma HLS INTERFACE s_axilite port=vertexScore bundle=control
 
+#if HAVE_EDGE_PROP
+
+#pragma HLS INTERFACE m_axi port=edgeProp offset=slave bundle=gmem3 max_read_burst_length=64
+#pragma HLS INTERFACE s_axilite port=edgeProp bundle=control
+
+#endif
 #pragma HLS INTERFACE s_axilite port=edge_end       bundle=control
 #pragma HLS INTERFACE s_axilite port=sink_offset    bundle=control
 #pragma HLS INTERFACE s_axilite port=sink_end       bundle=control
@@ -40,34 +46,43 @@
     hls::stream<filter_type>    toFilterArraySlice2[PE_NUM];
 #pragma HLS stream variable=toFilterArraySlice2  depth=4
 
-    hls::stream<filter_type>    toFilterArraySlice3[PE_NUM];
-#pragma HLS stream variable=toFilterArraySlice3  depth=4
 
     hls::stream<uint_uram>    writeArray[PE_NUM];
 #pragma HLS stream variable=writeArray  depth=2
 
+    hls::stream<uint_uram>    writeArrayLayer2[PE_NUM];
+#pragma HLS stream variable=writeArrayLayer2  depth=2
+
     hls::stream<uint_uram>    writeArrayLayer1[PE_NUM];
 #pragma HLS stream variable=writeArrayLayer1  depth=2
-
-    hls::stream<burst_raw>      edgeBurstStream;
-#pragma HLS stream variable=edgeBurstStream depth=2
-
-    hls::stream<burst_raw>      mapStream;
-#pragma HLS stream variable=mapStream depth=2
-
-
-    hls::stream<burst_raw>      edgeBurstStreamTmp;
-#pragma HLS stream variable=edgeBurstStreamTmp depth=512
-
-    hls::stream<burst_raw>      mapStreamTmp;
-#pragma HLS stream variable=mapStreamTmp depth=512
 
 
     hls::stream<burst_raw>      edgeBurstSliceStream;
 #pragma HLS stream variable=edgeBurstSliceStream depth=2
+    hls::stream<burst_raw>      edgeBurstStream;
+#pragma HLS stream variable=edgeBurstStream depth=2
+    hls::stream<burst_raw>      edgeBurstStreamTmp;
+#pragma HLS stream variable=edgeBurstStreamTmp depth=512
 
     hls::stream<burst_raw>      mapSliceStream;
 #pragma HLS stream variable=mapSliceStream depth=2
+    hls::stream<burst_raw>      mapStream;
+#pragma HLS stream variable=mapStream depth=2
+    hls::stream<burst_raw>      mapStreamTmp;
+#pragma HLS stream variable=mapStreamTmp depth=512
+
+#if HAVE_EDGE_PROP
+    hls::stream<burst_raw>      edgePropSliceStream;
+#pragma HLS stream variable=edgePropSliceStream depth=2
+    hls::stream<burst_raw>      edgePropStream;
+#pragma HLS stream variable=edgePropStream depth=2
+    hls::stream<burst_raw>      edgePropStreamTmp;
+#pragma HLS stream variable=edgePropStreamTmp depth=512
+
+#endif
+
+    hls::stream<edge_tuples_t>   edgeTuplesCoupled;
+#pragma HLS stream variable=edgeTuplesCoupled depth=2
 
     hls::stream<edge_tuples_t>   edgeTuplesBuffer;
 #pragma HLS stream variable=edgeTuplesBuffer depth=2
@@ -103,19 +118,30 @@
 #pragma HLS DATAFLOW
     //printf("%d %d \n",(int)edge_offset,(int)edge_end );
     burstRead(0, edge_end, edges, edgeBurstStream);
-
     sliceStream(edgeBurstStream, edgeBurstStreamTmp);
     sliceStream(edgeBurstStreamTmp, edgeBurstSliceStream);
 
     burstRead(0, edge_end, edgeScoreMap, mapStream);
-
     sliceStream(mapStream, mapStreamTmp);
     sliceStream(mapStreamTmp, mapSliceStream);
 
+#if HAVE_EDGE_PROP
+    
+    burstRead(0, edge_end, edgeProp, edgePropStream);
+    sliceStream(edgePropStream, edgePropStreamTmp);
+    sliceStream(edgePropStreamTmp, edgePropSliceStream);
+
+#endif
+
     cacheProcess(vertexScore, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
 
+#if HAVE_EDGE_PROP
+    propProcess(edgePropSliceStream, edgeTuplesBuffer, edgeTuplesCoupled);
+#else
+    propProcessSelf(edgeTuplesBuffer, edgeTuplesCoupled);
+#endif
     /* timing */
-    duplicateStream4WithClear(edgeTuplesBuffer, edgeTuplesLayer1[0], edgeTuplesLayer1[1], edgeTuplesLayer1[2], edgeTuplesLayer1[3]);
+    duplicateStream4WithClear(edgeTuplesCoupled, edgeTuplesLayer1[0], edgeTuplesLayer1[1], edgeTuplesLayer1[2], edgeTuplesLayer1[3]);
 
     for (int i = 0; i < 4 ; i++)
     {

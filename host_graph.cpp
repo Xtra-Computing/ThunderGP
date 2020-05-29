@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "host_graph_sw.h"
+#include "host_apply.h"
 #include "unistd.h"
-
 
 
 using namespace std;
@@ -18,7 +18,6 @@ using namespace std;
 #define HW_EMU_DEBUG        (0)
 #define HW_EMU_DEBUG_SIZE   (16384 * 4)
 
-#define HAVE_APPLY          (1)
 #define HAVE_GS             (1)
 #define HAVE_FPGA           (1)
 #define HAVE_SW             (0)
@@ -44,7 +43,7 @@ void freeResources(void) {
     if (context)            clReleaseContext(context);
 }
 
-extern gs_cu_t localGsKernel[SUB_PARTITION_NUM];
+extern gatherScatterDescriptor localGsKernel[SUB_PARTITION_NUM];
 extern partitionDescriptor partitions[MAX_PARTITIONS_NUM];
 extern int partIdTable[MAX_PARTITIONS_NUM];
 
@@ -116,6 +115,9 @@ void set_gs_kernel(int partId)
 
         clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->tmpProp.id));
 
+#if HAVE_EDGE_PROP
+        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeProp.id));
+#endif
         clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(int),    &edgeEnd);
         clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(int),    &sinkStart);
         clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(int),    &sinkEnd);
@@ -123,32 +125,6 @@ void set_gs_kernel(int partId)
 #endif
 }
 
-void set_apply_kernel(int partId)
-{
-#if HAVE_APPLY
-    int argvi = 0;
-    int base_score = float2int((1.0f - kDamp) / vertexNum);
-    int sink_end   = VERTEX_MAX;
-    int offset = 0;//partitions[partId * SUB_PARTITION_NUM].dstVertexStart;
-
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(MEM_ID_VERTEX_PROP));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partitions[partId * SUB_PARTITION_NUM + 2].tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partitions[partId * SUB_PARTITION_NUM + 1].tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partitions[partId * SUB_PARTITION_NUM + 0].tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partitions[partId * SUB_PARTITION_NUM + 3].tmpProp.id));
-    /* TODO ping-pong the  propUpdate and prop mem between each iteration */
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(localGsKernel[2].propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(localGsKernel[1].propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(localGsKernel[0].propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(localGsKernel[3].propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(MEM_ID_OUT_DEG));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(MEM_ID_ERROR));
-
-    clSetKernelArg(kernel_apply, argvi++, sizeof(int),    &sink_end);
-    clSetKernelArg(kernel_apply, argvi++, sizeof(int),    &offset);
-    clSetKernelArg(kernel_apply, argvi++, sizeof(int),    &base_score);
-#endif
-}
 
 
 void prepare_fpga_ddr(void)
@@ -183,7 +159,7 @@ void prepare_fpga_ddr(void)
 
     double end =  getCurrentTimestamp();
     DEBUG_PRINTF("data transfer %lf \n", (end - begin) * 1000);
-#if 1
+#if 0
     int * data = (int *)get_host_mem_pointer(partitions[0].tmpProp.id);
     for (int i = 0; i < VERTEX_MAX; i++)
     {
@@ -197,6 +173,8 @@ void prepare_fpga_ddr(void)
 }
 
 #define TEST_SCALE          (1)
+
+#define GLOBAL_BLK_SIZE     (blkNum / TEST_SCALE)
 
 static cl_command_queue gs_ops[SUB_PARTITION_NUM], apply_ops;
 static cl_event  syncEvent[MAX_PARTITIONS_NUM * SUB_PARTITION_NUM];
@@ -224,17 +202,19 @@ double launchFPGA(void)
         double fpga_run_start, fpga_run_end;
 
         /************************************************************************************/
-        /* load is same, only one iteration */
+
         fpga_run_start = getCurrentTimestamp();
-        for (int i = 0; i < blkNum / TEST_SCALE; i ++)
+        for (int i = 0; i < GLOBAL_BLK_SIZE; i ++)
         {
             set_gs_kernel(partIdTable[i]);
             if (i > 0)
             {
-                set_apply_kernel(partIdTable[i - 1]);
+                setApplyKernel(kernel_apply,partIdTable[i - 1],vertexNum);
+#if HAVE_APPLY
                 clEnqueueTask(apply_ops, kernel_apply, 4,
                               &syncEvent[(i - 1) * SUB_PARTITION_NUM],
                               &applyEvent[i - 1]);
+#endif
             }
             for (int j = 0; j < SUB_PARTITION_NUM; j ++)
             {
@@ -242,10 +222,12 @@ double launchFPGA(void)
                 clEnqueueTask(gs_ops[j], localGsKernel[j].kernel, 0, NULL,
                               &syncEvent[i * SUB_PARTITION_NUM + j]);
             }
-            set_apply_kernel(partIdTable[blkNum / TEST_SCALE - 1]);
+            setApplyKernel(kernel_apply,partIdTable[blkNum / TEST_SCALE - 1],vertexNum);
+#if HAVE_APPLY
             clEnqueueTask(apply_ops, kernel_apply, 4,
                           &syncEvent[(blkNum / TEST_SCALE - 1) * SUB_PARTITION_NUM],
                           &applyEvent[(blkNum / TEST_SCALE - 1)]);
+#endif
         }
 
         for (int i = 0; i < SUB_PARTITION_NUM; i++)
@@ -258,9 +240,14 @@ double launchFPGA(void)
         /************************************************************************************/
 
         /* profile */
-        for (int i = 0; i < blkNum / TEST_SCALE; i ++)
+        DEBUG_PRINTF("profile \n");
+        for (int i = 0; i < GLOBAL_BLK_SIZE; i ++)
         {
+#if HAVE_APPLY
             unsigned long apply_exec_time = xcl_get_event_duration(applyEvent[i]);
+#else
+            unsigned long apply_exec_time = 0;
+#endif
             for (int j = 0; j < SUB_PARTITION_NUM; j ++)
             {
                 unsigned long exec_time = xcl_get_event_duration(*localGsKernel[j].event[i]);
@@ -274,21 +261,24 @@ double launchFPGA(void)
         }
 
         /* verification */
+        DEBUG_PRINTF("verification \n");
         if (repeat == 0)
         {
             int baseScore = float2int((1.0f - kDamp) / vertexNum);
-            for (int i = 0; i < blkNum / TEST_SCALE; i ++)
+            for (int i = 0; i < GLOBAL_BLK_SIZE; i ++)
             {
                 for (int j = 0; j < SUB_PARTITION_NUM; j ++)
                 {
                     partitionGatherScatterCModel(context, device, j, &partitions[partIdTable[i] * SUB_PARTITION_NUM + j]);
                 }
+#if HAVE_APPLY
                 partitionApplyCModel(context, device, partIdTable[i], baseScore);
+#endif
             }
 
         }
         /* log */
-        if (repeat == 2)
+        if (repeat > 1)
         {
             double fpga_runtime_total = 0;
             double end2end_runtime_total = 0;
@@ -309,7 +299,7 @@ double launchFPGA(void)
                 DEBUG_PRINTF("[INFO] partedge %f fpga gs: %f ms, apply: %f ms %d, effic %lf  v/e %lf compress %lf \n",
                              partitions[i * SUB_PARTITION_NUM].log.end2end_exe,
                              max_fpga_exe / 1000000.0,
-                             partitions[i * SUB_PARTITION_NUM].log.apply_exe/ 1000000.0,
+                             partitions[i * SUB_PARTITION_NUM].log.apply_exe / 1000000.0,
                              (partitions[i * SUB_PARTITION_NUM].listEnd - partitions[i * SUB_PARTITION_NUM].listStart),
                              (((float)(partitions[i * SUB_PARTITION_NUM].listEnd - partitions[i * SUB_PARTITION_NUM].listStart)) / partitions[i * SUB_PARTITION_NUM].mapedTotalIndex),
                              ((partitions[i * SUB_PARTITION_NUM].dstVertexEnd - partitions[i * SUB_PARTITION_NUM].dstVertexStart)
@@ -384,13 +374,9 @@ int main(int argc, char **argv) {
     //gName = "twitter-2010";
 
     std::string mode = "de5_run"; // or harp
+    startVertexIdx = getStartIndex();
 
 
-    if (gName == "youtube")    startVertexIdx = 320872;
-    if (gName == "lj1")        startVertexIdx = 3928512;
-    if (gName == "pokec")      startVertexIdx = 182045;
-    if (gName == "rmat-19-32") startVertexIdx = 104802;
-    if (gName == "rmat-21-32") startVertexIdx = 365723;
     printf("start main\n");
 
     Graph* gptr = createGraph(gName, mode);
@@ -407,34 +393,6 @@ int main(int argc, char **argv) {
     mem_init(csr, context);
     kernel_init(program);
 
-    //software processing on CPU
-
-#if HAVE_SW
-    double begin;
-    double end;
-    printf ("software PageRank starts.\n");
-
-    processInit(
-        vertexNum,
-        edgeNum,
-        startVertexIdx
-    );
-
-
-    begin = getCurrentTimestamp();
-
-    singleThreadSWProcessing(
-        csr,
-        blkNum,
-        vertexNum,
-        startVertexIdx
-    );
-
-    end = getCurrentTimestamp();
-    elapsedTime = (end - begin) * 1000;
-
-    printf( "[INFO] singleThreadSWProcessing PR takes %lf ms.\n\n", elapsedTime);
-#endif
 
     std::cout << "fpga processing." << std::endl;
     processInit(

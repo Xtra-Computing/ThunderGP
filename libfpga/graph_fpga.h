@@ -35,6 +35,8 @@ typedef ap_uint<128>                uint4_raw;
 
 typedef ap_uint<BURST_ALL_BITS>     burst_raw;
 
+typedef ap_uint<BURST_ALL_BITS/2>   burst_half;
+
 typedef ap_uint<64>                 uint_uram;
 
 #define BITMAP_SLICE_SIZE           (16)
@@ -55,7 +57,11 @@ typedef ap_uint<64>                 uint_uram;
 typedef struct __int2__
 {
     int x;
+#if HAVE_UNSIGNED_PROP
+    uint_raw y;
+#else
     int y;
+#endif
 } int2;
 
 

@@ -8,7 +8,7 @@ he_mem_t local_mem[] =
     {
         MEM_ID_VERTEX_PROP,
         "vertexProp",
-        ATTR_PL_DDR1,
+        ATTR_PL_DDR3,
         sizeof(PROP_TYPE),
         SIZE_IN_VERTEX,
     },
@@ -27,7 +27,7 @@ he_mem_t local_mem[] =
         sizeof(PROP_TYPE),
         SIZE_IN_VERTEX,
     },
-    
+
     {
         MEM_ID_EDGE_TUPLES,
         "edgesTuples",
@@ -42,7 +42,7 @@ he_mem_t local_mem[] =
         sizeof(int),
         SIZE_IN_EDGE,
     },
-    {        
+    {
         MEM_ID_VERTEX_SCORE,
         "vertexScore",
         ATTR_HOST_ONLY,
@@ -73,7 +73,7 @@ he_mem_t local_mem[] =
     {
         MEM_ID_OUT_DEG,
         "outDeg",
-        ATTR_PL_DDR2,
+        ATTR_PL_DDR0,
         sizeof(int),
         SIZE_IN_VERTEX,
     },
@@ -132,6 +132,20 @@ he_mem_t local_mem[] =
         ATTR_HOST_ONLY,
         sizeof(int),
         SIZE_IN_EDGE,
+    },
+    {
+        MEM_ID_ACTIVE_VERTEX,
+        "activeVertex",
+        ATTR_HOST_ONLY,
+        sizeof(PROP_TYPE),
+        SIZE_IN_VERTEX,
+    },
+    {
+        MEM_ID_ACTIVE_VERTEX_NUM,
+        "activeVertexNum",
+        ATTR_HOST_ONLY,
+        sizeof(PROP_TYPE),
+        SIZE_IN_VERTEX,
     },
 };
 

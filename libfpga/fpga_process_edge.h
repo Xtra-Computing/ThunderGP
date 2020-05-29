@@ -133,7 +133,8 @@ void processEdgesFunction(
             else
                 origin_value = updated_value.range(31, 0);
 
-            origin_value += tmp_data.y;
+            origin_value = PROP_COMPUTE_STAGE3(origin_value, tmp_data.y);
+
             uint_uram tmp;
             if (idx & 0x01)
             {

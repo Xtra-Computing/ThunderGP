@@ -7,8 +7,13 @@
 
 #define MAX_ITER            (1)
 
-#define PR
-#define PROP_TYPE           int
+
+#if HAVE_UNSIGNED_PROP	
+typedef  unsigned int       PROP_TYPE;
+#else
+typedef  int       			PROP_TYPE;
+#endif 
+
 #define MAX_PROP            (INT_MAX - 1)
 
 #define kDamp               (0.85f)
@@ -36,11 +41,22 @@
 
 //#define SW_DEBUG
 
-#define BRAM_INIT			(0)
+#define BRAM_INIT				(0)
 
-#define CAHCE_FETCH_DEBUG   (1)
+#define CAHCE_FETCH_DEBUG   	(0)
 
 
-#define SUB_PARTITION_NUM   (4)
+#define VERTEX_ACTIVE_BIT_MASK 		(0x80000000)
+
+
+#if HAVE_VERTEX_ACTIVE_BIT
+
+#define IS_ACTIVE_VERTEX(a)			((((((a) & VERTEX_ACTIVE_BIT_MASK) == VERTEX_ACTIVE_BIT_MASK))) ? 1 : 0)
+
+#else
+
+#define IS_ACTIVE_VERTEX(a)			(1)
 
 #endif
+
+#endif /* __CONFIG_H__ */

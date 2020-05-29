@@ -8,17 +8,20 @@
 #include "fpga_filter.h"
 #include "fpga_process_edge.h"
 #include "fpga_cache.h"
+#include "fpga_edge_prop.h"
 
 
 
-//avoid bad timing when use subdevice provided by xilinx
 
 extern "C" {
-    void  readEdgesCU4(
+    void  readEdgesCU3(
         uint16          *edgeScoreMap,
         uint16          *vertexScore,
         uint16          *edges,
         uint16          *tmpVertexProp,
+#if HAVE_EDGE_PROP
+        uint16          *edgeProp,
+#endif
         int             edge_end,
         int             sink_offset,
         int             sink_end

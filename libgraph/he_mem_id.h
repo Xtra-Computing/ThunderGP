@@ -22,6 +22,9 @@
 #define MEM_ID_VERTEX_INDEX_BIT_ORI (18)
 #define MEM_ID_VERTEX_INDEX_BIT     (19)
 
+#define MEM_ID_ACTIVE_VERTEX        (20)
+#define MEM_ID_ACTIVE_VERTEX_NUM    (21)
+
 
 #define MEM_ID_PARTITION_BASE		(100)
 

@@ -4,9 +4,12 @@
 
 #include "graph_fpga.h"
 
+#include "fpga_application.h"
+
 
 #define LOCAL_BUFFER_SIZE       (2)
-void processEdgesReorderStream(hls::stream<int2>  &in , hls::stream<int2> &out)
+/* 2 distance */
+void processEdgesReorderStreamScheme1(hls::stream<int2>  &in , hls::stream<int2> &out)
 {
 #pragma HLS function_instantiate variable=in
     int2 local_buffer[LOCAL_BUFFER_SIZE];
@@ -29,7 +32,7 @@ void processEdgesReorderStream(hls::stream<int2>  &in , hls::stream<int2> &out)
         if (local_buffer[i].x == dstVidx)
         {
             DEBUG_PRINTF("is %d %d %d\n", int (dstVidx), int (local_buffer[i].y), int (tmp_data.y));
-            local_buffer[i].y += tmp_data.y;
+            local_buffer[i].y = PROP_COMPUTE_STAGE2(local_buffer[i].y, tmp_data.y);
 
         }
         else
@@ -64,7 +67,7 @@ void processEdgesReorderStream(hls::stream<int2>  &in , hls::stream<int2> &out)
 }
 
 
-
+/* 4 distance */
 void processEdgesReorderStreamScheme2(hls::stream<int2>  &in , hls::stream<int2> &out)
 {
 #pragma HLS function_instantiate variable=in
@@ -101,6 +104,9 @@ void processEdgesReorderStreamScheme2(hls::stream<int2>  &in , hls::stream<int2>
         uint_raw dstVidx  = tmp_data.x;
 
         ap_uint<1> flag[4];
+        // (ENDFLAG -1) for partition align
+        // (ENDFLAG)    for stream end,
+        // we cut the write stream here to avoid the flag be added to cache
         if ((dstVidx & ( ENDFLAG - 1 )) == (ENDFLAG - 1))
         {
             break;
@@ -110,7 +116,7 @@ void processEdgesReorderStreamScheme2(hls::stream<int2>  &in , hls::stream<int2>
 #pragma HLS UNROLL
             if ((vaild_flag[i] == 1) && (local_buffer[i].x  ==  dstVidx))
             {
-                local_buffer[i].y += tmp_data.y;
+                local_buffer[i].y  = PROP_COMPUTE_STAGE2(local_buffer[i].y, tmp_data.y);
                 flag[i] = 1;
             }
             else
@@ -219,9 +225,6 @@ void processEdgesReorderStreamScheme2(hls::stream<int2>  &in , hls::stream<int2>
                 write_to_stream(out, send);
             }
         }
-        // (ENDFLAG -1) for partition align
-        // (ENDFLAG)    for stream end,
-        // we cut the write stream here to avoid the flag be added to cache
 
     }
     for (int i = 0; i < 4; i++)

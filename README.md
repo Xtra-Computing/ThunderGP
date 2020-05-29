@@ -1,4 +1,4 @@
-#UNDER CONSTRUCTION
+
 ## Prerequisites
 * The gcc-4.8 or above
 * The SDAccel 2018.3 Design Suit

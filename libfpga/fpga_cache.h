@@ -129,8 +129,8 @@ void  duplicateStreamForCache(hls::stream<T>       &input,
     }
 }
 
-#define CACHE_UPDATE_BURST  (BURSTBUFFERSIZE / 2)
-#define LOG_CACHEUPDATEBURST (LOG_BURSTBUFFERSIZE - 1)
+#define CACHE_UPDATE_BURST  (BURSTBUFFERSIZE)
+#define LOG_CACHEUPDATEBURST (LOG_BURSTBUFFERSIZE)
 
 void stream2Command(hls::stream<burst_raw>          &mapStream,
                     hls::stream<cache_command>      &cmdStream)
@@ -169,9 +169,9 @@ void stream2Command(hls::stream<burst_raw>          &mapStream,
                 min_bound = last_index + 1;
             }
             cmd.idx = min_bound;
-            cmd.size =  max_index + 1 - min_bound;
+            cmd.size =  max_index + 2 - min_bound;
             write_to_stream(cmdStream, cmd);
-            last_index = max_index;
+            last_index = max_index + 1;
         }
     }
     cache_command end_cmd;

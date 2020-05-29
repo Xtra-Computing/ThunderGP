@@ -64,14 +64,15 @@ void gatherStageFunction (
         end_flag_shift = (tuples.data[EDGE_NUM - 1].x == ENDFLAG) ? 1 : 0;
 
         //data_r = tuples.data;
-        valid_r[0] = ((tuples.data[0].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[1] = ((tuples.data[1].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[2] = ((tuples.data[2].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[3] = ((tuples.data[3].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[4] = ((tuples.data[4].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[5] = ((tuples.data[5].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[6] = ((tuples.data[6].x & HASH_MASK) == i) ? 1 : 0;
-        valid_r[7] = ((tuples.data[7].x & HASH_MASK) == i) ? 1 : 0;
+
+        valid_r[0] = ((tuples.data[0].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[0].y);
+        valid_r[1] = ((tuples.data[1].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[1].y);
+        valid_r[2] = ((tuples.data[2].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[2].y);
+        valid_r[3] = ((tuples.data[3].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[3].y);
+        valid_r[4] = ((tuples.data[4].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[4].y);
+        valid_r[5] = ((tuples.data[5].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[5].y);
+        valid_r[6] = ((tuples.data[6].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[6].y);
+        valid_r[7] = ((tuples.data[7].x & HASH_MASK) == i) && IS_ACTIVE_VERTEX(tuples.data[7].y);
 
 
         opcode = valid_r[0]
@@ -98,7 +99,7 @@ void gatherStageFunction (
         filter.end = 0;
 
 
-        if ((end_flag_shift)!= 0)
+        if ((end_flag_shift) != 0)
         {
             filter.end = 1;
             filter.num = 1;
