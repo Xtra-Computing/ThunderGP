@@ -24,7 +24,7 @@ include ./utils/utils.mk
 #export  XCL_EMULATION_MODE=sw_emu
 TARGETS := hw
 TARGET := $(TARGETS)
-DEVICES := xilinx_vcu1525_xdma_201830_1
+DEVICES := xilinx_u200_xdma_201830_2
 # xilinx_vcu1525_xdma_201830_1
 DEVICE := $(DEVICES)
 XCLBIN := ./xclbin
