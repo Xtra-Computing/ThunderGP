@@ -48,7 +48,7 @@ $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
 
-## Results
+## Results (performance)
 
 Throughput (MTEPS) of different graph processing algorithms over datasets on VCU1525 platform.
 
@@ -60,7 +60,8 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on VCU
 | SSSP  	| 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
 
 
-## APIs to map your algorithms
+## APIs to map your algorithms (programmability) 
+Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
 both L1 and L2 is HLS code APIs for building the FPGA accelerators, and L3 is APIs for host program.
 * L1 provides the fundamental functions and basic modules used in our framework to build the compute kernels and the data flow. Users can use these API to construct their own data flow as well.
