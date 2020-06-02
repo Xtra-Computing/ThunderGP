@@ -57,7 +57,7 @@ $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.
 | BFS   	| 5,395  | 4,619  | 2,431  | 3,775  | 4,072  | 3,490  | 3,004  |
 | SSSP  	| 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
 
-Throughput (MTEPS) of different graph processing algorithms on VCU1525.
+Throughput (MTEPS) of different graph processing algorithms over datasets on VCU1525 platform.
 
 ## APIs to map your algorithms
 ThunderGraph covers three levels of API for implementation or further exploration. 
