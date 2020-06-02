@@ -67,12 +67,11 @@ The figure blow show the data flow of our framework and the L2 hooks,There are t
 
    * [Verification](docs/verification.md)
 
-### Details:
-
-[ThunderGP APIs ](docs/api_details.md)
+### Details: [ThunderGP APIs ](docs/api_details.md)
 
 ## Results
 
+Add performance tables.
 
 
 ## Related publications
