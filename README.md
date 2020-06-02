@@ -32,7 +32,7 @@ Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR
 The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command.   
 The below table is for quick reference of this argument.
 
-| Parameter    | Accelerated algorithm  |
+| Argument    | Accelerated algorithm  |
 |--------------|--------------|
 | ```app=pr``` | PageRank (PR)|
 | ```app=spmv``` | Sparse Matrix-vector Multiplication (SpMV) |
