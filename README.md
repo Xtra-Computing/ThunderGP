@@ -7,13 +7,12 @@
 
 ThunderGP enables data scientists to enjoy the performance of FPGA-based graph processing without compromising programmability.
 
-
-Two aspacts make the ThunderGP deliver superior performance:
+Two aspacts make the ThunderGP deliver superior performance.
 On the one hand, ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platforms. 
 
 ThunderGP can run on both Xilinx and Intel platforms:
 
-* [Check the implementation on Intel platform out.](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/). 
+* [Check the implementation on Intel platform out.](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/)
 
 * On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***5300 MTEPS (million traversed edges per second)***, or a ***2 times speedup*** over the state-of-the-art.
 
@@ -24,19 +23,11 @@ ThunderGP can run on both Xilinx and Intel platforms:
     * SDAccel 2018.3 Design Suit
     * SDAccel 2019.2 Design Suit
 * Supported devices:
-    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit
-    * Alveo U200 Data Center Accelerator Card
-    * Alveo U250 Data Center Accelerator Card
+    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
+    * Alveo U200 Data Center Accelerator Card (SDAccel 2019.2)
+    * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
+    
 ## Run the code
-
-Do not forget to set the PATH of the dataset. 
-
-```sh
-$ cd ./
-$ make cleanall
-$ make app=pr all -j # make the host execution program and FPGA execution program for pagerank application. It takes time.
-$ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
-```
 Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. 
 The wanted application can be implemented by passing argument ```app=[the wanted application]``` to ``` make ``` command. 
 The below table is for quick reference of this argument.
@@ -48,6 +39,13 @@ The below table is for quick reference of this argument.
 | ```app=bfs``` | Breadth first search |
 | ```app=sssp``` | Single Source Shortest Path |
 
+Here is an example of implementing PR application. 
+```sh
+$ cd ./
+$ make cleanall
+$ make app=pr all -j # make the host execution program and FPGA execution program for pagerank application. It takes time.
+$ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
+```
 Details:
 [Compile ThunderGP ](docs/compile_arch.md)
 
@@ -79,14 +77,15 @@ L3 provides the high level software APIs to deploy and control graph processing 
 
 [ThunderGP APIs ](docs/api_details.md)
 
+## Results
 
 
 
 ## Related publications
+* Xinyu Chen*, Ronak Bajaj^, Yao Chen, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [On-The-Fly Parallel Data Shuffling for Graph Processing on OpenCL-based FPGAs](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf). FPL, 2019.
 * Xinyu Chen*, Ronak Bajaj^, Yao Chen, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [Is FPGA useful for hash joins](https://www.comp.nus.edu.sg/~hebs/pub/cidr20-join.pdf). CIDR 2020: Conference on Innovative Data Systems Research
 
 
 ## Related systems
-
 * Graph systems on GPU: [G3](https://github.com/Xtra-Computing/G3) | [Medusa](https://github.com/Xtra-Computing/Medusa)
 * Other Thunder-series systems in Xtra NUS: [ThunderGBM](https://github.com/Xtra-Computing/thundergbm) | [ThunderSVM](https://github.com/Xtra-Computing/thundersvm)
