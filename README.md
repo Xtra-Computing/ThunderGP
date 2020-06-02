@@ -53,7 +53,7 @@ $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.
 Add performance tables.
 
 
-## APIs to adopt to your algorithms
+## APIs to map your algorithms
 ThunderGraph covers three levels of API for implementation or further exploration. 
 both L1 and L2 is HLS code APIs for building the FPGA accelerators, and L3 is APIs for host program.
 * L1 provides the fundamental functions and basic modules used in our framework to build the compute kernels and the data flow. Users can use these API to construct their own data flow as well.
