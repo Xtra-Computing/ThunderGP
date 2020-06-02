@@ -29,7 +29,7 @@ ThunderGP can run on both Xilinx and Intel platforms:
     
 ## Run the code
 Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR, SpMV, BFS and SSSP. 
-The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command. 
+The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command.   
 The below table is for quick reference of this argument.
 
 | Parameter    | Accelerated algorithm  |
