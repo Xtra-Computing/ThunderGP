@@ -209,8 +209,8 @@ double launchFPGA(void)
             set_gs_kernel(partIdTable[i]);
             if (i > 0)
             {
-                setApplyKernel(kernel_apply,partIdTable[i - 1],vertexNum);
 #if HAVE_APPLY
+                setApplyKernel(kernel_apply, partIdTable[i - 1], vertexNum);
                 clEnqueueTask(apply_ops, kernel_apply, 4,
                               &syncEvent[(i - 1) * SUB_PARTITION_NUM],
                               &applyEvent[i - 1]);
@@ -222,8 +222,8 @@ double launchFPGA(void)
                 clEnqueueTask(gs_ops[j], localGsKernel[j].kernel, 0, NULL,
                               &syncEvent[i * SUB_PARTITION_NUM + j]);
             }
-            setApplyKernel(kernel_apply,partIdTable[blkNum / TEST_SCALE - 1],vertexNum);
 #if HAVE_APPLY
+            setApplyKernel(kernel_apply, partIdTable[blkNum / TEST_SCALE - 1], vertexNum);
             clEnqueueTask(apply_ops, kernel_apply, 4,
                           &syncEvent[(blkNum / TEST_SCALE - 1) * SUB_PARTITION_NUM],
                           &applyEvent[(blkNum / TEST_SCALE - 1)]);

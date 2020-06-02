@@ -67,7 +67,7 @@ class CSR{
         std::vector<int> ciao;
         std::vector<int> rpai;
         std::vector<int> ciai;
-		std::vector<PROP_TYPE> eProps;
+		std::vector<prop_t> eProps;
 
         // The CSR is constructed based on the simple graph
         explicit CSR(const Graph &g);
@@ -86,7 +86,7 @@ class CSR_BLOCK{
 		int sinkEnd;
 		std::vector<int> rpa;
 		std::vector<int> cia;
-		std::vector<PROP_TYPE> eProps;
+		std::vector<prop_t> eProps;
 		explicit CSR_BLOCK(const int _cordx, const int _cordy, CSR* csr);
 		~CSR_BLOCK(){};
 };

@@ -142,7 +142,7 @@ CSR_BLOCK::CSR_BLOCK(
 		int blkNum = 0;
 		for(int j = 0; j < num; j++){
 			int ngbVidx = csr->ciao[start + j];
-			PROP_TYPE eProp = csr->ciao[start + j];
+			prop_t eProp = csr->ciao[start + j];
 			if(ngbVidx >= sinkStart && ngbVidx < sinkEnd){
 				cia.push_back(ngbVidx);
 				eProps.push_back(eProp);

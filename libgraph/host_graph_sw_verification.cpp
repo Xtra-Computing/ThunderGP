@@ -40,7 +40,7 @@ void partitionGatherScatterCModel(
     partitionDescriptor     *partitions
 )
 {
-    PROP_TYPE *edgesTuples   = (PROP_TYPE *)get_host_mem_pointer(partitions->edge.id);
+    prop_t *edgesTuples   = (prop_t *)get_host_mem_pointer(partitions->edge.id);
     int *edgeScoreMap        = (int*)get_host_mem_pointer(partitions->edgeMap.id);
     unsigned int *vertexScore         = (unsigned int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
     unsigned int *tmpVertexPropVerify = (unsigned int*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_VERIFY);

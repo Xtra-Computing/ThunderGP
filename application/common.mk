@@ -1,4 +1,8 @@
-XCLBIN := ./xclbin
+
+VAR_TRUE=true
+
+
+XCLBIN := ./xclbin_$(APP)
 DSA := $(call device2sandsa, $(DEVICE))
 
 CXX := $(XILINX_SDX)/bin/xcpp
@@ -14,7 +18,10 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 
 HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/he_mem.cpp ./libgraph/data_helper.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_verification.cpp  ./libgraph/host_graph_sw.cpp
+ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
 HOST_SRCS += $(APPCONFIG)/host_vertex_apply.cpp
+HOST_SRCS += ./libgraph/host_graph_apply_verification.cpp
+endif
 
 # Host compiler global settings
 CXXFLAGS := $(opencl_CXXFLAGS) -Wall
@@ -39,7 +46,7 @@ CLFLAGS += --xp prop:solution.kernel_compiler_margin=10%
 # Kernel linker flags
 LDCLFLAGS += --xp prop:solution.kernel_compiler_margin=10% --kernel_frequency=280
 
-EXECUTABLE = host_graph_fpga
+EXECUTABLE = host_graph_fpga_$(APP)
 
 EMCONFIG_DIR = $(XCLBIN)/$(DSA)
 
@@ -56,7 +63,6 @@ HOST_SRCS += $(xcl_SRCS)
 CP = cp -rf
 
 
-VAR_TRUE=true
 
 GS_KERNEL_PATH    = ./libfpga/common
 APPLY_KERNEL_PATH = $(APPCONFIG)

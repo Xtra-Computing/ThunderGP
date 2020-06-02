@@ -17,7 +17,9 @@ DEVICES := xilinx_u200_xdma_201830_2
 
 DEVICE  := $(DEVICES)
 
-APP := bfs
+
+app := pr
+APP = $(app)
 
 APPCONFIG = ./application/$(APP)
 

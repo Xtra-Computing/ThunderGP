@@ -9,9 +9,9 @@
 
 
 #if HAVE_UNSIGNED_PROP	
-typedef  unsigned int       PROP_TYPE;
+typedef  unsigned int       prop_t;
 #else
-typedef  int       			PROP_TYPE;
+typedef  int       			prop_t;
 #endif 
 
 #define MAX_PROP            (INT_MAX - 1)

@@ -1,0 +1,2 @@
+### Memory management
+Currently, Xilinx Multiple-SLRs FPGAs have many independent DRAM banks, and many graph algorithms manipulate more than five types of data. Managing the data and the partitions among the banks using the traditional OpenCL APIs need a lot of redundant code for configuration, which makes the code hard to maintaining, Therefore we developed an unique ID based memory management module, by using this module  
