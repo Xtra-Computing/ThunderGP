@@ -1,15 +1,21 @@
 [![GitHub license](https://img.shields.io/badge/license-apache2-yellowgreen)](./LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs.svg)](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/issues)
+
+# ThunderGP: An Efficient Graph Processing Framework for HLS-based FPGAs
+
+## Introduction
+
+ThunderGP, an efficient edge-centric graph processing framework on HLS-based FPGAs, brings both programmability and performance to data scientists.
+
+ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. 
+
+
+
+
 ## Prerequisites
 * The gcc-4.8 or above
-* Tools: 
-    * SDAccel 2018.3 Design Suit
-    * SDAccel 2019.2 Design Suit
-* Supported devices 
-    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit
-    * Alveo U200 Data Center Accelerator Card
-    * Alveo U250 Data Center Accelerator Card
-   
+* The SDAccel 2018.3 Design Suit
+* The Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit
 
 ## Run the code
 
@@ -21,7 +27,7 @@ $ make cleanall
 $ make app=pr all -j # make the host execution program and FPGA execution program for pagerank application. It takes time.
 $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
 ```
-Currently, our framework support accelerate four graph analytic algorithm, it can be selected by compile parameter ```app=xxx``` in the make command, bellowing table is for quick reference of this parameter
+Currently, our framework support accelerate four graph analytic algorithms, it can be selected by compile parameter ```app=xxx``` in the make command, bellowing table is for quick reference of this parameter
 
 
 
@@ -59,8 +65,7 @@ L3 provides the high level software APIs to deploy and control graph processing 
 
 [3.Verification](docs/verification.md)
 
-####Details:
-
+####Details
 [ThunderGP APIs ](docs/api_details.md)
 
 
