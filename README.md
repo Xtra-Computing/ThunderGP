@@ -20,9 +20,13 @@ ThunderGP can run on both Xilinx and Intel platforms:
 
 ## Prerequisites
 * The gcc-4.8 or above
-* The SDAccel 2018.3 Design Suit
-* The Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit
-
+* Tools:
+    * SDAccel 2018.3 Design Suit
+    * SDAccel 2019.2 Design Suit
+* Supported devices:
+    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit
+    * Alveo U200 Data Center Accelerator Card
+    * Alveo U250 Data Center Accelerator Card
 ## Run the code
 
 Do not forget to set the PATH of the dataset. 
@@ -71,7 +75,8 @@ L3 provides the high level software APIs to deploy and control graph processing 
 
 [3.Verification](docs/verification.md)
 
-####Details
+#### Details:
+
 [ThunderGP APIs ](docs/api_details.md)
 
 
