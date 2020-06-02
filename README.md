@@ -9,9 +9,7 @@ ThunderGP, an efficient edge-centric graph processing framework on HLS-based FPG
 
 On the one hand, it embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platform. 
 
-Currenlty, ThunderGP can run on both Xilinx and [Intel platform](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/). It is running at 250Mhz on Xilinx multi-SLR based FPGAs, and the performance can be up to 5300 MTEPS, or a 2$\times$ speedup over the state-of-the-art.
-
-
+Currenlty, ThunderGP can run on both Xilinx and [Intel platform](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/). It is running at 250Mhz on Xilinx multi-SLR based FPGAs, and the performance can be up to 5300 MTEPS, or a 2X speedup over the state-of-the-art.
 
 
 ## Prerequisites
