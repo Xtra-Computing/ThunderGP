@@ -4,7 +4,7 @@ ThunderGP is a general framework aims to accelerate different graph analytic alg
 
 The compilation of ThunderGP is managed by [GNU make](https://www.gnu.org/software/make/manual/html_node/Introduction.html), and we provide a simple way to compile ThunderGP for different applications. 
 #### Application selection
-Currently, our framework support accelerate four graph analytic algorithm, it can be selected by compile parameter ```app=xxx``` in the make command
+Currently, our framework supports accelerating four graph analytic algorithms, and it can be selected by compile parameter ```app=xxx``` in the make command.
 
 | Parameter    | Accelerated algorithm  |
 |--------------|--------------|
@@ -35,7 +35,7 @@ $ make app=pr all -j
 
 #### Makefile tree
 
-The Makefile file structure is shown in the bellowing tree
+The Makefile file structure is shown in the bellowing tree:
 
 ```sh
 ├── application
@@ -60,9 +60,9 @@ The Makefile file structure is shown in the bellowing tree
 ```
 
 #### Application-specific compilation
-As mentioned, ThunderGP support many graph analytic algorithms. Currently, the difference among algorithms is unformed by architecture-based configurations which is abstracted by ourself, and These configurations can be incremental added to ThunderGP for support new algorithms in the future. 
+As mentioned, ThunderGP supports many graph analytic algorithms. Currently, the difference among algorithms is uniformed by architecture-based configurations which are abstracted by ourself, and these configurations can be incremental added to ThunderGP for support new algorithms in the future.
 
-The application-specific configuration is located in the ```application``` folder, and each algorithm has a sub-folder in this path, The corresponding configurations is store in this sub-folder.
+The application-specific configuration is located in the ```application``` folder, and each algorithm has a sub-folder in this path, The corresponding configurations are stored in this sub-folder.
 
 The following table shows the existing application-specific configurations for compilation (the ```build.mk```)
 
