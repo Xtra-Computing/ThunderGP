@@ -4,7 +4,8 @@ ThunderGP is a general framework aims to accelerate different graph analytic alg
 
 The compilation of ThunderGP is managed by [GNU make](https://www.gnu.org/software/make/manual/html_node/Introduction.html), and we provide a simple way to compile ThunderGP for different applications. 
 #### Application selection
-Currently, our framework supports accelerating four graph analytic algorithms, and it can be selected by compile parameter ```app=xxx``` in the make command.
+Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. The wanted application can be implemented by passing argument app=[the wanted application] to make command. The below table is details of this argument.
+
 
 | Parameter    | Accelerated algorithm  |
 |--------------|--------------|
