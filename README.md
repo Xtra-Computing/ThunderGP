@@ -5,7 +5,7 @@
 
 ## Introduction
 
-ThunderGP enables data scientists to enjoy the performance of FPGA-based graph processing without compromising programmability.
+ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based graph processing without compromising ***programmability***.
 
 Two aspacts make the ThunderGP deliver superior performance.
 On the one hand, ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platforms. 
