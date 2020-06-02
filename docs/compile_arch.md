@@ -7,7 +7,7 @@ The compilation of ThunderGP is managed by [GNU make](https://www.gnu.org/softwa
 Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. The wanted application can be implemented by passing argument app=[the wanted application] to make command. The below table is details of this argument.
 
 
-| Parameter    | Accelerated algorithm  |
+| Argument    | Accelerated algorithm  |
 |--------------|--------------|
 | ```app=pr``` | PageRank |
 | ```app=spmv``` | Sparse matrix-vector multiplication (SpMV) |
