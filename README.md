@@ -7,10 +7,16 @@
 
 ThunderGP enables data scientists to enjoy the performance of FPGA-based graph processing without compromising programmability.
 
-Two aspacts make the ThunderGP deliver superior performance.
+
+Two aspacts make the ThunderGP deliver superior performance:
+
 On the one hand, ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platforms. 
 
-ThunderGP can run on both Xilinx and Intel platforms. [check the implementation on Intel platform out](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/). It is running at 250Mhz on Xilinx multi-SLR based FPGAs, and the performance can be up to **5300 MTEPS**, or a **2 X** speedup over the state-of-the-art.
+ThunderGP can run on both Xilinx and Intel platforms:
+
+* [Check the implementation on Intel platform out.](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/). 
+
+* On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***5300 MTEPS (million traversed edges per second)***, or a ***2 times speedup*** over the state-of-the-art.
 
 
 ## Prerequisites
@@ -28,9 +34,9 @@ $ make cleanall
 $ make app=pr all -j # make the host execution program and FPGA execution program for pagerank application. It takes time.
 $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
 ```
-Currently, our framework supports accelerating four graph analytic algorithms, and it can be selected by compile parameter ```app=xxx``` in the make command, bellowing table is for quick reference of this parameter
-
-
+Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. 
+The wanted application can be implemented by passing argument ```app=[the wanted application]``` to ``` make ``` command. 
+The below table is for quick reference of this argument.
 
 | Parameter    | Accelerated algorithm  |
 |--------------|--------------|
