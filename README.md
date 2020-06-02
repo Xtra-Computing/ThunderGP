@@ -53,9 +53,10 @@ $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.
 | Algo. 	| R21   	| R24   	| GG    	| WT    	| PK    	| LJ    	| TW    	|
 |-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
 | PR    	| 4,274 	| 3,797 	| 2,502 	| 3,138 	| 3,790 	| 2,860 	| 2,438 	|
-| SpMV  	|       	|       	|       	|       	|       	|       	|       	|
-| BFS   	|       	|       	|       	|       	|       	|       	|       	|
-| SSSP  	|       	|       	|       	|       	|       	|       	|       	|
+| SpMV  	| 4,759  | 4,396  | 2,018  | 3,043  | 3,871  | 3,133  | 2,561  |
+| BFS   	| 5,395  | 4,619  | 2,431  | 3,775  | 4,072  | 3,490  | 3,004  |
+| SSSP  	| 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
+
 
 ## APIs to map your algorithms
 ThunderGraph covers three levels of API for implementation or further exploration. 
