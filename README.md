@@ -60,7 +60,7 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on VCU
 | SSSP  	| 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
 
 
-## APIs to map your algorithms (programmability) 
+## APIs (programmability) 
 Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
 both L1 and L2 is HLS code APIs for building the FPGA accelerators, and L3 is APIs for host program.
