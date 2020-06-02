@@ -46,8 +46,11 @@ $ make cleanall
 $ make app=pr all -j # make the host execution program and FPGA execution program for pagerank application. It takes time.
 $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
 ```
-Details:
-[Compile ThunderGP ](docs/compile_arch.md)
+#### More details: [Compiling ThunderGP ](docs/compile_arch.md)
+
+## Results
+
+Add performance tables.
 
 
 ## APIs to adopt to your algorithms
@@ -68,11 +71,6 @@ The figure blow show the data flow of our framework and the L2 hooks,There are t
    * [Verification](docs/verification.md)
 
 #### More details: [ThunderGP APIs ](docs/api_details.md)
-
-## Results
-
-Add performance tables.
-
 
 ## Related publications
 * Xinyu Chen*, Ronak Bajaj^, Yao Chen, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [On-The-Fly Parallel Data Shuffling for Graph Processing on OpenCL-based FPGAs](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf). FPL, 2019.
