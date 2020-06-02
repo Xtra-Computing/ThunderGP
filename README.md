@@ -22,24 +22,24 @@ ThunderGP can run on both Xilinx and Intel platforms:
 * Tools:
     * SDAccel 2018.3 Design Suit
     * SDAccel 2019.2 Design Suit
-* Supported devices:
+* Evaluated platforms from Xilinx:
     * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
     * Alveo U200 Data Center Accelerator Card (SDAccel 2019.2)
     * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
     
 ## Run the code
-Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. 
-The wanted application can be implemented by passing argument ```app=[the wanted application]``` to ``` make ``` command. 
+Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR, SpMV, BFS and SSSP. 
+The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command. 
 The below table is for quick reference of this argument.
 
 | Parameter    | Accelerated algorithm  |
 |--------------|--------------|
-| ```app=pr``` | PageRank |
-| ```app=spmv``` | Sparse matrix-vector multiplication (SpMV) |
-| ```app=bfs``` | Breadth first search |
-| ```app=sssp``` | Single Source Shortest Path |
+| ```app=pr``` | PageRank (PR)|
+| ```app=spmv``` | Sparse Matrix-vector Multiplication (SpMV) |
+| ```app=bfs``` | Breadth First Search (BFS)|
+| ```app=sssp``` | Single Source Shortest Path (SSSP)|
 
-Here is an example of implementing PR application. 
+Here is an example of implementing PR algorithm. 
 ```sh
 $ cd ./
 $ make cleanall
@@ -50,7 +50,7 @@ Details:
 [Compile ThunderGP ](docs/compile_arch.md)
 
 
-## API Definition
+## APIs to adopt to your algorithms
 ThunderGraph covers three levels of API for implementation or further exploration. 
 ### Overview
 both L1 and L2 is HLS code APIs for building the FPGA accelerators, and L3 is APIs for host program.
