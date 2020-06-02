@@ -28,7 +28,7 @@ ThunderGP can run on both Xilinx and Intel platforms:
     * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
     
 ## Run the code
-Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR, SpMV, BFS and SSSP. 
+Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR, SpMV, BFS and SSSP.  
 The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command.   
 The below table is for quick reference of this argument.
 
