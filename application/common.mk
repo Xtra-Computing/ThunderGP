@@ -17,10 +17,10 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 #--xp param:compiler.enableAutoFrequencyScaling=0
 
 HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/he_mem.cpp ./libgraph/data_helper.cpp
-HOST_SRCS += ./libgraph/host_graph_sw_verification.cpp  ./libgraph/host_graph_sw.cpp
+HOST_SRCS += ./libgraph/host_graph_verification_gs.cpp  ./libgraph/host_graph_sw.cpp
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
 HOST_SRCS += $(APPCONFIG)/host_vertex_apply.cpp
-HOST_SRCS += ./libgraph/host_graph_apply_verification.cpp
+HOST_SRCS += ./libgraph/host_graph_verification_apply.cpp
 endif
 
 # Host compiler global settings

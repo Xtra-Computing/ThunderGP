@@ -19,7 +19,7 @@ Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV,
 
 ThunderGP has both host program which runs on the CPU side and the accelerator program which runs on the FPGA card, and the compilation of these programs is controlled by the following parameter
 
-| Parameter    | Programs |
+| Argument    | Programs |
 |--------------|--------------|
 | ```exe``` | Host program, it is very fast |
 | ```all``` | Host + Accelerator program, it is time-costly (10+ hours) |

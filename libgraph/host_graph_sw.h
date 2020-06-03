@@ -109,12 +109,6 @@ void partitionGatherScatterCModel(
     partitionDescriptor     *partitions
 );
 
-void partitionApplyCModel(
-    cl_context              &context,
-    cl_device_id            &device,
-    int                     partId,
-    unsigned int            baseScore
-);
 
 void partitionFunction(
     CSR                     *csr,
@@ -122,5 +116,22 @@ void partitionFunction(
     cl_context              &context,
     partitionDescriptor     *partitions
 );
+
+
+void setApplyKernel(
+    cl_kernel &kernel_apply,
+    int partId,
+    int vertexNum
+);
+
+
+
+void partitionApplyCModel(
+    cl_context              &context,
+    cl_device_id            &device,
+    int                     partId,
+    unsigned int            baseScore
+);
+
 
 #endif /* __HOST_GRAPH_SW_H__ */

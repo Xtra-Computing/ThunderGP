@@ -224,7 +224,7 @@ void processInit(
         }
     }
     */
-    for (int i = 0; i < (vertexNum/ (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
+    for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
         vertexScore[i]    = MAX_PROP;
     }
     //vertexScore[source] = 0x80000001;
@@ -236,6 +236,22 @@ void processInit(
     printf("init_score after int %f\n", int2float(init_score_int));
 }
 
+
+double cuPerformance[SUB_PARTITION_NUM];
+
+
+double performanceEstimator(double vertex, double edge)
+{
+    const double p00 =   3.096e+05;
+    const double p10 =      0.6971;
+    const double p01 =      0.2648;
+    const double p11 =  -1.076e-08;
+    const double p02 =   4.187e-08;
+    double x = edge;
+    double y = vertex;
+    double time = p00 + p10 * x + p01 * y + p11 * x * y + p02 * y * y;
+    return time;
+}
 
 
 
@@ -282,6 +298,11 @@ void partitionFunction(
     blkNum =  (mapedSourceIndex + BLK_SIZE - 1) / BLK_SIZE;
     printf("blkNum:%d  vertexNum: %d \n", blkNum, vertexNum);
 
+
+    for (int i = 0; i < SUB_PARTITION_NUM; i++)
+    {
+        cuPerformance[i] = 0;
+    }
 
     for (int i = 0; i < blkNum; i ++) {
         /****************************************************************************************************************/
@@ -367,27 +388,93 @@ void partitionFunction(
             edgeProp[cur_edge_num] = 0;
             cur_edge_num ++; //printf("%d edge_tuple_range %d\n", k, cur_edge_num);
         }
+        
+        double currentEst[SUB_PARTITION_NUM];
+        double currentEstLut[SUB_PARTITION_NUM];
+        int    reOrderIndexArray[SUB_PARTITION_NUM];
+        int    finalOrder[SUB_PARTITION_NUM];
         for (int subIndex = 0 ; subIndex < SUB_PARTITION_NUM ; subIndex ++ )
         {
             int  partId = i * SUB_PARTITION_NUM + subIndex;
             partitions[partId].compressRatio = (double (mapedSourceIndex)) / vertexNum;
             DEBUG_PRINTF("ratio %d / %d is %lf \n", mapedSourceIndex, vertexNum, partitions[partId].compressRatio);
             partitions[partId].dstVertexStart = VERTEX_MAX * (i);
-            partitions[partId].dstVertexEnd   = (((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : (VERTEX_MAX * (i + 1)  - 1));
+            partitions[partId].dstVertexEnd   = ((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1) ;
             volatile int subPartitionSize = ((cur_edge_num / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
-            int reOrderIndex = 0;
-            if (i % 2 == 0)
-            {
-                reOrderIndex = subIndex;
-            }
-            else
-            {
-                reOrderIndex = SUB_PARTITION_NUM - subIndex - 1;
-            }
+            int reOrderIndex = subIndex;
             unsigned int bound = subPartitionSize * (reOrderIndex + 1);
+
+            int totalEdge = (bound > cur_edge_num) ? (cur_edge_num - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
+            int totalVertex = edgeScoreMap[subPartitionSize * (reOrderIndex + 1) - 1] -  edgeScoreMap[subPartitionSize * reOrderIndex];
+            currentEst[subIndex] = performanceEstimator(totalVertex, totalEdge);
+            currentEstLut[subIndex] = currentEst[subIndex];
+            reOrderIndexArray[subIndex] = subIndex;
+            finalOrder[subIndex] = subIndex;
+        }
+        for (int k = 0; k < SUB_PARTITION_NUM; k++)
+        {
+            for (int j = 0; j < SUB_PARTITION_NUM - k - 1; j++)
+            {
+                if (currentEst[j] < currentEst[j + 1])
+                {
+                    int tmpId = reOrderIndexArray[j];
+                    double tmpEst = currentEst[j];
+
+                    reOrderIndexArray[j] = reOrderIndexArray[j + 1];
+                    reOrderIndexArray[j + 1]  = tmpId;
+
+                    currentEst[j] = currentEst[j + 1];
+                    currentEst[j + 1] = tmpEst;
+                }
+            }
+        }
+        for (int k = 0; k < SUB_PARTITION_NUM; k++)
+        {
+            DEBUG_PRINTF("[EST]: %d is expected to exe in %lfms\n", reOrderIndexArray[k], currentEst[k] / 1000000.0);
+        }
+        int tmpMap[SUB_PARTITION_NUM];
+        for (int k = 0; k < SUB_PARTITION_NUM; k++)
+        {
+            tmpMap[k] = 0;
+        }
+
+        for (int k = 0; k < SUB_PARTITION_NUM; k++)
+        {
+            double maxPerf = -1;
+            int    maxIndex = SUB_PARTITION_NUM;
+            for (int j = 0; j < SUB_PARTITION_NUM; j++)
+            {
+                if (tmpMap[j] == 0)
+                {
+                    if (maxPerf < cuPerformance[j])
+                    {
+                        maxPerf = cuPerformance[j];
+                        maxIndex = j;
+                    }
+                }
+            }
+            tmpMap[maxIndex] = 1;
+            finalOrder[maxIndex] = reOrderIndexArray[SUB_PARTITION_NUM - k - 1];
+        }
+        for (int k = 0; k < SUB_PARTITION_NUM; k++)
+        {
+            cuPerformance[k] += currentEstLut[finalOrder[k]];
+            DEBUG_PRINTF("[EST]: finalOrder %d total exe: %lfms\n", finalOrder[k], cuPerformance[k] / 1000000.0);
+        }
+
+
+        for (int subIndex = 0 ; subIndex < SUB_PARTITION_NUM ; subIndex ++ )
+        {
+            int  partId = i * SUB_PARTITION_NUM + subIndex;
+            volatile int subPartitionSize = ((cur_edge_num / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
+            int reOrderIndex = finalOrder[subIndex];
+
+            unsigned int bound = subPartitionSize * (reOrderIndex + 1);
+
             partitions[partId].listStart =  0;
             partitions[partId].listEnd = (bound > cur_edge_num) ? (cur_edge_num - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
             partitions[partId].mapedTotalIndex = mapedSourceIndex;
+
             DEBUG_PRINTF("[SIZE] %d cur_edge_num sub %d\n", cur_edge_num, partitions[partId].listEnd);
             partition_mem_init(context, partId, partitions[partId].listEnd, subIndex); // subIndex --> cuIndex
             memcpy(partitions[partId].edge.data     , &edgesTuples[subPartitionSize * reOrderIndex]  , partitions[partId].listEnd * sizeof(int));
@@ -397,9 +484,8 @@ void partitionFunction(
     }
 
 #define CACHE_UNIT_SIZE (4096 * 2)
-    for (int index = 0; index < blkNum; index++)
+    for (int i = 0; i < blkNum; i++)
     {
-        int i = index * SUB_PARTITION_NUM;
         int *edgeScoreMap = (int*)partitions[i].edgeMap.data;
         DEBUG_PRINTF("\n----------------------------------------------------------------------------------\n");
         DEBUG_PRINTF("[PART] partitions %d info :\n", i);
@@ -464,6 +550,7 @@ void partitionFunction(
     {
         partIdTable[i] = i;
     }
+#if 1
     for (int i = 0; i < blkNum; i++)
     {
         for (int j = 0; j < blkNum - i - 1; j++)
@@ -476,6 +563,7 @@ void partitionFunction(
             }
         }
     }
+#endif
     for (int i = 0; i < blkNum; i++)
     {
         DEBUG_PRINTF("[SCHE] %d with %d @ %d \n", partIdTable[i], partitions[partIdTable[i] * SUB_PARTITION_NUM].listEnd, i);
@@ -491,6 +579,7 @@ void partitionFunction(
     }
 
 }
+
 
 
 

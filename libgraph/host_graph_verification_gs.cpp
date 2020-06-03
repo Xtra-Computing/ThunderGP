@@ -1,36 +1,9 @@
-
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-
-#include <stdlib.h>
-#include <malloc.h>
-#include <iostream>
-#include <fstream>
-#include <unordered_map>
-#include <chrono>
-#include <algorithm>
-#include <iostream>
-#include <time.h>
-#include <unistd.h>
-#include <vector>
-#include <math.h>
-#include <ctime>
-
-#include <sys/time.h>
-
 #include "host_graph_sw.h"
 
 #include "config.h"
 #include "fpga_application.h"
 
 #include "host_graph_sw_verification.h"
-
-
-extern partitionDescriptor partitions[MAX_PARTITIONS_NUM];
-extern gatherScatterDescriptor localGsKernel[SUB_PARTITION_NUM];
-
 
 
 void partitionGatherScatterCModel(
@@ -40,17 +13,17 @@ void partitionGatherScatterCModel(
     partitionDescriptor     *partitions
 )
 {
-    prop_t *edgesTuples   = (prop_t *)get_host_mem_pointer(partitions->edge.id);
+    unsigned int  *edgesTuples   = (unsigned int *)get_host_mem_pointer(partitions->edge.id);
     int *edgeScoreMap        = (int*)get_host_mem_pointer(partitions->edgeMap.id);
-    unsigned int *vertexScore         = (unsigned int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
-    unsigned int *tmpVertexPropVerify = (unsigned int*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_VERIFY);
-    unsigned int *edgeProp            = (unsigned int*)get_host_mem_pointer(partitions->edgeProp.id);
+    prop_t *vertexScore         = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
+    prop_t *tmpVertexPropVerify = (prop_t*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_VERIFY);
+    prop_t *edgeProp            = (prop_t*)get_host_mem_pointer(partitions->edgeProp.id);
     clear_host_mem(MEM_ID_TMP_VERTEX_VERIFY);
     DEBUG_PRINTF("partition cmodel verify:\n");
 
     for (unsigned int i = 0; i < partitions->listEnd; i++)
     {
-        unsigned int update = 0;
+        prop_t update = 0;
         unsigned int address = (edgesTuples[i] > partitions->dstVertexEnd) ? partitions->dstVertexEnd : edgesTuples[i];
         if (IS_ACTIVE_VERTEX(vertexScore[edgeScoreMap[i]]))
         {
@@ -82,7 +55,7 @@ void partitionGatherScatterCModel(
     transfer_data_from_pl(context, device, partitions->tmpProp.id);
 
 
-    unsigned int *tmpVertexProp =  (unsigned int*)get_host_mem_pointer(partitions->tmpProp.id);
+    prop_t *tmpVertexProp =  (prop_t*)get_host_mem_pointer(partitions->tmpProp.id);
 
     int error_count = 0;
     int total_count = 0;

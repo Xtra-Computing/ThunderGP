@@ -7,10 +7,9 @@
 #include <fstream>
 #include <vector>
 
-#include "host_graph_sw.h"
-#include "host_apply.h"
 #include "unistd.h"
 
+#include "host_graph_sw.h"
 
 using namespace std;
 
@@ -159,17 +158,6 @@ void prepare_fpga_ddr(void)
 
     double end =  getCurrentTimestamp();
     DEBUG_PRINTF("data transfer %lf \n", (end - begin) * 1000);
-#if 0
-    int * data = (int *)get_host_mem_pointer(partitions[0].tmpProp.id);
-    for (int i = 0; i < VERTEX_MAX; i++)
-    {
-        data[i] = i * 2;
-    }
-    int debug_mem_id[2];
-    debug_mem_id[0] = partitions[0].tmpProp.id;
-    debug_mem_id[1] = partitions[1].tmpProp.id;
-    transfer_data_to_pl(context, device, debug_mem_id, ARRAY_SIZE(debug_mem_id));
-#endif
 }
 
 #define TEST_SCALE          (1)
