@@ -23,7 +23,7 @@
 
 #include "host_graph_sw.h"
 
-#include "mem_config.h"
+#include "he_mem_config.h"
 
 
 #define EDEG_MEMORY_SIZE        ((edgeNum + (ALIGN_SIZE * 4) * blkNum) * 1)
@@ -77,6 +77,40 @@ gatherScatterDescriptor * getGatherScatter(int kernelID)
     return &localGsKernel[kernelID];
 }
 
+
+void setGsKernel(int partId)
+{
+#if HAVE_GS
+    for (int i = 0; i < SUB_PARTITION_NUM; i++)
+    {
+        gatherScatterDescriptor * gsHandler = getGatherScatter(i); 
+        partitionDescriptor * partition = getPartition(partId * SUB_PARTITION_NUM + i);
+        int argvi = 0;
+        int edgeEnd     = partition->listEnd;
+        int sinkStart   = 0;
+        int sinkEnd     = VERTEX_MAX;
+
+#if HW_EMU_DEBUG
+        edgeEnd         = HW_EMU_DEBUG_SIZE;
+#endif
+        //DEBUG_PRINTF("gs task in cu [%d] info:\n", i);
+        //DEBUG_PRINTF("\tedge  %d %d \n", 0, edgeEnd);
+        //DEBUG_PRINTF("\tsink  %d %d \n", sinkStart, sinkEnd);
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeMap.id));
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(gsHandler->prop.id));
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edge.id));
+
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->tmpProp.id));
+
+#if HAVE_EDGE_PROP
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeProp.id));
+#endif
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &edgeEnd);
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &sinkStart);
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &sinkEnd);
+    }
+#endif
+}
 
 
 void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, int cuIndex, void *data)
@@ -583,18 +617,4 @@ void partitionFunction(
 
 
 
-
-int float2int(float a) {
-    return (int)(a * INT2FLOAT);
-}
-
-float int2float(int a) {
-    return ((float)a / INT2FLOAT);
-}
-
-double getCurrentTimestamp(void) {
-    timespec a;
-    clock_gettime(CLOCK_MONOTONIC, &a);
-    return (double(a.tv_nsec) * 1.0e-9) + double(a.tv_sec);
-}
 

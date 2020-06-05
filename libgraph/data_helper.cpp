@@ -113,3 +113,19 @@ int getStartIndex(void)
 {
     return startIdx;
 }
+
+
+int float2int(float a) {
+    return (int)(a * INT2FLOAT);
+}
+
+float int2float(int a) {
+    return ((float)a / INT2FLOAT);
+}
+
+double getCurrentTimestamp(void) {
+    timespec a;
+    clock_gettime(CLOCK_MONOTONIC, &a);
+    return (double(a.tv_nsec) * 1.0e-9) + double(a.tv_sec);
+}
+

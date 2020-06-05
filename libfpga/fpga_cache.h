@@ -447,7 +447,7 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
     return;
 
 }
-void cacheProcess( uint16                           *vertexScore,
+void srcPropertyProcess( uint16                           *vertexScore,
                    hls::stream<burst_raw>           &edgeBurstStream,
                    hls::stream<burst_raw>           &mapStream,
                    hls::stream<edge_tuples_t>       &edgeTuplesBuffer

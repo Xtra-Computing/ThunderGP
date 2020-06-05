@@ -4,7 +4,7 @@
 #include "graph_fpga.h"
 
 
-void filterFunction(
+void tupleFilter(
     filter_type                 &filter,
     uint_raw                    &filter_num,
     hls::stream<filter_type>    &toFilterItem,

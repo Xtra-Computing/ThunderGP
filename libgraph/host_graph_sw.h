@@ -124,6 +124,8 @@ void setApplyKernel(
     int vertexNum
 );
 
+void setGsKernel(int partId);
+
 
 
 void partitionApplyCModel(

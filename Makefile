@@ -93,3 +93,6 @@ cleanall: clean
 	-$(RMDIR) ./membership.out
 
 
+cleandir:
+	-$(RMDIR) host_graph_fpga*
+	-$(RMDIR) xclbin*

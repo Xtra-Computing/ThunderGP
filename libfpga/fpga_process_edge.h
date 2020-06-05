@@ -82,7 +82,7 @@ void processEdgeWrite(
 }
 
 
-void processEdgesFunction(
+void dstPropertyProcess(
     int                     index,
     uint_raw                sink_offset,
     uint_raw                sink_end,

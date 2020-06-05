@@ -133,7 +133,7 @@
 
 #endif
 
-    cacheProcess(vertexScore, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
+    srcPropertyProcess(vertexScore, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
 
 #if HAVE_EDGE_PROP
     propProcess(edgePropSliceStream, edgeTuplesBuffer, edgeTuplesCoupled);
@@ -188,7 +188,7 @@
     for (int i = 0; i < PE_NUM ; i++)
     {
 #pragma HLS UNROLL
-        filterFunction( filter_tmp[i], filter_num[i], toFilterArraySlice2[i], buildArray[i]);
+        tupleFilter( filter_tmp[i], filter_num[i], toFilterArraySlice2[i], buildArray[i]);
     }
 
 
@@ -200,12 +200,12 @@
     for (int i = 0; i < PE_NUM ; i++)
     {
 #pragma HLS UNROLL
-        processEdgesReorderStreamScheme2(buildArraySlice[i], buildArrayRes[i]);
+        rawSolver(buildArraySlice[i], buildArrayRes[i]);
     }
     for (int i = 0; i < PE_NUM ; i++)
     {
 #pragma HLS UNROLL
-        processEdgesFunction(i, sink_offset, sink_end, tmpVPropBuffer[i], buildArrayRes[i], writeArrayLayer1[i]);
+        dstPropertyProcess(i, sink_offset, sink_end, tmpVPropBuffer[i], buildArrayRes[i], writeArrayLayer1[i]);
     }
     for (int i = 0; i < PE_NUM ; i++)
     {

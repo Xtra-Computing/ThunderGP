@@ -14,14 +14,6 @@
 using namespace std;
 
 
-#define HW_EMU_DEBUG        (0)
-#define HW_EMU_DEBUG_SIZE   (16384 * 4)
-
-#define HAVE_GS             (1)
-#define HAVE_FPGA           (1)
-#define HAVE_SW             (0)
-
-
 int vertexNum;
 int edgeNum;
 int blkNum;
@@ -68,9 +60,6 @@ void hardware_init(const char * name, char *file_name) {
 }
 
 
-
-
-
 static cl_kernel kernel_apply;
 
 
@@ -91,38 +80,6 @@ void kernel_init(cl_program &program)
 #endif
 }
 
-void set_gs_kernel(int partId)
-{
-#if HAVE_GS
-    for (int i = 0; i < SUB_PARTITION_NUM; i++)
-    {
-        partitionDescriptor *partition = &partitions[partId * SUB_PARTITION_NUM + i];
-        int argvi = 0;
-        int edgeEnd     = partition->listEnd;
-        int sinkStart   = 0;
-        int sinkEnd     = VERTEX_MAX;
-
-#if HW_EMU_DEBUG
-        edgeEnd         = HW_EMU_DEBUG_SIZE;
-#endif
-        //DEBUG_PRINTF("gs task in cu [%d] info:\n", i);
-        //DEBUG_PRINTF("\tedge  %d %d \n", 0, edgeEnd);
-        //DEBUG_PRINTF("\tsink  %d %d \n", sinkStart, sinkEnd);
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeMap.id));
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(localGsKernel[i].prop.id));
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edge.id));
-
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->tmpProp.id));
-
-#if HAVE_EDGE_PROP
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeProp.id));
-#endif
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(int),    &edgeEnd);
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(int),    &sinkStart);
-        clSetKernelArg(localGsKernel[i].kernel, argvi++, sizeof(int),    &sinkEnd);
-    }
-#endif
-}
 
 
 
@@ -194,7 +151,7 @@ double launchFPGA(void)
         fpga_run_start = getCurrentTimestamp();
         for (int i = 0; i < GLOBAL_BLK_SIZE; i ++)
         {
-            set_gs_kernel(partIdTable[i]);
+            setGsKernel(partIdTable[i]);
             if (i > 0)
             {
 #if HAVE_APPLY

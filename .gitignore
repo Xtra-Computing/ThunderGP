@@ -10,3 +10,4 @@ sdx_*
 *.jou
 release*
 test_log*
+xclbin*

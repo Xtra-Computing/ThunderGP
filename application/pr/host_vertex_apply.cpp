@@ -43,7 +43,7 @@ prop_t  applyVerfication(prop_t tProp,prop_t source, unsigned int outDeg, void *
     int newScore = baseScore  + ((kDampFixPoint * tProp) >> 7);
     if (outDeg != 0)
     {
-        updateVerify = newScore / outDeg;
+        updateVerify = newScore / (int)outDeg;
     }
     return updateVerify;
 }

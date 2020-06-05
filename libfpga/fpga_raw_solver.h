@@ -68,7 +68,7 @@ void processEdgesReorderStreamScheme1(hls::stream<int2>  &in , hls::stream<int2>
 
 
 /* 4 distance */
-void processEdgesReorderStreamScheme2(hls::stream<int2>  &in , hls::stream<int2> &out)
+void rawSolver(hls::stream<int2>  &in , hls::stream<int2> &out)
 {
 #pragma HLS function_instantiate variable=in
     int2 local_buffer[5];

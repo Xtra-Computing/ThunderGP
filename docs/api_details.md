@@ -58,6 +58,7 @@ Example:
 #### L2
 | Hooks    | Description  |
 |-----------|--------------|
+| preprocessProperty | per-process the source vertex property |
 | updateCalculation | Calculate the update value by using the edge property and source vertex property  |
 | updateMergeInRAWSolver | destination property update in RAW solver | 
 | updateDestination | destination property update | 

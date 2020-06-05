@@ -3,7 +3,7 @@
 
 #include "graph_fpga.h"
 
-inline shuffled_type decoder(uchar opcode) {
+inline shuffled_type shuffleDecoder(uchar opcode) {
 #pragma HLS INLINE
     const unsigned int lutIdx[256] = {
         0,

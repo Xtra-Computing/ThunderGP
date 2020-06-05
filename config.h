@@ -59,4 +59,18 @@ typedef  int       			prop_t;
 
 #endif
 
+
+
+
+#define HW_EMU_DEBUG        (0)
+#define HW_EMU_DEBUG_SIZE   (16384 * 4)
+
+#define HAVE_GS             (1)
+#define HAVE_FPGA           (1)
+#define HAVE_SW             (0)
+
+
+
+
+
 #endif /* __CONFIG_H__ */

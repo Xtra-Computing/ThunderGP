@@ -84,7 +84,7 @@ void gatherStageFunction (
                  + (valid_r[6] << 6)
                  + (valid_r[7] << 7);
 
-        shuff_ifo  = decoder(opcode);
+        shuff_ifo  = shuffleDecoder(opcode);
 
         filter.num = shuff_ifo.num;
         idx[0] =  shuff_ifo.idx & 0x7;

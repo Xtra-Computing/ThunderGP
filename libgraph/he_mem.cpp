@@ -5,7 +5,7 @@
 #include "he_mem.h"
 #include "he_mem_id.h"
 
-#include "mem_attr.h"
+#include "he_mem_attr.h"
 
 
 static std::vector<he_mem_lookup_t> mem_list;
