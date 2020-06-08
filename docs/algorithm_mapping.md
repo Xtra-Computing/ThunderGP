@@ -8,7 +8,7 @@ Our framework adopts an simplifed GAS processing model. The edges in one partiti
 There are two types of compute kernel in ThunderGP: the scatter-gather and the apply, and mapping a new graph analytic algorithms is equivalent to reconstruct these two compute kernels. From our observation on many graph analytic algorithms, we carefully make abstractions on the scatter-gather stage for programing efficiency.
 
 
-## Scatter-Gather compute kernel
+## Compute kernel - Scatter-Gather
 
 
 ![overview](images/overview.png)
@@ -36,7 +36,7 @@ Notes:
 
 by using __L2__ interface, mapping the scatter-gather stage of a new algorithm is very simple, it can also get a pretty good performance without touching the low-level code.
 
-## Apply compute kernel
+## Compute kernel - Apply
 
 The apply stage of each graph analytic algorithm may need different type of data, and this variance makes the abstraction a little tough. Currently, mapping the apply stage of a new algorithm need additional step: add the interface code manually. It is easy to achieve as the processing in apply is very simple ,and our existing code can be a good reference. The steps are shown below:
 
