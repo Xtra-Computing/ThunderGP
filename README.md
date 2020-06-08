@@ -66,6 +66,7 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on VCU
 Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
 both L1 and L2 is HLS code APIs for building the FPGA accelerators, and L3 is APIs for host program.
+
 * L1 provides the fundamental functions and basic modules used in our framework to build the compute kernels and the data flow. Users can use these API to construct their own data flow as well.
 
 * L2 provides hooks for mapping graph processing algorithm. As we have shown our proposed data flow is efficient (refer to our paper), in this level, the data flow is fixed, and we only focus on how to map graph processing algorithm smoothly.

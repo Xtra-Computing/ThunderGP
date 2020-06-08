@@ -5,7 +5,7 @@
 
 #include "fpga_decoder.h"
 
-void gatherProcessEngineWrite(
+void shuffleDispatcher(
     int                         i,
     uchar                       &opcode,
     filter_type                 &filter,
@@ -19,7 +19,7 @@ void gatherProcessEngineWrite(
 }
 
 
-void gatherStageFunction (
+void shuffleEntry (
     int                         i,
     hls::stream<edge_tuples_t>  &edgeTuplesArray,
     hls::stream<filter_type>    &toFilterArray,
@@ -113,7 +113,7 @@ void gatherStageFunction (
 #pragma HLS UNROLL
             filter.data[j] = tuples.data[idx[j]];  //data_r_uint2[idx_t];
         }
-        gatherProcessEngineWrite(i, opcode, filter, toFilterArray);
+        shuffleDispatcher(i, opcode, filter, toFilterArray);
         if (filter.end != 0)
         {
             break;

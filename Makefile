@@ -41,12 +41,13 @@ exe: cleanexe $(EXECUTABLE)
 
 # Building kernel
 
-include ./application/gs_kernel.mk
+include ./application/common_gs_kernel.mk
 
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
 $(XCLBIN)/vertexApply.$(TARGET).$(DSA).xo: $(APPLY_KERNEL_PATH)/vertex_apply.cpp
 	mkdir -p $(XCLBIN)
 	$(XOCC) $(CLFLAGS) -c -k vertexApply -I'$(<D)' -o'$@' '$<'
+include ./application/common_apply_kernel.mk
 include $(APPCONFIG)/apply_kernel.mk
 endif
 

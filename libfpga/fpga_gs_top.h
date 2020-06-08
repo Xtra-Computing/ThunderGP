@@ -157,7 +157,7 @@
     for (int i = 0; i < PE_NUM ; i++)
     {
 #pragma HLS UNROLL
-        gatherStageFunction (
+        shuffleEntry (
             i,
             edgeTuplesArray[i],
             toFilterArraySlice[i],
