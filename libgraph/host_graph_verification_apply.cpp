@@ -6,7 +6,18 @@
 
 #include "host_graph_sw_verification.h"
 
-extern prop_t  applyVerfication(prop_t update,prop_t source, unsigned int outDeg, void * arg);
+#if  CUSTOMIZE_APPLY == 0
+
+prop_t  applyVerfication(prop_t tProp, prop_t source, unsigned int outDeg, void * arg)
+{
+
+    unsigned int temp;
+    prop_t updateVerify;
+    updateVerify = applyCalculation(tProp,source,outDeg,temp, *(unsigned int *)arg);
+
+    return updateVerify;
+}
+
 
 void partitionApplyCModel(
     cl_context              &context,
@@ -85,3 +96,5 @@ void partitionApplyCModel(
     }
     DEBUG_PRINTF("[RES] apply error_count %d \n", error_count);
 }
+
+#endif

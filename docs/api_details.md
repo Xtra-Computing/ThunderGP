@@ -1,10 +1,24 @@
 
 ### API Table (under construction)
+#### Stream operations
+To provide more portability, ThunderGP warps some operations on steam channel
+
+| Module    | Description  |
+|-----------|--------------|
+| read_from_stream    |  blocking read from stream   |
+| read_from_stream_nb | nonblocking read from stream |
+| write_to_stream     |  blocking write to stream    |
+| clear_stream        |  clear the stream for next iteration |
+| empty_stream        |  clear the stream in some unexpected situations |
+
+
 #### L1 
 | Module    | Description  |
 |-----------|--------------|
 | burstRead | Read data in bust mode from global memory and generate stream |
+|burstReadLite|Similar to burstRead, but do not send the END_FLAG token|
 | writeBack | write the stream data into global memory |
+|writeBackLite| Similar to writeBack, but do not check the END_FLAG token|
 | srcPropertyProcess | Manage the source vertex cache and output stream of edge tuples|
 | shuffleDecoder   | Shuffle decoder |
 | tupleFilter  | Filter valid data for PEs  |

@@ -27,10 +27,11 @@ void partitionGatherScatterCModel(
         unsigned int address = (edgesTuples[i] > partitions->dstVertexEnd) ? partitions->dstVertexEnd : edgesTuples[i];
         if (IS_ACTIVE_VERTEX(vertexScore[edgeScoreMap[i]]))
         {
-#if HAVE_EDGE_PROP
-            update = PROP_COMPUTE_STAGE1(vertexScore[edgeScoreMap[i]], edgeProp[i]);
-#else
             update = PROP_COMPUTE_STAGE0(vertexScore[edgeScoreMap[i]]);
+#if HAVE_EDGE_PROP
+            update = PROP_COMPUTE_STAGE1(update, edgeProp[i]);
+#else
+            update = PROP_COMPUTE_STAGE1(update, 0);
 #endif
             tmpVertexPropVerify[address] = PROP_COMPUTE_STAGE3(tmpVertexPropVerify[address], update);
         }

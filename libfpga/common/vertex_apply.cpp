@@ -6,20 +6,23 @@
 #include "fpga_burst_read.h"
 
 
-
-void bfsApply(
+void applyFunction(
     int                             loopNum,
+#if HAVE_APPLY_OUTDEG
+    hls::stream<burst_raw>          &outDegreeStream,
+#endif
     hls::stream<burst_raw>          &vertexPropStream,
     hls::stream<burst_raw>          &tmpVertexPropStream,
+    unsigned int                    baseScore,
     hls::stream<burst_raw>          &newVertexPropStream,
-    int                             *activeNum
+    int                             *error
 )
 {
-    int activeNumArray[BURST_ALL_BITS / INT_WIDTH];
-#pragma HLS ARRAY_PARTITION variable=activeNumArray dim=0 complete
+    int infoArray[BURST_ALL_BITS / INT_WIDTH];
+#pragma HLS ARRAY_PARTITION variable=infoArray dim=0 complete
     for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i++)
     {
-        activeNumArray[i] = 0;
+        infoArray[i] = 0;
     }
     for (int loopCount = 0; loopCount < loopNum; loopCount ++)
     {
@@ -27,44 +30,45 @@ void bfsApply(
 #pragma HLS PIPELINE II=1
         burst_raw vertexProp;
         burst_raw tmpVertexProp;
+
         read_from_stream(vertexPropStream, vertexProp);
         read_from_stream(tmpVertexPropStream, tmpVertexProp);
+
+#if HAVE_APPLY_OUTDEG
+        burst_raw outDeg;
+        read_from_stream(outDegreeStream, outDeg);
+#endif
 
         burst_raw newVertexProp;
 
         for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i++)
         {
 #pragma HLS UNROLL
-            unsigned int tProp     = tmpVertexProp.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
-            unsigned int uProp     = vertexProp.range(   (i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
-            unsigned int wProp;
-            if ((uProp & 0x80000000) == (tProp & 0x80000000))
-            {
-                wProp = uProp & 0x7fffffff;  // last active vertex
-            }
-            else if ((tProp & 0x80000000) == 0x80000000)
-            {
-                activeNumArray[i] ++;
-                wProp = tProp; // current active vertex
-            }
-            else
-            {
-                wProp = MAX_PROP; // not travsered
-            }
+            prop_t tProp     = tmpVertexProp.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
+            prop_t uProp     = vertexProp.range(   (i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
+#if HAVE_APPLY_OUTDEG
+            prop_t out_deg   = outDeg.range(       (i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
+#endif
 
+#if HAVE_APPLY_OUTDEG
+            prop_t  wProp     = applyCalculation( tProp, uProp, out_deg, infoArray[i],  arg);
+#else
+            prop_t  wProp     = applyCalculation( tProp, uProp, 0, infoArray[i],  arg);
+#endif
             newVertexProp.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH ) = wProp;
+
         }
         write_to_stream(newVertexPropStream, newVertexProp);
     }
 
-    int totalNum = 0;
+    int infoAggregate = 0;
 
     for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i ++)
     {
-        C_PRINTF("activeNumArray %d %d \n", i, activeNumArray[i]);
-        totalNum += activeNumArray[i];
+        DEBUG_PRINTF("infoArray %d %d \n", i, infoArray[i]);
+        infoAggregate += infoArray[i];
     }
-    activeNum[0] = totalNum;
+    error[0] = infoAggregate;
 
 }
 
@@ -80,6 +84,9 @@ extern "C" {
         uint16        *newVertexProp2,
         uint16        *newVertexProp3,
         uint16        *newVertexProp4,
+#if HAVE_APPLY_OUTDEG
+        uint16        *outDegree,
+#endif
         int           *error,
         unsigned int  vertexNum,
         unsigned int  addrOffset,
@@ -129,10 +136,16 @@ extern "C" {
 #pragma HLS INTERFACE m_axi port=vertexProp offset=slave bundle=gmem6 max_read_burst_length=64
 #pragma HLS INTERFACE s_axilite port=vertexProp bundle=control
 
+#if HAVE_APPLY_OUTDEG
 
-//#pragma HLS INTERFACE m_axi port=outDegree offset=slave bundle=gmem7 max_read_burst_length=128 num_write_outstanding=4
-//#pragma HLS INTERFACE s_axilite port=outDegree bundle=control
+#pragma HLS INTERFACE m_axi port=outDegree offset=slave bundle=gmem7 max_read_burst_length=64
+#pragma HLS INTERFACE s_axilite port=outDegree bundle=control
 
+        hls::stream<burst_raw>      outDegreeStream;
+#pragma HLS stream variable=outDegreeStream depth=256
+        burstReadLite(addrOffset, vertexNum, outDegree, outDegreeStream);
+
+#endif
 
 #pragma HLS INTERFACE s_axilite port=vertexNum      bundle=control
 #pragma HLS INTERFACE s_axilite port=baseScore      bundle=control
@@ -151,12 +164,10 @@ extern "C" {
         hls::stream<burst_raw>      tmpVertexPropStream;
 #pragma HLS stream variable=tmpVertexPropStream depth=128
 
-        hls::stream<burst_raw>      outDegreeStream;
-#pragma HLS stream variable=outDegreeStream depth=128
 
 
         hls::stream<burst_raw>      newVertexPropStream;
-#pragma HLS stream variable=newVertexPropStream depth=2
+#pragma HLS stream variable=newVertexPropStream depth=32
 
         hls::stream<burst_raw>      newVertexPropArray[4];
 #pragma HLS stream variable=newVertexPropArray depth=2
@@ -166,7 +177,6 @@ extern "C" {
 
 
         burstReadLite(addrOffset, vertexNum, vertexProp, vertexPropStream);
-        //burstReadLite(0, vertexNum, outDegree, outDegreeStream);
 
 
         burstReadLite(0, vertexNum, tmpVertexProp1, tmpVertexPropArray[0]);
@@ -176,10 +186,14 @@ extern "C" {
 
         cuMerge(loopNum, tmpVertexPropArray, tmpVertexPropStream);
 
-        bfsApply(
+        applyFunction(
             loopNum,
+#if HAVE_APPLY_OUTDEG
+            outDegreeStream,
+#endif
             vertexPropStream,
             tmpVertexPropStream,
+            baseScore,
             newVertexPropStream,
             error
         );

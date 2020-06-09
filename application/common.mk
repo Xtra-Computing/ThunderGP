@@ -18,8 +18,13 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 
 HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/he_mem.cpp ./libgraph/data_helper.cpp
 HOST_SRCS += ./libgraph/host_graph_verification_gs.cpp  ./libgraph/host_graph_sw.cpp
+
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
+
+ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
 HOST_SRCS += $(APPCONFIG)/host_vertex_apply.cpp
+endif
+
 HOST_SRCS += ./libgraph/host_graph_verification_apply.cpp
 endif
 
@@ -65,7 +70,11 @@ CP = cp -rf
 
 
 GS_KERNEL_PATH    = ./libfpga/common
+ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
 APPLY_KERNEL_PATH = $(APPCONFIG)
+else
+APPLY_KERNEL_PATH = ./libfpga/common
+endif
 
 
 
@@ -107,3 +116,21 @@ CXXFLAGS += -DHAVE_UNSIGNED_PROP=0
 CLFLAGS  += -DHAVE_UNSIGNED_PROP=0
 endif
 
+
+ifeq ($(strip $(HAVE_APPLY_OUTDEG)), $(strip $(VAR_TRUE)))
+CXXFLAGS += -DHAVE_APPLY_OUTDEG=1
+CLFLAGS  += -DHAVE_APPLY_OUTDEG=1
+else
+CXXFLAGS += -DHAVE_APPLY_OUTDEG=0
+CLFLAGS  += -DHAVE_APPLY_OUTDEG=0
+endif
+
+
+
+ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
+CXXFLAGS += -DCUSTOMIZE_APPLY=1
+CLFLAGS  += -DCUSTOMIZE_APPLY=1
+else
+CXXFLAGS += -DCUSTOMIZE_APPLY=0
+CLFLAGS  += -DCUSTOMIZE_APPLY=0
+endif
