@@ -74,15 +74,14 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on U25
 ## APIs (programmability) 
 Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
-both L1 and L2 is HLS code APIs for building the FPGA accelerators, and L3 is APIs for host program.
+APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host program. Details are as below:
 
-* L1 provides the fundamental functions and basic modules used in our framework to build the compute kernels and the data flow. Users can use these API to construct their own data flow as well.
+* L1 is used to construct the basic modules to build the compute kernels and the dataflow. 
 
-* L2 provides hooks for mapping graph processing algorithm. As we have shown our proposed data flow is efficient (refer to our paper), in this level, the data flow is fixed, and we only focus on how to map graph processing algorithm smoothly.
-[Mapping new graph analytic algorithm](docs/algorithm_mapping.md)  
-The figure blow show the data flow of our framework and the L2 hooks,There are two main compute unit: ***gather-scatter*** kernel and ***apply*** kernel for mapping a new algorithm, users need to handle the following hooks, calcuationUpdateValue, updateProperty etc.
+* L2 provides hooks for mapping graph processing algorithms. 
+   *[Mapping new graph analytic algorithm](docs/algorithm_mapping.md)  
 
-* L3 provides the high level software APIs to deploy and control graph processing engine. There is a tend to using multiple-SLRs FPGA or multiple FPGAs cluster in the future heterogeneous system, therefore, L3 also wraps the partition scheduling and memory management interface for further exploration. 
+* L3 provides the high-level APIs on host side to deploy or control graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
 
    * [Memory management](docs/memory.md) 
 
