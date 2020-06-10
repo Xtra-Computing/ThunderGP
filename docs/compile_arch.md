@@ -1,11 +1,10 @@
-### Compile ThunderGP
-ThunderGP is a general framework aims to accelerate different graph analytic algorithms. The code structure should be carefully designed to uniform the difference among these algorithms, and the compilation is the first to be considered.
-### Overview
+## Compiling ThunderGP
+This page provides details of quickly deploying build-in graph analytic algorithms of ThunderGP.  
+The compilation of ThunderGP is managed by [GNU make](https://www.gnu.org/software/make/manual/html_node/Introduction.html).
 
-The compilation of ThunderGP is managed by [GNU make](https://www.gnu.org/software/make/manual/html_node/Introduction.html), and we provide a simple way to compile ThunderGP for different applications. 
-#### Application selection
-Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. The wanted application can be implemented by passing argument app=[the wanted application] to make command. The below table is details of this argument.
+### Compilation Arguments
 
+Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV, BFS and SSSP. The wanted application can be implemented by passing argument app=[the wanted application] to the make command. The below table are details of this argument.
 
 | Argument    | Accelerated algorithm  |
 |--------------|--------------|
@@ -14,21 +13,18 @@ Currently, ThunderGP supports four graph analytic applications, namely PR, SpMV,
 | ```app=bfs``` | Breadth first search |
 | ```app=sssp``` | Single Source Shortest Path |
 
+Other arguments the developers may use. 
 
-#### Host/Accelerator compilation
-
-ThunderGP has both host program which runs on the CPU side and the accelerator program which runs on the FPGA card, and the compilation of these programs is controlled by the following parameter
-
-| Argument    | Programs |
+| Argument    | Description |
 |--------------|--------------|
-| ```exe``` | Host program, it is very fast |
-| ```all``` | Host + Accelerator program, it is time-costly (10+ hours) |
+| ```all``` | Compile host + cccelerator programs, it is time-costly (10+ hours) |
+| ```exe``` | Compile host program only, it is very fast |
 | ```cleanexe``` | Clean the host program |
 | ```clean``` | Clean the accelerator program |
-| ```cleanall``` | Clean all of the programs |
+| ```cleanall``` | Clean all of the host + accelerator programs |
 
 
-Overall, If you want to compile the host and accelerator programs for PageRank compile command is:
+For example, if you want to implement the PageRank, the command is:
 
 ```sh
 $ make app=pr all -j
@@ -61,13 +57,11 @@ The Makefile file structure is shown in the bellowing tree:
 ```
 
 #### Application-specific compilation
-As mentioned, ThunderGP supports many graph analytic algorithms. Currently, the difference among algorithms is uniformed by architecture-based configurations which are abstracted by ourself, and these configurations can be incremental added to ThunderGP for support new algorithms in the future.
+As mentioned, ThunderGP supports four graph analytic algorithms. Currently, the difference among algorithms is uniformed by architecture-based configurations which are abstracted by ourself, and these configurations can be incremental added to ThunderGP for support new algorithms in the future.
 
 The application-specific configuration is located in the ```application``` folder, and each algorithm has a sub-folder in this path, The corresponding configurations are stored in this sub-folder.
 
 The following table shows the existing application-specific configurations for compilation (the ```build.mk```)
-
-
 
 
 | Configuration | Value | Description  |
