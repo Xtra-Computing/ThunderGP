@@ -30,7 +30,7 @@ For example, if you want to implement the PageRank, the command is:
 $ make app=pr all -j
 ```
 
-### Makefile tree
+### Makefile Tree
 
 The Makefile file structure is shown in the bellowing tree:
 
