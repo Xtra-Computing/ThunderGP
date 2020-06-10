@@ -1,3 +1,14 @@
+# outline 
+## introduction to this page
+## our gas model (from TC paper) pesudo code can be attached. 
+## the execution flow of thunderGP and conresponding figures. 
+## summary the L2 APIs. 
+## an PageRank application as mapping example.
+## other configurations. 
+
+
+
+
 # Algorithm mapping
 In this section, we introduce how to map new algorithms to our framework with __L2__ level APIs provided by ThunderGP.
 
