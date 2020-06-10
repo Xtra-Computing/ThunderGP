@@ -79,7 +79,7 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 * L1 is used to construct the basic modules to build the compute kernels and the dataflow. 
 
 * L2 provides hooks for mapping graph processing algorithms. 
-   *[Mapping new graph analytic algorithm](docs/algorithm_mapping.md)  
+   * [Mapping new graph analytic algorithm](docs/algorithm_mapping.md)  
 
 * L3 provides the high-level APIs on host side to deploy or control graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
 
