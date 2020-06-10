@@ -56,22 +56,3 @@ The Makefile file structure is shown in the bellowing tree:
     └── xcl.mk       # Xilinx OpenCL library
 ```
 
-#### Application-specific compilation
-As mentioned, ThunderGP supports four graph analytic algorithms. Currently, the difference among algorithms is uniformed by architecture-based configurations which are abstracted by ourself, and these configurations can be incremental added to ThunderGP for support new algorithms in the future.
-
-The application-specific configuration is located in the ```application``` folder, and each algorithm has a sub-folder in this path, The corresponding configurations are stored in this sub-folder.
-
-The following table shows the existing application-specific configurations for compilation (the ```build.mk```)
-
-
-| Configuration | Value | Description  |
-|---------------|-------|--------------|
-| HAVE_FULL_SLR |          true/false  | single SLR or multiple SLRs   |
-| HAVE_APPLY    |          true/false  | have apply kernel or not   |
-| HAVE_VERTEX_ACTIVE_BIT | true/false  | the vertex property is masked or not    |
-| HAVE_EDGE_PROP |         true/false  | the tuple have edge property or not   |
-| HAVE_UNSIGNED_PROP    |  true/false  | the type of property is unsigned or not   |
-
-Details:
-
-[Mapping new graph analytic algorithm](docs/algorithm_mapping.md)
