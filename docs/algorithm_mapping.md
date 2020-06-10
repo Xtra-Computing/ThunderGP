@@ -52,10 +52,10 @@ The apply stage of each graph analytic algorithm may need different types of dat
 
 The first one for mapping apply stage of the graph algorithm is using the __L2__ hooks, but the date type is limited by existing data path. Currently, ThunderGP support load __four__ types of data for the application-specific calculation in apply stage:  
 
-* __1__. the property of vertices;
-* __2__. the out-degree of vertices;
-* __3__. the update value from scatter-gather stage;
-* __4__. an additional big word;
+*  The property of vertices;
+*  The out-degree of vertices;
+*  The update value from scatter-gather stage;
+*  An additional big word;
 
 Following table shows the hook functions for apply stage. 
 
