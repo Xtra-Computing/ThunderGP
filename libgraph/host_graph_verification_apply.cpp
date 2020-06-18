@@ -37,7 +37,7 @@ void partitionApplyCModel(
     prop_t * outDeg       = (prop_t*)get_host_mem_pointer(MEM_ID_OUT_DEG);
     prop_t * vertexProp   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
 
-    partitionDescriptor  *p_partition = getPartition(partId * SUB_PARTITION_NUM);
+    subPartitionDescriptor  *p_partition = getPartition(partId * SUB_PARTITION_NUM);
 
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {

@@ -73,9 +73,15 @@ typedef struct
     unsigned int  mapedTotalIndex;
     unsigned int  cuIndex;
     profile_log_t log;
-} partitionDescriptor;
+} subPartitionDescriptor;
 
-partitionDescriptor * getPartition(int partID);
+
+typedef struct
+{
+    subPartitionDescriptor *subPartitions[SUB_PARTITION_NUM];
+} partitionItem;
+
+subPartitionDescriptor * getPartition(int partID);
 
 gatherScatterDescriptor * getGatherScatter(int kernelID);
 
@@ -106,7 +112,7 @@ void partitionGatherScatterCModel(
     cl_context              &context,
     cl_device_id            &device,
     int                     cuIndex,
-    partitionDescriptor     *partitions
+    subPartitionDescriptor  *subPartitions
 );
 
 
@@ -114,7 +120,7 @@ void partitionFunction(
     CSR                     *csr,
     int                     &blkNum,
     cl_context              &context,
-    partitionDescriptor     *partitions
+    subPartitionDescriptor  *subPartitions
 );
 
 

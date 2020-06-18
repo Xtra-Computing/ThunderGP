@@ -3,7 +3,7 @@
 #include "graph_fpga.h"
 
 
-#include "fpga_burst_read.h"
+#include "fpga_global_mem.h"
 
 
 void applyFunction(

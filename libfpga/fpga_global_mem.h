@@ -1,5 +1,5 @@
-#ifndef __FPGA_BURST_READ_H__
-#define __FPGA_BURST_READ_H__
+#ifndef __FPGA_GLOBAL_MEM_H__
+#define __FPGA_GLOBAL_MEM_H__
 
 #include "graph_fpga.h"
 
@@ -255,4 +255,4 @@ void  cuMerge ( int               loopNum,
 
 
 
-#endif /*__FPGA_BURST_READ_H__ */
+#endif /*__FPGA_GLOBAL_MEM_H__ */

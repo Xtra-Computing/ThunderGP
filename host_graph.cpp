@@ -35,7 +35,7 @@ void freeResources(void) {
 }
 
 extern gatherScatterDescriptor localGsKernel[SUB_PARTITION_NUM];
-extern partitionDescriptor partitions[MAX_PARTITIONS_NUM];
+extern subPartitionDescriptor subPartitions[MAX_PARTITIONS_NUM];
 extern int partIdTable[MAX_PARTITIONS_NUM];
 
 
@@ -96,12 +96,12 @@ void prepare_fpga_ddr(void)
     };
     DEBUG_PRINTF("%s", "transfer base mem\n");
     transfer_data_to_pl(context, device, base_mem_id, ARRAY_SIZE(base_mem_id));
-    DEBUG_PRINTF("%s", "transfer partitions mem\n");
+    DEBUG_PRINTF("%s", "transfer subPartitions mem\n");
     for (int i = 0; i < blkNum; i ++) {
         int partition_mem_id[3];
-        partition_mem_id[0] = partitions[i].edge.id;
-        partition_mem_id[1] = partitions[i].edgeMap.id;
-        partition_mem_id[2] = partitions[i].edgeProp.id;
+        partition_mem_id[0] = subPartitions[i].edge.id;
+        partition_mem_id[1] = subPartitions[i].edgeMap.id;
+        partition_mem_id[2] = subPartitions[i].edgeProp.id;
         transfer_data_to_pl(context, device, partition_mem_id, ARRAY_SIZE(partition_mem_id));
     }
     DEBUG_PRINTF("%s", "transfer cu mem\n");
@@ -197,10 +197,10 @@ double launchFPGA(void)
             {
                 unsigned long exec_time = xcl_get_event_duration(*localGsKernel[j].event[i]);
                 //clReleaseEvent(localGsKernel[j].event[i]);
-                //partitions[i * SUB_PARTITION_NUM + j].log.end2end_exe = (fpga_run_end - fpga_run_start) * 1000;
+                //subPartitions[i * SUB_PARTITION_NUM + j].log.end2end_exe = (fpga_run_end - fpga_run_start) * 1000;
                 runtime_total = (fpga_run_end - fpga_run_start) * 1000;
-                partitions[i * SUB_PARTITION_NUM + j].log.fpga_exe = exec_time;
-                partitions[i * SUB_PARTITION_NUM + j].log.apply_exe = apply_exec_time;
+                subPartitions[i * SUB_PARTITION_NUM + j].log.fpga_exe = exec_time;
+                subPartitions[i * SUB_PARTITION_NUM + j].log.apply_exe = apply_exec_time;
             }
 
         }
@@ -214,7 +214,7 @@ double launchFPGA(void)
             {
                 for (int j = 0; j < SUB_PARTITION_NUM; j ++)
                 {
-                    partitionGatherScatterCModel(context, device, j, &partitions[partIdTable[i] * SUB_PARTITION_NUM + j]);
+                    partitionGatherScatterCModel(context, device, j, &subPartitions[partIdTable[i] * SUB_PARTITION_NUM + j]);
                 }
 #if HAVE_APPLY
                 partitionApplyCModel(context, device, partIdTable[i], baseScore);
@@ -232,24 +232,24 @@ double launchFPGA(void)
                 double max_fpga_exe = 0;
                 for (int j = 0; j < SUB_PARTITION_NUM; j ++)
                 {
-                    if (partitions[i * SUB_PARTITION_NUM + j].log.fpga_exe > max_fpga_exe)
+                    if (subPartitions[i * SUB_PARTITION_NUM + j].log.fpga_exe > max_fpga_exe)
                     {
-                        max_fpga_exe = partitions[i * SUB_PARTITION_NUM + j].log.fpga_exe ;
+                        max_fpga_exe = subPartitions[i * SUB_PARTITION_NUM + j].log.fpga_exe ;
                     }
-                    DEBUG_PRINTF("[INFO]  cu%d exe: %f \n", j, partitions[i * SUB_PARTITION_NUM + j].log.fpga_exe / 1000000.0);
+                    DEBUG_PRINTF("[INFO]  cu%d exe: %f \n", j, subPartitions[i * SUB_PARTITION_NUM + j].log.fpga_exe / 1000000.0);
                 }
                 end2end_runtime_total = runtime_total;
                 fpga_runtime_total    += max_fpga_exe / 1000000.0;
 
                 DEBUG_PRINTF("[INFO] partedge %f fpga gs: %f ms, apply: %f ms %d, effic %lf  v/e %lf compress %lf \n",
-                             partitions[i * SUB_PARTITION_NUM].log.end2end_exe,
+                             subPartitions[i * SUB_PARTITION_NUM].log.end2end_exe,
                              max_fpga_exe / 1000000.0,
-                             partitions[i * SUB_PARTITION_NUM].log.apply_exe / 1000000.0,
-                             (partitions[i * SUB_PARTITION_NUM].listEnd - partitions[i * SUB_PARTITION_NUM].listStart),
-                             (((float)(partitions[i * SUB_PARTITION_NUM].listEnd - partitions[i * SUB_PARTITION_NUM].listStart)) / partitions[i * SUB_PARTITION_NUM].mapedTotalIndex),
-                             ((partitions[i * SUB_PARTITION_NUM].dstVertexEnd - partitions[i * SUB_PARTITION_NUM].dstVertexStart)
-                              / ((float)(partitions[i * SUB_PARTITION_NUM].listEnd - partitions[i * SUB_PARTITION_NUM].listStart))),
-                             partitions[i * SUB_PARTITION_NUM].compressRatio);
+                             subPartitions[i * SUB_PARTITION_NUM].log.apply_exe / 1000000.0,
+                             (subPartitions[i * SUB_PARTITION_NUM].listEnd - subPartitions[i * SUB_PARTITION_NUM].listStart),
+                             (((float)(subPartitions[i * SUB_PARTITION_NUM].listEnd - subPartitions[i * SUB_PARTITION_NUM].listStart)) / subPartitions[i * SUB_PARTITION_NUM].mapedTotalIndex),
+                             ((subPartitions[i * SUB_PARTITION_NUM].dstVertexEnd - subPartitions[i * SUB_PARTITION_NUM].dstVertexStart)
+                              / ((float)(subPartitions[i * SUB_PARTITION_NUM].listEnd - subPartitions[i * SUB_PARTITION_NUM].listStart))),
+                             subPartitions[i * SUB_PARTITION_NUM].compressRatio);
 
             }
             DEBUG_PRINTF("[INFO] summary e2e %lf fpga %lf\n",
@@ -283,7 +283,7 @@ double fpgaProcessing(
         csr,
         blkNum,
         context,
-        partitions
+        subPartitions
     );
     double t2 = getCurrentTimestamp();
     double elapsedTime = (t2 - t1) * 1000;

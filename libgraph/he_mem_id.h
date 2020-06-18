@@ -26,13 +26,13 @@
 #define MEM_ID_ACTIVE_VERTEX_NUM    (21)
 
 
-#define MEM_ID_PARTITION_BASE		(100)
+#define MEM_ID_PARTITION_BASE       (100)
 
-#define MEM_ID_PARTITION_OFFSET		(128)
+#define MEM_ID_PARTITION_OFFSET     (128)
 
 
-#define MEM_ID_GS_BASE				(8192)
-#define MEM_ID_GS_OFFSET			(128)
+#define MEM_ID_GS_BASE              (8192)
+#define MEM_ID_GS_OFFSET            (128)
 
 
 #endif /* __HE_MEM_ID_H__ */

@@ -10,21 +10,21 @@ void partitionGatherScatterCModel(
     cl_context              &context,
     cl_device_id            &device,
     int                     cuIndex,
-    partitionDescriptor     *partitions
+    subPartitionDescriptor  *subPartitions
 )
 {
-    unsigned int  *edgesTuples   = (unsigned int *)get_host_mem_pointer(partitions->edge.id);
-    int *edgeScoreMap        = (int*)get_host_mem_pointer(partitions->edgeMap.id);
+    unsigned int  *edgesTuples   = (unsigned int *)get_host_mem_pointer(subPartitions->edge.id);
+    int *edgeScoreMap        = (int*)get_host_mem_pointer(subPartitions->edgeMap.id);
     prop_t *vertexScore         = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
     prop_t *tmpVertexPropVerify = (prop_t*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_VERIFY);
-    prop_t *edgeProp            = (prop_t*)get_host_mem_pointer(partitions->edgeProp.id);
+    prop_t *edgeProp            = (prop_t*)get_host_mem_pointer(subPartitions->edgeProp.id);
     clear_host_mem(MEM_ID_TMP_VERTEX_VERIFY);
     DEBUG_PRINTF("partition cmodel verify:\n");
 
-    for (unsigned int i = 0; i < partitions->listEnd; i++)
+    for (unsigned int i = 0; i < subPartitions->listEnd; i++)
     {
         prop_t update = 0;
-        unsigned int address = (edgesTuples[i] > partitions->dstVertexEnd) ? partitions->dstVertexEnd : edgesTuples[i];
+        unsigned int address = (edgesTuples[i] > subPartitions->dstVertexEnd) ? subPartitions->dstVertexEnd : edgesTuples[i];
         if (IS_ACTIVE_VERTEX(vertexScore[edgeScoreMap[i]]))
         {
             update = PROP_COMPUTE_STAGE0(vertexScore[edgeScoreMap[i]]);
@@ -53,19 +53,19 @@ void partitionGatherScatterCModel(
         }
 #endif
     }
-    transfer_data_from_pl(context, device, partitions->tmpProp.id);
+    transfer_data_from_pl(context, device, subPartitions->tmpProp.id);
 
 
-    prop_t *tmpVertexProp =  (prop_t*)get_host_mem_pointer(partitions->tmpProp.id);
+    prop_t *tmpVertexProp =  (prop_t*)get_host_mem_pointer(subPartitions->tmpProp.id);
 
     int error_count = 0;
     int total_count = 0;
-    for (unsigned int i = partitions->dstVertexStart; i < partitions->dstVertexEnd; i ++) {
+    for (unsigned int i = subPartitions->dstVertexStart; i < subPartitions->dstVertexEnd; i ++) {
         if (tmpVertexPropVerify[i] != 0)
         {
             total_count ++;
         }
-        if (tmpVertexPropVerify[i] != tmpVertexProp[i - partitions->dstVertexStart])
+        if (tmpVertexPropVerify[i] != tmpVertexProp[i - subPartitions->dstVertexStart])
         {
             error_count++;
 
@@ -90,6 +90,6 @@ void partitionGatherScatterCModel(
         }
     }
     DEBUG_PRINTF("[RES] error_count %d  in size %d/ %d\n", error_count, total_count,
-                 partitions->dstVertexEnd - partitions->dstVertexStart + 1 );
+                 subPartitions->dstVertexEnd - subPartitions->dstVertexStart + 1 );
 }
 

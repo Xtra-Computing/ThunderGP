@@ -1,12 +1,23 @@
 
 VAR_TRUE=true
 
+CP = cp -rf
 
 XCLBIN := ./xclbin_$(APP)
 DSA := $(call device2sandsa, $(DEVICE))
 
 CXX := $(XILINX_SDX)/bin/xcpp
 XOCC := $(XILINX_SDX)/bin/xocc
+
+
+
+GS_KERNEL_PATH    = ./libfpga/common
+ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
+APPLY_KERNEL_PATH = $(APPCONFIG)
+else
+APPLY_KERNEL_PATH = ./libfpga/common
+endif
+
 
 include $(ABS_COMMON_REPO)/utils/opencl.mk
 
@@ -65,18 +76,13 @@ CXXFLAGS +=  $(xcl_CXXFLAGS)
 LDFLAGS +=   $(xcl_CXXFLAGS)
 HOST_SRCS += $(xcl_SRCS)
 
-CP = cp -rf
 
 
-
-GS_KERNEL_PATH    = ./libfpga/common
-ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
-APPLY_KERNEL_PATH = $(APPCONFIG)
-else
-APPLY_KERNEL_PATH = ./libfpga/common
-endif
-
-
+#############################################################################
+#                                                                           #
+#                     Specific build configuration                          #
+#                                                                           #
+#############################################################################
 
 ifeq ($(strip $(HAVE_FULL_SLR)), $(strip $(VAR_TRUE)))
 CXXFLAGS += -DSUB_PARTITION_NUM=4

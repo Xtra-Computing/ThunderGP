@@ -2,7 +2,7 @@
 #include <string.h>
 #include "graph_fpga.h"
 
-#include "fpga_burst_read.h"
+#include "fpga_global_mem.h"
 #include "fpga_slice.h"
 #include "fpga_gather.h"
 #include "fpga_filter.h"

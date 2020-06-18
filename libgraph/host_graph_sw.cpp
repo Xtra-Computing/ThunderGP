@@ -30,8 +30,8 @@
 #define VERTEX_MEMORY_SIZE      (((vertexNum - 1)/VERTEX_MAX + 1) * VERTEX_MAX)
 
 
+subPartitionDescriptor subPartitions[MAX_PARTITIONS_NUM * SUB_PARTITION_NUM];
 
-partitionDescriptor partitions[MAX_PARTITIONS_NUM];
 int partIdTable[MAX_PARTITIONS_NUM];
 
 gatherScatterDescriptor localGsKernel[] = {
@@ -66,9 +66,9 @@ void base_mem_init(cl_context &context)
     }
 }
 
-partitionDescriptor * getPartition(int partID)
+subPartitionDescriptor * getPartition(int partID)
 {
-    return &partitions[partID];
+    return &subPartitions[partID];
 }
 
 
@@ -84,7 +84,7 @@ void setGsKernel(int partId)
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
         gatherScatterDescriptor * gsHandler = getGatherScatter(i); 
-        partitionDescriptor * partition = getPartition(partId * SUB_PARTITION_NUM + i);
+        subPartitionDescriptor * partition = getPartition(partId * SUB_PARTITION_NUM + i);
         int argvi = 0;
         int edgeEnd     = partition->listEnd;
         int sinkStart   = 0;
@@ -119,7 +119,7 @@ void setApplyKernel(cl_kernel &kernel_apply, int partId, int vertexNum)
 #if HAVE_APPLY
     int argvi = 0;
     int base_score = float2int((1.0f - kDamp) / vertexNum);
-    partitionDescriptor *p_partition = getPartition(partId * SUB_PARTITION_NUM);
+    subPartitionDescriptor *p_partition = getPartition(partId * SUB_PARTITION_NUM);
 
     volatile unsigned int partitionVertexNum = ((p_partition->dstVertexEnd - p_partition->dstVertexStart)
             / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE );
@@ -191,7 +191,7 @@ void processMemInit(cl_context &context)
 void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex)
 {
     int i = blkIndex;
-    partitionDescriptor *partitionItem  = &partitions[i];
+    subPartitionDescriptor *partitionItem  = &subPartitions[i];
     {
         partitionItem->cuIndex = cuIndex;
         partitionItem->edge.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET;
@@ -332,7 +332,7 @@ void partitionFunction(
     CSR                     *csr,
     int                     &blkNum,
     cl_context              &context,
-    partitionDescriptor     *partitions
+    subPartitionDescriptor     *subPartitions
 )
 {
     memset(partIdTable, 0, sizeof(int) * MAX_PARTITIONS_NUM);
@@ -412,9 +412,9 @@ void partitionFunction(
                 }
             }
 
-            partitions[i].scatterCacheRatio =  ((float)hit_counter) / ((mapedSourceIndex / DELTA + 1 ));
+            subPartitions[i].scatterCacheRatio =  ((float)hit_counter) / ((mapedSourceIndex / DELTA + 1 ));
             DEBUG_PRINTF("[TRS] scatter cache ratio: %lf in %d @blk %d \n",
-                         partitions[i].scatterCacheRatio,
+                         subPartitions[i].scatterCacheRatio,
                          DELTA, i);
             /* calculate scatter efficient */
         }
@@ -468,10 +468,10 @@ void partitionFunction(
         for (int subIndex = 0 ; subIndex < SUB_PARTITION_NUM ; subIndex ++ )
         {
             int  partId = i * SUB_PARTITION_NUM + subIndex;
-            partitions[partId].compressRatio = (double (mapedSourceIndex)) / vertexNum;
-            DEBUG_PRINTF("ratio %d / %d is %lf \n", mapedSourceIndex, vertexNum, partitions[partId].compressRatio);
-            partitions[partId].dstVertexStart = VERTEX_MAX * (i);
-            partitions[partId].dstVertexEnd   = ((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1) ;
+            subPartitions[partId].compressRatio = (double (mapedSourceIndex)) / vertexNum;
+            DEBUG_PRINTF("ratio %d / %d is %lf \n", mapedSourceIndex, vertexNum, subPartitions[partId].compressRatio);
+            subPartitions[partId].dstVertexStart = VERTEX_MAX * (i);
+            subPartitions[partId].dstVertexEnd   = ((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1) ;
             volatile int subPartitionSize = ((cur_edge_num / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
             int reOrderIndex = subIndex;
             unsigned int bound = subPartitionSize * (reOrderIndex + 1);
@@ -543,47 +543,47 @@ void partitionFunction(
 
             unsigned int bound = subPartitionSize * (reOrderIndex + 1);
 
-            partitions[partId].listStart =  0;
-            partitions[partId].listEnd = (bound > cur_edge_num) ? (cur_edge_num - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
-            partitions[partId].mapedTotalIndex = mapedSourceIndex;
+            subPartitions[partId].listStart =  0;
+            subPartitions[partId].listEnd = (bound > cur_edge_num) ? (cur_edge_num - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
+            subPartitions[partId].mapedTotalIndex = mapedSourceIndex;
 
-            DEBUG_PRINTF("[SIZE] %d cur_edge_num sub %d\n", cur_edge_num, partitions[partId].listEnd);
-            partition_mem_init(context, partId, partitions[partId].listEnd, subIndex); // subIndex --> cuIndex
-            memcpy(partitions[partId].edge.data     , &edgesTuples[subPartitionSize * reOrderIndex]  , partitions[partId].listEnd * sizeof(int));
-            memcpy(partitions[partId].edgeMap.data  , &edgeScoreMap[subPartitionSize * reOrderIndex] , partitions[partId].listEnd * sizeof(int));
-            memcpy(partitions[partId].edgeProp.data , &edgeProp[subPartitionSize * reOrderIndex]     , partitions[partId].listEnd * sizeof(int));
+            DEBUG_PRINTF("[SIZE] %d cur_edge_num sub %d\n", cur_edge_num, subPartitions[partId].listEnd);
+            partition_mem_init(context, partId, subPartitions[partId].listEnd, subIndex); // subIndex --> cuIndex
+            memcpy(subPartitions[partId].edge.data     , &edgesTuples[subPartitionSize * reOrderIndex]  , subPartitions[partId].listEnd * sizeof(int));
+            memcpy(subPartitions[partId].edgeMap.data  , &edgeScoreMap[subPartitionSize * reOrderIndex] , subPartitions[partId].listEnd * sizeof(int));
+            memcpy(subPartitions[partId].edgeProp.data , &edgeProp[subPartitionSize * reOrderIndex]     , subPartitions[partId].listEnd * sizeof(int));
         }
     }
 
 #define CACHE_UNIT_SIZE (4096 * 2)
     for (int i = 0; i < blkNum; i++)
     {
-        int *edgeScoreMap = (int*)partitions[i].edgeMap.data;
+        int *edgeScoreMap = (int*)subPartitions[i].edgeMap.data;
         DEBUG_PRINTF("\n----------------------------------------------------------------------------------\n");
-        DEBUG_PRINTF("[PART] partitions %d info :\n", i);
-        DEBUG_PRINTF("[PART] \t edgelist from %d to %d\n"   , partitions[i].listStart      , partitions[i].listEnd     );
-        DEBUG_PRINTF("[PART] \t dst. vertex from %d to %d\n", partitions[i].dstVertexStart , partitions[i].dstVertexEnd);
-        DEBUG_PRINTF("[PART] \t src. vertex from %d to %d\n", partitions[i].srcVertexStart , partitions[i].srcVertexEnd);
-        DEBUG_PRINTF("[PART] \t dump: %d - %d\n", (edgeScoreMap[partitions[i].listStart]), (edgeScoreMap[partitions[i].listEnd - 1]));
-        DEBUG_PRINTF("[PART] scatter cache ratio %lf \n", partitions[i].scatterCacheRatio);
-        DEBUG_PRINTF("[PART] v/e %lf \n", (partitions[i].dstVertexEnd - partitions[i].dstVertexStart)
-                     / ((float)(partitions[i].listEnd - partitions[i].listStart)));
+        DEBUG_PRINTF("[PART] subPartitions %d info :\n", i);
+        DEBUG_PRINTF("[PART] \t edgelist from %d to %d\n"   , subPartitions[i].listStart      , subPartitions[i].listEnd     );
+        DEBUG_PRINTF("[PART] \t dst. vertex from %d to %d\n", subPartitions[i].dstVertexStart , subPartitions[i].dstVertexEnd);
+        DEBUG_PRINTF("[PART] \t src. vertex from %d to %d\n", subPartitions[i].srcVertexStart , subPartitions[i].srcVertexEnd);
+        DEBUG_PRINTF("[PART] \t dump: %d - %d\n", (edgeScoreMap[subPartitions[i].listStart]), (edgeScoreMap[subPartitions[i].listEnd - 1]));
+        DEBUG_PRINTF("[PART] scatter cache ratio %lf \n", subPartitions[i].scatterCacheRatio);
+        DEBUG_PRINTF("[PART] v/e %lf \n", (subPartitions[i].dstVertexEnd - subPartitions[i].dstVertexStart)
+                     / ((float)(subPartitions[i].listEnd - subPartitions[i].listStart)));
 
-        DEBUG_PRINTF("[PART] v: %d e: %d \n", (partitions[i].dstVertexEnd - partitions[i].dstVertexStart),
-                     (partitions[i].listEnd - partitions[i].listStart));
+        DEBUG_PRINTF("[PART] v: %d e: %d \n", (subPartitions[i].dstVertexEnd - subPartitions[i].dstVertexStart),
+                     (subPartitions[i].listEnd - subPartitions[i].listStart));
 
-        DEBUG_PRINTF("[PART] est. efficient %lf\n", ((float)(partitions[i].listEnd - partitions[i].listStart)) / mapedSourceIndex);
+        DEBUG_PRINTF("[PART] est. efficient %lf\n", ((float)(subPartitions[i].listEnd - subPartitions[i].listStart)) / mapedSourceIndex);
 
-        DEBUG_PRINTF("[PART] compressRatio %lf \n\n", partitions[i].compressRatio);
+        DEBUG_PRINTF("[PART] compressRatio %lf \n\n", subPartitions[i].compressRatio);
 
 
 #if SRC_VERTEX_CHECK
-        int lastMapIndex = edgeScoreMap[partitions[i].listStart];
+        int lastMapIndex = edgeScoreMap[subPartitions[i].listStart];
         int inner_counter = 0;
         DEBUG_PRINTF("SRC_VERTEX_CHECK @%d\n", SRC_VERTEX_CHECK_UNIT);
         int max_diff  = 0;
         int diff_count[3] = {0};
-        for (unsigned int j = partitions[i].listStart;  j < partitions[i].listEnd; j += SRC_VERTEX_CHECK_UNIT)
+        for (unsigned int j = subPartitions[i].listStart;  j < subPartitions[i].listEnd; j += SRC_VERTEX_CHECK_UNIT)
         {
             inner_counter ++;
             int diff = edgeScoreMap[j] - lastMapIndex;
@@ -627,7 +627,7 @@ void partitionFunction(
     {
         for (int j = 0; j < blkNum - i - 1; j++)
         {
-            if (partitions[partIdTable[j] * SUB_PARTITION_NUM].listEnd < partitions[partIdTable[j + 1] * SUB_PARTITION_NUM].listEnd)
+            if (subPartitions[partIdTable[j] * SUB_PARTITION_NUM].listEnd < subPartitions[partIdTable[j + 1] * SUB_PARTITION_NUM].listEnd)
             {
                 int tmpId = partIdTable[j];
                 partIdTable[j] = partIdTable[j + 1];
@@ -638,7 +638,7 @@ void partitionFunction(
 #endif
     for (int i = 0; i < blkNum; i++)
     {
-        DEBUG_PRINTF("[SCHE] %d with %d @ %d \n", partIdTable[i], partitions[partIdTable[i] * SUB_PARTITION_NUM].listEnd, i);
+        DEBUG_PRINTF("[SCHE] %d with %d @ %d \n", partIdTable[i], subPartitions[partIdTable[i] * SUB_PARTITION_NUM].listEnd, i);
     }
     int paddingVertexNum  = ((vertexNum  - 1) / (ALIGN_SIZE * 4) + 1 ) * (ALIGN_SIZE * 4);
     int *tmpVertexProp =  (int*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_PROP);

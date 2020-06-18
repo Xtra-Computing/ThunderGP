@@ -23,6 +23,9 @@ APP = $(app)
 
 APPCONFIG = ./application/$(APP)
 
+
+include $(APPCONFIG)/config.mk
+
 include $(APPCONFIG)/build.mk
 
 include ./application/common.mk

@@ -10,7 +10,7 @@ void setApplyKernel(cl_kernel &kernel_apply, int partId, int vertexNum)
 #if HAVE_APPLY
     int argvi = 0;
     int base_score = float2int((1.0f - kDamp) / vertexNum);
-    partitionDescriptor *p_partition = getPartition(partId * SUB_PARTITION_NUM);
+    subPartitionDescriptor *p_partition = getPartition(partId * SUB_PARTITION_NUM);
 
     volatile unsigned int partitionVertexNum = ((p_partition->dstVertexEnd - p_partition->dstVertexStart)
             / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE );
@@ -67,7 +67,7 @@ void partitionApplyCModel(
     prop_t * outDeg       = (prop_t*)get_host_mem_pointer(MEM_ID_OUT_DEG);
     prop_t * vertexProp   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
 
-    partitionDescriptor  *p_partition = getPartition(partId * SUB_PARTITION_NUM);
+    subPartitionDescriptor  *p_partition = getPartition(partId * SUB_PARTITION_NUM);
 
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
