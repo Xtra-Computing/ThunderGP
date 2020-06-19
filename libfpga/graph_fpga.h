@@ -65,16 +65,6 @@ typedef struct __int2__
 } int2;
 
 
-
-typedef struct __int4__
-{
-    int s0;
-    int s1;
-    int s2;
-    int s3;
-} int4;
-
-
 typedef struct EdgeInfo {
     int2 data[EDGE_NUM];
 } edge_tuples_t;

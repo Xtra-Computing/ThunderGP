@@ -11,6 +11,8 @@
 
 #include "host_graph_sw.h"
 
+#include "host_graph_scheduler.h"
+
 using namespace std;
 
 
@@ -36,7 +38,6 @@ void freeResources(void) {
 
 extern gatherScatterDescriptor localGsKernel[SUB_PARTITION_NUM];
 extern subPartitionDescriptor subPartitions[MAX_PARTITIONS_NUM];
-extern int partIdTable[MAX_PARTITIONS_NUM];
 
 
 void hardware_init(const char * name, char *file_name) {
@@ -151,11 +152,11 @@ double launchFPGA(void)
         fpga_run_start = getCurrentTimestamp();
         for (int i = 0; i < GLOBAL_BLK_SIZE; i ++)
         {
-            setGsKernel(partIdTable[i]);
+            setGsKernel(getArrangedPartitionID(i));
             if (i > 0)
             {
 #if HAVE_APPLY
-                setApplyKernel(kernel_apply, partIdTable[i - 1], vertexNum);
+                setApplyKernel(kernel_apply, getArrangedPartitionID(i - 1), vertexNum);
                 clEnqueueTask(apply_ops, kernel_apply, 4,
                               &syncEvent[(i - 1) * SUB_PARTITION_NUM],
                               &applyEvent[i - 1]);
@@ -168,7 +169,7 @@ double launchFPGA(void)
                               &syncEvent[i * SUB_PARTITION_NUM + j]);
             }
 #if HAVE_APPLY
-            setApplyKernel(kernel_apply, partIdTable[blkNum / TEST_SCALE - 1], vertexNum);
+            setApplyKernel(kernel_apply, getArrangedPartitionID(blkNum / TEST_SCALE - 1), vertexNum);
             clEnqueueTask(apply_ops, kernel_apply, 4,
                           &syncEvent[(blkNum / TEST_SCALE - 1) * SUB_PARTITION_NUM],
                           &applyEvent[(blkNum / TEST_SCALE - 1)]);
@@ -214,10 +215,10 @@ double launchFPGA(void)
             {
                 for (int j = 0; j < SUB_PARTITION_NUM; j ++)
                 {
-                    partitionGatherScatterCModel(context, device, j, &subPartitions[partIdTable[i] * SUB_PARTITION_NUM + j]);
+                    partitionGatherScatterCModel(context, device, j, &subPartitions[getArrangedPartitionID(i) * SUB_PARTITION_NUM + j]);
                 }
 #if HAVE_APPLY
-                partitionApplyCModel(context, device, partIdTable[i], baseScore);
+                partitionApplyCModel(context, device, getArrangedPartitionID(i), baseScore);
 #endif
             }
 
@@ -261,7 +262,6 @@ double launchFPGA(void)
 
 //clear_host_mem(MEM_ID_TMP_VERTEX_VERIFY);
 
-//swVerifyCmodel(task_info);
 //transfer_data_from_pl(context, device, MEM_ID_VERTEX_PROP);
 //transfer_data_from_pl(context, device, MEM_ID_TMP_VERTEX_PROP);
 

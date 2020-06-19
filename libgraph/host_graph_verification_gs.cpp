@@ -3,7 +3,7 @@
 #include "config.h"
 #include "fpga_application.h"
 
-#include "host_graph_sw_verification.h"
+#include "host_graph_verification.h"
 
 
 void partitionGatherScatterCModel(

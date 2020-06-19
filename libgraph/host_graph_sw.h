@@ -26,15 +26,6 @@
 
 typedef struct
 {
-    int edge_start;
-    int edge_end;
-    int sink_start;
-    int sink_end;
-    int base_score;
-} fpga_task_info_t;
-
-typedef struct
-{
     const char* name;
     int partition_mem_attr;
     int prop_id;
@@ -78,10 +69,13 @@ typedef struct
 
 typedef struct
 {
-    subPartitionDescriptor *subPartitions[SUB_PARTITION_NUM];
-} partitionItem;
+    subPartitionDescriptor *sub[SUB_PARTITION_NUM];
+    int    finalOrder[SUB_PARTITION_NUM];
+    unsigned int totalEdge;
+    unsigned int subPartitionSize;
+} partitionDescriptor;
 
-subPartitionDescriptor * getPartition(int partID);
+subPartitionDescriptor * getSubPartition(int partID);
 
 gatherScatterDescriptor * getGatherScatter(int kernelID);
 
@@ -103,10 +97,6 @@ void processInit(
     const int   &edgeNum,
     const int   &source
 );
-
-void processMemInit(cl_context &context);
-
-void swVerifyCmodel( fpga_task_info_t task_info);
 
 void partitionGatherScatterCModel(
     cl_context              &context,

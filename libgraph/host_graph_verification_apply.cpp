@@ -4,7 +4,7 @@
 #include "config.h"
 #include "fpga_application.h"
 
-#include "host_graph_sw_verification.h"
+#include "host_graph_verification.h"
 
 #if  CUSTOMIZE_APPLY == 0
 
@@ -29,7 +29,7 @@ void partitionApplyCModel(
     DEBUG_PRINTF("partId %d\n", partId);
     for (int i  = 0; i < SUB_PARTITION_NUM; i++)
     {
-        transfer_data_from_pl(context, device, getPartition(partId * SUB_PARTITION_NUM + i)->tmpProp.id);
+        transfer_data_from_pl(context, device, getSubPartition(partId * SUB_PARTITION_NUM + i)->tmpProp.id);
 
     }
     prop_t * pCuData[SUB_PARTITION_NUM];
@@ -37,18 +37,18 @@ void partitionApplyCModel(
     prop_t * outDeg       = (prop_t*)get_host_mem_pointer(MEM_ID_OUT_DEG);
     prop_t * vertexProp   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
 
-    subPartitionDescriptor  *p_partition = getPartition(partId * SUB_PARTITION_NUM);
+    subPartitionDescriptor  *p_partition = getSubPartition(partId * SUB_PARTITION_NUM);
 
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
-        pCuData[i] = (prop_t*)get_host_mem_pointer(getPartition(partId * SUB_PARTITION_NUM + i)->tmpProp.id);
+        pCuData[i] = (prop_t*)get_host_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + i)->tmpProp.id);
     }
 
     volatile unsigned int partitionVertexNum = ((p_partition->dstVertexEnd - p_partition->dstVertexStart)
             / (ALIGN_SIZE) + 1 ) * (ALIGN_SIZE);
     DEBUG_PRINTF("[DUMP] partitionVertexNum %d\n", partitionVertexNum);
 
-    int offset = getPartition(partId * SUB_PARTITION_NUM)->dstVertexStart;
+    int offset = getSubPartition(partId * SUB_PARTITION_NUM)->dstVertexStart;
 
     for (int i = 0; i < VERTEX_MAX; i++)
     {
