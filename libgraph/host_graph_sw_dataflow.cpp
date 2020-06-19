@@ -47,7 +47,7 @@ int acceleratorInit(const char * name, char *file_name)
     return 0;
 }
 
-int acceleratorSuperStep(int step, graphInfo *info)
+int acceleratorSuperStep(int superStep, graphInfo *info)
 {
     graphAccelerator * acc = getAccelerator();
     int blkNum = info->blkNum;
@@ -56,7 +56,7 @@ int acceleratorSuperStep(int step, graphInfo *info)
         if (i < blkNum)
         {
             partitionDescriptor * partition = getPartition(i);
-            setGsKernel(getArrangedPartitionID(i), step, info);
+            setGsKernel(getArrangedPartitionID(i), superStep, info);
             for (int j = 0; j < SUB_PARTITION_NUM; j ++)
             {
                 clEnqueueTask(acc->gsOps[j], getGatherScatter(j)->kernel, 0, NULL,
@@ -69,7 +69,7 @@ int acceleratorSuperStep(int step, graphInfo *info)
             partitionDescriptor * lastPartition;
             lastPartition = getPartition(i - 1);
 
-            setApplyKernel(getArrangedPartitionID(i - 1), step, info);
+            setApplyKernel(getArrangedPartitionID(i - 1), superStep, info);
             clEnqueueTask(acc->applyOps, getApply()->kernel, SUB_PARTITION_NUM,
                           lastPartition->syncEvent,
                           &lastPartition->applyEvent);
@@ -86,7 +86,7 @@ int acceleratorSuperStep(int step, graphInfo *info)
 }
 
 
-int accelratorProfile (int step, graphInfo *info, double exeTime)
+int accelratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime)
 {
     graphAccelerator * acc = getAccelerator();
     int blkNum = info->blkNum;
@@ -109,23 +109,23 @@ int accelratorProfile (int step, graphInfo *info, double exeTime)
     }
 
     /* verification */
-    if (step == 0)
+    if (runCounter == 0)
     {
         for (int i = 0; i < blkNum; i ++)
         {
             partitionDescriptor * partition = getPartition(i);
             for (int j = 0; j < SUB_PARTITION_NUM; j ++)
             {
-                partitionGatherScatterCModel(acc->context, acc->device, j, partition->sub[j]);
+                partitionGatherScatterCModel(acc->context, acc->device,superStep, j, partition->sub[j]);
             }
 #if HAVE_APPLY
-            partitionApplyCModel(acc->context, acc->device, getArrangedPartitionID(i), dataPrepareGetArg(info));
+            partitionApplyCModel(acc->context, acc->device,superStep, getArrangedPartitionID(i), dataPrepareGetArg(info));
 #endif
         }
 
     }
     /* log */
-    if (step > 1)
+    if (runCounter > 1)
     {
         double fpga_runtime_total = 0;
         double end2end_runtime_total = 0;

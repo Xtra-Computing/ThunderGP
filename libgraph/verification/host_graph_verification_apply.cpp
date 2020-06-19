@@ -22,6 +22,7 @@ prop_t  applyVerfication(prop_t tProp, prop_t source, unsigned int outDeg, void 
 void partitionApplyCModel(
     cl_context              &context,
     cl_device_id            &device,
+    int                     superStep,
     int                     partId,
     unsigned int            applyArg
 )
@@ -70,8 +71,8 @@ void partitionApplyCModel(
     }
 
     int error_count = 0;
-    transfer_data_from_pl(context, device, getGatherScatter(0)->propUpdate.id);
-    prop_t* hwUpdate = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->propUpdate.id);
+    transfer_data_from_pl(context, device, getGatherScatter(0)->prop[1].id);
+    prop_t* hwUpdate = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->prop[1].id);
     for (unsigned int i = 0; i < p_partition->dstVertexEnd - p_partition->dstVertexStart + 1; i++)
     {
         if (updateVerify[i] !=  hwUpdate[i + offset])

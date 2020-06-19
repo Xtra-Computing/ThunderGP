@@ -68,6 +68,8 @@ void kernelInit(graphAccelerator * acc)
 
 void setGsKernel(int partId, int superStep, graphInfo *info)
 {
+    int currentPropId = superStep%2;
+
 #if HAVE_GS
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
@@ -85,7 +87,7 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
         //DEBUG_PRINTF("\tedge  %d %d \n", 0, edgeEnd);
         //DEBUG_PRINTF("\tsink  %d %d \n", sinkStart, sinkEnd);
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeMap.id));
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(gsHandler->prop.id));
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(gsHandler->prop[currentPropId].id));
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edge.id));
 
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->tmpProp.id));
@@ -109,6 +111,8 @@ int applyGlobalMemoryIndex[] =
 
 void setApplyKernel(int partId, int superStep, graphInfo *info)
 {
+    int currentPropId = superStep % 2;
+    int updatePropId  = (superStep + 1) % 2;
 #if HAVE_APPLY
     applyDescriptor * applyHandler = getApply();
     int argvi = 0;
@@ -121,17 +125,16 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
     int offset = p_partition->dstVertexStart;
 
 
-
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->prop.id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->prop[currentPropId].id));
 
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 2)->tmpProp.id));
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 1)->tmpProp.id));
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 0)->tmpProp.id));
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 3)->tmpProp.id));
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->propUpdate.id));
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(1)->propUpdate.id));
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(0)->propUpdate.id));
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(3)->propUpdate.id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->prop[updatePropId].id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(1)->prop[updatePropId].id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(0)->prop[updatePropId].id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(3)->prop[updatePropId].id));
 #if HAVE_APPLY_OUTDEG
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(MEM_ID_OUT_DEG));
 #endif

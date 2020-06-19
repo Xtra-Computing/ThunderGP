@@ -21,12 +21,21 @@ void base_mem_init(cl_context &context)
 
 static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, int cuIndex, void *data)
 {
-    gsItem->prop.id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET;
-    gsItem->prop.name = "cu prop";
-    gsItem->prop.attr = CU_DDR;
-    gsItem->prop.unit_size = sizeof(int);
-    gsItem->prop.size_attr = SIZE_IN_VERTEX;
-    he_mem_init(context, &gsItem->prop);
+    gsItem->prop[0].id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET;
+    gsItem->prop[0].name = "cu prop ping";
+    gsItem->prop[0].attr = CU_DDR;
+    gsItem->prop[0].unit_size = sizeof(int);
+    gsItem->prop[0].size_attr = SIZE_IN_VERTEX;
+    he_mem_init(context, &gsItem->prop[0]);
+    memcpy(gsItem->prop[0].data, data, gsItem->prop[0].size);
+
+    gsItem->prop[1].id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET + 2;
+    gsItem->prop[1].name = "cu prop pong";
+    gsItem->prop[1].attr = CU_DDR;
+    gsItem->prop[1].unit_size = sizeof(int);
+    gsItem->prop[1].size_attr = SIZE_IN_VERTEX;
+    he_mem_init(context, &gsItem->prop[1]);
+    memcpy(gsItem->prop[1].data, data, gsItem->prop[1].size);
 
     gsItem->tmpProp.id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET + 1;
     gsItem->tmpProp.name = "cu output tmpProp";
@@ -34,16 +43,6 @@ static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, in
     gsItem->tmpProp.unit_size = sizeof(int);
     gsItem->tmpProp.size_attr = SIZE_IN_VERTEX;
     he_mem_init(context, &gsItem->tmpProp);
-
-    gsItem->propUpdate.id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET + 2;
-    gsItem->propUpdate.name = "cu propUpdate";
-    gsItem->propUpdate.attr = CU_DDR;
-    gsItem->propUpdate.unit_size = sizeof(int);
-    gsItem->propUpdate.size_attr = SIZE_IN_VERTEX;
-    he_mem_init(context, &gsItem->propUpdate);
-
-    memcpy(gsItem->prop.data, data, gsItem->prop.size);
-    memcpy(gsItem->propUpdate.data, data, gsItem->propUpdate.size);
 }
 
 

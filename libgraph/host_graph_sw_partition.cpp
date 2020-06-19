@@ -107,7 +107,7 @@ static void partitionTransfer(graphInfo *info)
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
         int mem_id[2];
-        mem_id[0] = getGatherScatter(i)->prop.id;
+        mem_id[0] = getGatherScatter(i)->prop[0].id;
         mem_id[1] = getGatherScatter(i)->tmpProp.id;
         transfer_data_to_pl(acc->context, acc->device, mem_id, ARRAY_SIZE(mem_id));
     }

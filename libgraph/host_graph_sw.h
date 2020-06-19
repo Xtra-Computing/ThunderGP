@@ -79,8 +79,7 @@ typedef struct
     int prop_id;
     int output_id;
     cl_kernel kernel;
-    he_mem_t  prop;
-    he_mem_t  propUpdate;
+    he_mem_t  prop[2];
     he_mem_t  tmpProp;
 } gatherScatterDescriptor;
 
@@ -143,9 +142,9 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
 
 int acceleratorDataPreprocess(graphInfo *info);
 
-int acceleratorSuperStep(int step, graphInfo *info);
+int acceleratorSuperStep(int superStep, graphInfo *info);
 
-int accelratorProfile (int step, graphInfo *info, double exeTime);
+int accelratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime);
 
 int acceleratorDeinit(void);
 
@@ -154,6 +153,7 @@ int acceleratorDeinit(void);
 void partitionGatherScatterCModel(
     cl_context              &context,
     cl_device_id            &device,
+    int                     superStep,
     int                     cuIndex,
     subPartitionDescriptor  *subPartitions
 );
@@ -161,6 +161,7 @@ void partitionGatherScatterCModel(
 void partitionApplyCModel(
     cl_context              &context,
     cl_device_id            &device,
+    int                     superStep,
     int                     partId,
     unsigned int            applyArg
 );

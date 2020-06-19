@@ -9,10 +9,14 @@
 void partitionGatherScatterCModel(
     cl_context              &context,
     cl_device_id            &device,
+    int                     superStep,
     int                     cuIndex,
     subPartitionDescriptor  *subPartitions
 )
 {
+    //int currentPropId = superStep%2;
+
+
     unsigned int  *edgesTuples  = (unsigned int *)get_host_mem_pointer(subPartitions->edge.id);
     int *edgeScoreMap           = (int*)get_host_mem_pointer(subPartitions->edgeMap.id);
     prop_t *vertexScoreMapped   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);

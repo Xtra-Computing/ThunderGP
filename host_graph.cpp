@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
         endStamp = getCurrentTimestamp();
 
         /* profile */
-        accelratorProfile(runCounter, &graphDataInfo, endStamp - startStamp);
+        accelratorProfile(0, runCounter, &graphDataInfo, endStamp - startStamp);
     }
     acceleratorDeinit();
 
