@@ -27,15 +27,15 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 #--xp prop:solution.kernel_compiler_margin=<Frequency Percentage>
 #--xp param:compiler.enableAutoFrequencyScaling=0
 
-HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/he_mem.cpp ./libgraph/data_helper.cpp
-HOST_SRCS += ./libgraph/host_graph_verification_gs.cpp
+HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/data_helper.cpp
+
 HOST_SRCS += ./libgraph/host_graph_sw.cpp
+
 HOST_SRCS += ./libgraph/host_graph_sw_mem.cpp
+HOST_SRCS += ./libgraph/memory/he_mem.cpp 
+
 HOST_SRCS += ./libgraph/scheduler/host_graph_scheduler.cpp
-
 HOST_SRCS += ./libgraph/scheduler/secondOrderEstimator/scheduler.cpp
-
-
 
 
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
@@ -44,8 +44,10 @@ ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
 HOST_SRCS += $(APPCONFIG)/host_vertex_apply.cpp
 endif
 
-HOST_SRCS += ./libgraph/host_graph_verification_apply.cpp
+HOST_SRCS += ./libgraph/verification/host_graph_verification_apply.cpp
 endif
+
+HOST_SRCS += ./libgraph/verification/host_graph_verification_gs.cpp
 
 # Host compiler global settings
 CXXFLAGS := $(opencl_CXXFLAGS) -Wall
@@ -53,7 +55,9 @@ CXXFLAGS += -I/$(XILINX_SDX)/Vivado_HLS/include/ -O3 -g -fmessage-length=0 -std=
 CXXFLAGS += -I ./
 CXXFLAGS += -I ./libfpga
 CXXFLAGS += -I ./libgraph
+CXXFLAGS += -I ./libgraph/memory
 CXXFLAGS += -I ./libgraph/scheduler
+CXXFLAGS += -I ./libgraph/verification
 CXXFLAGS += -I $(APPCONFIG)
 
 # Host linker flags
