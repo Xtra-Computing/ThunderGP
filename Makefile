@@ -1,11 +1,15 @@
 
-include ./utils/help.mk
+
 
 # Points to Utility Directory
 COMMON_REPO = ./
 ABS_COMMON_REPO = $(shell readlink -f $(COMMON_REPO))
 
-include ./utils/utils.mk
+UTILS_PATH = ./utils
+
+
+include $(UTILS_PATH)/help.mk
+include $(UTILS_PATH)/utils.mk
 
 #export  XCL_EMULATION_MODE=sw_emu
 TARGETS := hw
