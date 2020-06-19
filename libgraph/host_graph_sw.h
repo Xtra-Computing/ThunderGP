@@ -109,8 +109,7 @@ void partitionGatherScatterCModel(
 void partitionFunction(
     CSR                     *csr,
     int                     &blkNum,
-    cl_context              &context,
-    subPartitionDescriptor  *subPartitions
+    cl_context              &context
 );
 
 

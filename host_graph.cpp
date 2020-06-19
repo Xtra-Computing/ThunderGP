@@ -282,8 +282,7 @@ double fpgaProcessing(
     partitionFunction(
         csr,
         blkNum,
-        context,
-        subPartitions
+        context
     );
     double t2 = getCurrentTimestamp();
     double elapsedTime = (t2 - t1) * 1000;

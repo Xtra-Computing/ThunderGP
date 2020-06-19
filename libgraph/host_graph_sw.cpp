@@ -104,6 +104,11 @@ void setGsKernel(int partId)
 
 #if  CUSTOMIZE_APPLY == 0
 
+int applyGlobalMemoryIndex[] = 
+{
+    2,1,0,3
+};
+
 void setApplyKernel(cl_kernel &kernel_apply, int partId, int vertexNum)
 {
 #if HAVE_APPLY
@@ -197,8 +202,7 @@ void processInit(
 void partitionFunction(
     CSR                        *csr,
     int                        &blkNum,
-    cl_context                 &context,
-    subPartitionDescriptor     *subPartitions
+    cl_context                 &context
 )
 {
 
