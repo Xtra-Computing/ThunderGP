@@ -1,210 +1,124 @@
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <fcntl.h>
-
-#include <stdlib.h>
-#include <malloc.h>
-#include <iostream>
-#include <fstream>
-#include <unordered_map>
-#include <chrono>
-#include <algorithm>
-#include <iostream>
-#include <time.h>
-#include <unistd.h>
-#include <vector>
-#include <math.h>
-#include <ctime>
-
-
-#include <sys/time.h>
-
 #include "host_graph_sw.h"
 
 
 #include "host_graph_scheduler.h"
 
 
-void process_mem_init(cl_context &context);
-void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex);
+#define EDEG_MEMORY_SIZE        ((edgeNum + (ALIGN_SIZE * 4) * 128) * 1)
+#define VERTEX_MEMORY_SIZE      (((vertexNum - 1)/VERTEX_MAX + 1) * VERTEX_MAX)
 
-
-subPartitionDescriptor subPartitions[MAX_PARTITIONS_NUM * SUB_PARTITION_NUM];
-
-partitionDescriptor partitions[MAX_PARTITIONS_NUM];
-
-
-gatherScatterDescriptor localGsKernel[] = {
-    {
-        .name = "readEdgesCU1",
-    },
-    {
-        .name = "readEdgesCU2",
-    },
-    {
-        .name = "readEdgesCU3",
-    },
-    {
-        .name = "readEdgesCU4",
-    },
-};
-
-
-subPartitionDescriptor * getSubPartition(int partID)
-{
-    return &subPartitions[partID];
-}
-
-partitionDescriptor * getPartition(int partID)
-{
-    return &partitions[partID];
-}
-
-gatherScatterDescriptor * getGatherScatter(int kernelID)
-{
-    return &localGsKernel[kernelID];
-}
-
-
-void setGsKernel(int partId)
-{
-#if HAVE_GS
-    for (int i = 0; i < SUB_PARTITION_NUM; i++)
-    {
-        gatherScatterDescriptor * gsHandler = getGatherScatter(i);
-        subPartitionDescriptor * partition = getSubPartition(partId * SUB_PARTITION_NUM + i);
-        int argvi = 0;
-        int edgeEnd     = partition->listEnd;
-        int sinkStart   = 0;
-        int sinkEnd     = VERTEX_MAX;
-
-#if HW_EMU_DEBUG
-        edgeEnd         = HW_EMU_DEBUG_SIZE;
-#endif
-        //DEBUG_PRINTF("gs task in cu [%d] info:\n", i);
-        //DEBUG_PRINTF("\tedge  %d %d \n", 0, edgeEnd);
-        //DEBUG_PRINTF("\tsink  %d %d \n", sinkStart, sinkEnd);
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeMap.id));
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(gsHandler->prop.id));
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edge.id));
-
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->tmpProp.id));
-
-#if HAVE_EDGE_PROP
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeProp.id));
-#endif
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &edgeEnd);
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &sinkStart);
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &sinkEnd);
-    }
-#endif
-}
-
-#if  CUSTOMIZE_APPLY == 0
-
-int applyGlobalMemoryIndex[] = 
-{
-    2,1,0,3
-};
-
-void setApplyKernel(cl_kernel &kernel_apply, int partId, int vertexNum)
-{
-#if HAVE_APPLY
-    int argvi = 0;
-    int base_score = float2int((1.0f - kDamp) / vertexNum);
-    subPartitionDescriptor *p_partition = getSubPartition(partId * SUB_PARTITION_NUM);
-
-    volatile unsigned int partitionVertexNum = ((p_partition->dstVertexEnd - p_partition->dstVertexStart)
-            / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE );
-    int sink_end = partitionVertexNum;
-    int offset = p_partition->dstVertexStart;
-
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->prop.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 2)->tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 1)->tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 0)->tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 3)->tmpProp.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(1)->propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(0)->propUpdate.id));
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(3)->propUpdate.id));
-#if HAVE_APPLY_OUTDEG
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(MEM_ID_OUT_DEG));
-#endif
-    clSetKernelArg(kernel_apply, argvi++, sizeof(cl_mem), get_cl_mem_pointer(MEM_ID_ERROR));
-
-    clSetKernelArg(kernel_apply, argvi++, sizeof(int),    &sink_end);
-    clSetKernelArg(kernel_apply, argvi++, sizeof(int),    &offset);
-    clSetKernelArg(kernel_apply, argvi++, sizeof(int),    &base_score);
-#endif
-}
-
-#endif
-
+extern void base_mem_init(cl_context &context);
+extern void process_mem_init(cl_context &context);
+extern void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex);
 
 extern int schedulerRegister(void);
 
-void processInit(
-    const int   &vertexNum,
-    const int   &edgeNum,
-    const int   &source
-)
+int acceleratorDataPrepare(const std::string &gName, const std::string &mode, graphInfo *info)
 {
-    schedulerRegister();
-    int *vertexProp =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_PROP);
-    int *outDeg =           (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
-    int *vertexScore =      (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
-    unsigned int *activeVertexNum = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX_NUM);
-    unsigned int *activeVertices  = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX);
+    graphAccelerator * acc = getAccelerator();
+
+    Graph* gptr = createGraph(gName, mode);
+    CSR* csr    = new CSR(*gptr);
+    acc->csr    = csr;
+    free(gptr);
+
+    int vertexNum = csr ->vertexNum;
+    int edgeNum   = csr ->edgeNum;
 
 
-    float init_score_float = 1.0f / vertexNum;
-    int init_score_int = float2int(init_score_float);
-    printf("init_score %d\n", init_score_int);
+    register_size_attribute(SIZE_IN_EDGE     , EDEG_MEMORY_SIZE  );
+    register_size_attribute(SIZE_IN_VERTEX   , VERTEX_MEMORY_SIZE);
+    register_size_attribute(SIZE_USER_DEFINE , 1                 );
 
-    /*
+    base_mem_init(acc->context);
+
+    int *rpa        = (int*)get_host_mem_pointer(MEM_ID_RPA);
+    int *cia        = (int*)get_host_mem_pointer(MEM_ID_CIA);
+    int *outDeg     = (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
+
     for (int i = 0; i < vertexNum; i++) {
-        vertexProp[i] = init_score_int;
-        if (outDeg[i] > 0)
-        {
-            vertexScore[i] =  vertexProp[i] / outDeg[i];
-            if (i < 128)
-            {
-                //printf("%d %d %d %d \n", i, vertexScore[i], vertexProp[i], outDeg[i] );
-            }
+        if (i < csr->vertexNum) { // 'vertexNum' may be aligned.
+            rpa[i] = csr->rpao[i];
+            outDeg[i] = csr->rpao[i + 1] - csr->rpao[i];
         }
-        else
-        {
-            vertexScore[i]  = 0;
+        else {
+            rpa[i] = 0;
+            outDeg[i] = 0;
         }
     }
-    */
-    for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
-        vertexScore[i]    = MAX_PROP;
+    rpa[vertexNum] = csr->rpao[vertexNum];
+    for (int i = 0; i < edgeNum; i++) {
+        cia[i] = csr->ciao[i];
     }
-    //vertexScore[source] = 0x80000001;
-    activeVertexNum[0] = 1;
-    activeVertices[0] = source;
 
+    /* compress vertex*/
+    unsigned int *vertexMap   = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
+    unsigned int *vertexRemap = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
 
-    printf("init_score original %f \n", init_score_float);
-    printf("init_score original to int %d \n", init_score_int);
-    printf("init_score after int %f\n", int2float(init_score_int));
+    unsigned int mapedSourceIndex = 0;
+
+    for (int u = 0; u < vertexNum; u++) {
+        int num = rpa[u + 1] - rpa[u];
+        vertexMap[u] = mapedSourceIndex;
+        if (num != 0)
+        {
+            vertexRemap[mapedSourceIndex] = u;
+            mapedSourceIndex ++;
+        }
+    }
+
+    info->vertexNum = vertexNum;
+    info->compressedVertexNum = mapedSourceIndex;
+    info->edgeNum   = edgeNum;
+    info->blkNum =  (mapedSourceIndex + BLK_SIZE - 1) / BLK_SIZE;
+
+    return 0;
 }
 
 
 
-
-
-
-void partitionFunction(
-    CSR                        *csr,
-    int                        &blkNum,
-    cl_context                 &context
-)
+static void partitionTransfer(graphInfo *info)
 {
+    graphAccelerator * acc = getAccelerator();
+
+    DEBUG_PRINTF("%s", "transfer base mem start\n");
+    double  begin = getCurrentTimestamp();
+
+    int base_mem_id[]  = {
+        MEM_ID_VERTEX_SCORE_CACHED,
+        MEM_ID_OUT_DEG,
+        MEM_ID_ERROR
+    };
+    DEBUG_PRINTF("%s", "transfer base mem\n");
+    transfer_data_to_pl(acc->context, acc->device, base_mem_id, ARRAY_SIZE(base_mem_id));
+    DEBUG_PRINTF("%s", "transfer subPartitions mem\n");
+    for (int i = 0; i < info->blkNum; i ++) {
+        int mem_id[3];
+        mem_id[0] = getSubPartition(i)->edge.id;
+        mem_id[1] = getSubPartition(i)->edgeMap.id;
+        mem_id[2] = getSubPartition(i)->edgeProp.id;
+        transfer_data_to_pl(acc->context, acc->device, mem_id, ARRAY_SIZE(mem_id));
+    }
+
+    DEBUG_PRINTF("%s", "transfer cu mem\n");
+    for (int i = 0; i < SUB_PARTITION_NUM; i++)
+    {
+        int mem_id[2];
+        mem_id[0] = getGatherScatter(i)->prop.id;
+        mem_id[1] = getGatherScatter(i)->tmpProp.id;
+        transfer_data_to_pl(acc->context, acc->device, mem_id, ARRAY_SIZE(mem_id));
+    }
+
+    double end =  getCurrentTimestamp();
+    DEBUG_PRINTF("data transfer %lf \n", (end - begin) * 1000);
+}
+
+
+
+void partitionFunction(graphInfo *info)
+{
+    graphAccelerator * acc = getAccelerator();
 
     int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
     int *cia = (int*)get_host_mem_pointer(MEM_ID_CIA);
@@ -216,7 +130,7 @@ void partitionFunction(
     schedulerInit(NULL);
 
     unsigned int mapedSourceIndex = 0;
-    int vertexNum = csr->vertexNum;
+    int vertexNum = info->vertexNum;
 
     for (int u = 0; u < vertexNum; u++) {
         int num = rpa[u + 1] - rpa[u];
@@ -236,12 +150,9 @@ void partitionFunction(
     int startIndx = getStartIndex();
     vertexScoreCached[startIndx] = 0x80000001;
 
-    process_mem_init(context);
+    process_mem_init(acc->context);
 
-    blkNum =  (mapedSourceIndex + BLK_SIZE - 1) / BLK_SIZE;
-    printf("blkNum:%d  vertexNum: %d \n", blkNum, vertexNum);
-
-    for (int i = 0; i < blkNum; i ++) {
+    for (int i = 0; i < info->blkNum; i ++) {
         partitionDescriptor * partition = getPartition(i);
         for (int k = 0; k < SUB_PARTITION_NUM; k++ )
         {
@@ -249,7 +160,7 @@ void partitionFunction(
         }
     }
 
-    for (int i = 0; i < blkNum; i ++) {
+    for (int i = 0; i < info->blkNum; i ++) {
         partitionDescriptor * partition = getPartition(i);
 
         /****************************************************************************************************************/
@@ -309,7 +220,7 @@ void partitionFunction(
             partition->sub[subIndex]->srcVertexStart =  edgeScoreMap[subPartitionSize * subIndex];
             partition->sub[subIndex]->srcVertexEnd   =  edgeScoreMap[subPartitionSize * (subIndex + 1) - 1];
         }
-        schedulerSubPartitionArrangement(partition);
+        schedulerSubPartitionArrangement(i);
 
         for (int subIndex = 0 ; subIndex < SUB_PARTITION_NUM ; subIndex ++ )
         {
@@ -326,7 +237,7 @@ void partitionFunction(
             partition->sub[subIndex]->srcVertexEnd   =  edgeScoreMap[subPartitionSize * (reOrderIndex + 1) - 1];
 
             DEBUG_PRINTF("[SIZE] %d cur_edge_num sub %d\n", partition->totalEdge, partition->sub[subIndex]->listEnd);
-            partition_mem_init(context, partId, partition->sub[subIndex]->listEnd, subIndex); // subIndex --> cuIndex
+            partition_mem_init(acc->context, partId, partition->sub[subIndex]->listEnd, subIndex); // subIndex --> cuIndex
             memcpy(partition->sub[subIndex]->edge.data     , &edgesTuples[subPartitionSize * reOrderIndex]  , partition->sub[subIndex]->listEnd * sizeof(int));
             memcpy(partition->sub[subIndex]->edgeMap.data  , &edgeScoreMap[subPartitionSize * reOrderIndex] , partition->sub[subIndex]->listEnd * sizeof(int));
             memcpy(partition->sub[subIndex]->edgeProp.data , &edgeProp[subPartitionSize * reOrderIndex]     , partition->sub[subIndex]->listEnd * sizeof(int));
@@ -334,25 +245,32 @@ void partitionFunction(
     }
 
 #define CACHE_UNIT_SIZE (4096 * 2)
-    for (int i = 0; i < blkNum; i++)
+
+
+    schedulerPartitionArrangement(info->blkNum);
+
+
+    for (int i = 0; i < info->blkNum; i++)
     {
-        int *edgeScoreMap = (int*)subPartitions[i].edgeMap.data;
+        subPartitionDescriptor * subPartition = getSubPartition(i);
+        int *edgeScoreMap = (int*)subPartition->edgeMap.data;
+
         DEBUG_PRINTF("\n----------------------------------------------------------------------------------\n");
         DEBUG_PRINTF("[PART] subPartitions %d info :\n", i);
-        DEBUG_PRINTF("[PART] \t edgelist from %d to %d\n"   , subPartitions[i].listStart      , subPartitions[i].listEnd     );
-        DEBUG_PRINTF("[PART] \t dst. vertex from %d to %d\n", subPartitions[i].dstVertexStart , subPartitions[i].dstVertexEnd);
-        DEBUG_PRINTF("[PART] \t src. vertex from %d to %d\n", subPartitions[i].srcVertexStart , subPartitions[i].srcVertexEnd);
-        DEBUG_PRINTF("[PART] \t dump: %d - %d\n", (edgeScoreMap[subPartitions[i].listStart]), (edgeScoreMap[subPartitions[i].listEnd - 1]));
-        DEBUG_PRINTF("[PART] scatter cache ratio %lf \n", subPartitions[i].scatterCacheRatio);
-        DEBUG_PRINTF("[PART] v/e %lf \n", (subPartitions[i].dstVertexEnd - subPartitions[i].dstVertexStart)
-                     / ((float)(subPartitions[i].listEnd - subPartitions[i].listStart)));
+        DEBUG_PRINTF("[PART] \t edgelist from %d to %d\n"   , subPartition->listStart      , subPartition->listEnd     );
+        DEBUG_PRINTF("[PART] \t dst. vertex from %d to %d\n", subPartition->dstVertexStart , subPartition->dstVertexEnd);
+        DEBUG_PRINTF("[PART] \t src. vertex from %d to %d\n", subPartition->srcVertexStart , subPartition->srcVertexEnd);
+        DEBUG_PRINTF("[PART] \t dump: %d - %d\n", (edgeScoreMap[subPartition->listStart]), (edgeScoreMap[subPartition->listEnd - 1]));
+        DEBUG_PRINTF("[PART] scatter cache ratio %lf \n", subPartition->scatterCacheRatio);
+        DEBUG_PRINTF("[PART] v/e %lf \n", (subPartition->dstVertexEnd - subPartition->dstVertexStart)
+                     / ((float)(subPartition->listEnd - subPartition->listStart)));
 
-        DEBUG_PRINTF("[PART] v: %d e: %d \n", (subPartitions[i].dstVertexEnd - subPartitions[i].dstVertexStart),
-                     (subPartitions[i].listEnd - subPartitions[i].listStart));
+        DEBUG_PRINTF("[PART] v: %d e: %d \n", (subPartition->dstVertexEnd - subPartition->dstVertexStart),
+                     (subPartition->listEnd - subPartition->listStart));
 
-        DEBUG_PRINTF("[PART] est. efficient %lf\n", ((float)(subPartitions[i].listEnd - subPartitions[i].listStart)) / mapedSourceIndex);
+        DEBUG_PRINTF("[PART] est. efficient %lf\n", ((float)(subPartition->listEnd - subPartition->listStart)) / mapedSourceIndex);
 
-        DEBUG_PRINTF("[PART] compressRatio %lf \n\n", subPartitions[i].compressRatio);
+        DEBUG_PRINTF("[PART] compressRatio %lf \n\n", subPartition->compressRatio);
 
 
         /****************************************************************************************************************/
@@ -361,12 +279,10 @@ void partitionFunction(
 
     }
 
-    schedulerPartitionArrangement(partitions, blkNum);
 
-
-    for (int i = 0; i < blkNum; i++)
+    for (int i = 0; i < info->blkNum; i++)
     {
-        DEBUG_PRINTF("[SCHE] %d with %d @ %d \n", getArrangedPartitionID(i), partitions[getArrangedPartitionID(i)].totalEdge, i);
+        DEBUG_PRINTF("[SCHE] %d with %d @ %d \n", getArrangedPartitionID(i), getPartition(getArrangedPartitionID(i))->totalEdge, i);
     }
 
     int paddingVertexNum  = ((vertexNum  - 1) / (ALIGN_SIZE * 4) + 1 ) * (ALIGN_SIZE * 4);
@@ -378,10 +294,52 @@ void partitionFunction(
         tmpVertexProp[i] = 0;
         vertexProp[i] = base_score;
     }
-
+    partitionTransfer(info);
 }
 
+int acceleratorDataPreprocess(graphInfo *info)
+{
+    schedulerRegister();
+    int *vertexProp =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_PROP);
+    int *outDeg =           (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
+    int *vertexScore =      (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
+    unsigned int *activeVertexNum = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX_NUM);
+    unsigned int *activeVertices  = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX);
 
+
+    int vertexNum = info->vertexNum;
+    int edgeNum   = info->edgeNum;
+
+    float init_score_float = 1.0f / vertexNum;
+    int init_score_int = float2int(init_score_float);
+    printf("init_score %d\n", init_score_int);
+
+    /*
+    for (int i = 0; i < vertexNum; i++) {
+        vertexProp[i] = init_score_int;
+        if (outDeg[i] > 0)
+        {
+            vertexScore[i] =  vertexProp[i] / outDeg[i];
+            if (i < 128)
+            {
+                //printf("%d %d %d %d \n", i, vertexScore[i], vertexProp[i], outDeg[i] );
+            }
+        }
+        else
+        {
+            vertexScore[i]  = 0;
+        }
+    }
+    */
+    for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
+        vertexScore[i]    = MAX_PROP;
+    }
+    //vertexScore[source] = 0x80000001;
+    activeVertexNum[0] = 1;
+    activeVertices[0] =  getStartIndex();
+    partitionFunction(info);
+    return 0;
+}
 
 
 #if 0

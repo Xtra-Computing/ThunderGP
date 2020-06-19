@@ -32,8 +32,9 @@ int soeInitHanlder(void *arg)
 }
 
 
-int soeSubPartitionArrangementHandler(partitionDescriptor * partition)
+int soeSubPartitionArrangementHandler(int partIndex)
 {
+    partitionDescriptor * partition =getPartition(partIndex);
     double currentEst[SUB_PARTITION_NUM];
     double currentEstLut[SUB_PARTITION_NUM];
     int    reOrderIndexArray[SUB_PARTITION_NUM];
@@ -105,18 +106,17 @@ int soeSubPartitionArrangementHandler(partitionDescriptor * partition)
     return 0;
 }
 
-int soeSchedulerPartitionArrangement(partitionDescriptor * partitions, int * table, int size)
+int soeSchedulerPartitionArrangement(int * table, int size)
 {
     for (int i = 0; i < size; i++)
     {
         table[i] = i;
     }
-#if 1
     for (int i = 0; i < size; i++)
     {
         for (int j = 0; j < size - i - 1; j++)
         {
-            if (partitions[table[j]].totalEdge < partitions[table[j + 1]].totalEdge)
+            if (getPartition(table[j])->totalEdge < getPartition(table[j + 1])->totalEdge)
             {
                 int tmpId = table[j];
                 table[j] = table[j + 1];
@@ -124,8 +124,6 @@ int soeSchedulerPartitionArrangement(partitionDescriptor * partitions, int * tab
             }
         }
     }
-#endif
-
     return 0;
 }
 

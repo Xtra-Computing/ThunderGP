@@ -2,8 +2,6 @@
 
 #include "he_mem_config.h"
 
-#define EDEG_MEMORY_SIZE        ((edgeNum + (ALIGN_SIZE * 4) * blkNum) * 1)
-#define VERTEX_MEMORY_SIZE      (((vertexNum - 1)/VERTEX_MAX + 1) * VERTEX_MAX)
 
 const int sizeAttrLut[] = {ATTR_PL_DDR3, ATTR_PL_DDR2, ATTR_PL_DDR1, ATTR_PL_DDR0};
 
@@ -21,7 +19,7 @@ void base_mem_init(cl_context &context)
     }
 }
 
-void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, int cuIndex, void *data)
+static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, int cuIndex, void *data)
 {
     gsItem->prop.id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET;
     gsItem->prop.name = "cu prop";
@@ -95,38 +93,5 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
         partitionItem->tmpProp.unit_size = VERTEX_MAX * sizeof(int);
         partitionItem->tmpProp.size_attr = SIZE_USER_DEFINE;
         he_mem_init(context, &partitionItem->tmpProp);
-    }
-}
-void mem_init(CSR * csr, cl_context &context)
-{
-    int vertexNum = csr->vertexNum;
-    int edgeNum   = csr->edgeNum;
-    int blkNum    = (vertexNum + BLK_SIZE - 1) / BLK_SIZE;
-
-    printf("blkNum %d  %d \n", blkNum,  EDEG_MEMORY_SIZE);
-
-    register_size_attribute(SIZE_IN_EDGE     , EDEG_MEMORY_SIZE  );
-    register_size_attribute(SIZE_IN_VERTEX   , VERTEX_MEMORY_SIZE);
-    register_size_attribute(SIZE_USER_DEFINE , 1                 );
-
-    base_mem_init(context);
-
-    int *rpa        = (int*)get_host_mem_pointer(MEM_ID_RPA);
-    int *cia        = (int*)get_host_mem_pointer(MEM_ID_CIA);
-    int *outDeg     = (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
-
-    for (int i = 0; i < vertexNum; i++) {
-        if (i < csr->vertexNum) { // 'vertexNum' may be aligned.
-            rpa[i] = csr->rpao[i];
-            outDeg[i] = csr->rpao[i + 1] - csr->rpao[i];
-        }
-        else {
-            rpa[i] = 0;
-            outDeg[i] = 0;
-        }
-    }
-    rpa[vertexNum] = csr->rpao[vertexNum];
-    for (int i = 0; i < edgeNum; i++) {
-        cia[i] = csr->ciao[i];
     }
 }

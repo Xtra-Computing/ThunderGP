@@ -4,9 +4,9 @@
 
 typedef int (* schedulerInitHanlder)(void *arg);
 
-typedef int (* subPartitionArrangementHandler)(partitionDescriptor * partition);
+typedef int (* subPartitionArrangementHandler)(int partIndex);
 
-typedef int (* partitionArrangementHandler)(partitionDescriptor * partitions, int * table, int size);
+typedef int (* partitionArrangementHandler)(int * table, int size);
 
 
 
@@ -25,9 +25,9 @@ int registerScheduler(graphStaticScheduler * pItem);
 
 int schedulerInit(void *arg);
 
-int schedulerSubPartitionArrangement(partitionDescriptor * partition);
+int schedulerSubPartitionArrangement(int partIndex);
 
-int schedulerPartitionArrangement(partitionDescriptor * partitions, int size);
+int schedulerPartitionArrangement(int size);
 
 int getArrangedPartitionID(int step);
 

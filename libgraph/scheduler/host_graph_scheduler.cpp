@@ -31,8 +31,9 @@ int schedulerInit(void *arg)
     return scheduler.init(arg);
 }
 
-int schedulerSubPartitionArrangement(partitionDescriptor * partition)
+int schedulerSubPartitionArrangement(int partIndex)
 {
+    partitionDescriptor * partition = getPartition(partIndex);
     if (scheduler.subPartionScheduler == NULL)
     {
         for (int i = 0; i < SUB_PARTITION_NUM; i++)
@@ -41,11 +42,11 @@ int schedulerSubPartitionArrangement(partitionDescriptor * partition)
         }
         return 0;
     }
-    return scheduler.subPartionScheduler(partition);
+    return scheduler.subPartionScheduler(partIndex);
 }
 
 
-int schedulerPartitionArrangement(partitionDescriptor * partitions, int size)
+int schedulerPartitionArrangement(int size)
 {
     if (scheduler.partitionScheduler == NULL)
     {
@@ -55,5 +56,5 @@ int schedulerPartitionArrangement(partitionDescriptor * partitions, int size)
         }
         return 0;
     }
-    return scheduler.partitionScheduler(partitions, partIdTable, size);
+    return scheduler.partitionScheduler(partIdTable, size);
 }

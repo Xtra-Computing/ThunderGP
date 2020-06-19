@@ -11,9 +11,9 @@ int normalInitHanlder(void *arg)
     return 0;
 }
 
-
-int normalSubPartitionArrangementHandler(partitionDescriptor * partition)
+int soeSubPartitionArrangementHandler(int partIndex)
 {
+    partitionDescriptor * partition =getPartition(partIndex);
     if (stepCounter % 2 == 0)
     {
         for (int k = 0; k < SUB_PARTITION_NUM; k++)
@@ -32,7 +32,7 @@ int normalSubPartitionArrangementHandler(partitionDescriptor * partition)
     return 0;
 }
 
-int normalSchedulerPartitionArrangement(partitionDescriptor * partitions, int * table, int size)
+int normalSchedulerPartitionArrangement(int * table, int size)
 {
     for (int i = 0; i < size; i++)
     {

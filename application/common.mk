@@ -29,10 +29,13 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 
 HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/data_helper.cpp
 
-HOST_SRCS += ./libgraph/host_graph_sw.cpp
+HOST_SRCS += ./libgraph/memory/he_mem.cpp 
 
 HOST_SRCS += ./libgraph/host_graph_sw_mem.cpp
-HOST_SRCS += ./libgraph/memory/he_mem.cpp 
+HOST_SRCS += ./libgraph/host_graph_sw_partition.cpp
+HOST_SRCS += ./libgraph/host_graph_sw_kernel.cpp
+
+HOST_SRCS += ./libgraph/host_graph_sw_dataflow.cpp
 
 HOST_SRCS += ./libgraph/scheduler/host_graph_scheduler.cpp
 HOST_SRCS += ./libgraph/scheduler/secondOrderEstimator/scheduler.cpp
