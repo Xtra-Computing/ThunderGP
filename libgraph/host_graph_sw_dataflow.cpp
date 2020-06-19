@@ -92,8 +92,9 @@ int accelratorProfile (int step, graphInfo *info, double exeTime)
     int blkNum = info->blkNum;
     for (int i = 0; i < blkNum; i ++)
     {
-#if HAVE_APPLY
         partitionDescriptor * partition = getPartition(i);
+#if HAVE_APPLY
+        
         unsigned long applyTime = xcl_get_event_duration(partition->applyEvent);
 #else
         unsigned long applyTime = 0;

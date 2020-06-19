@@ -1,5 +1,5 @@
 #include "host_graph_sw.h"
-#include "l2.h"
+#include "fpga_application.h"
 
 #define INT2FLOAT                   (pow(2,30))
 

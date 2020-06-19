@@ -11,8 +11,6 @@ typedef  unsigned int       prop_t;
 typedef  int       			prop_t;
 #endif 
 
-#define MAX_PROP            (INT_MAX - 1)
-
 
 #define BLK_SIZE            (512*1024)
 #define VERTEX_MAX          (BLK_SIZE)

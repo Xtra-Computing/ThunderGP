@@ -1,7 +1,6 @@
 #ifndef __FPGA_APPLICATION_H__
 #define __FPGA_APPLICATION_H__
 
-#include "l2.h"
 
 
 #define VERTEX_ACTIVE_BIT_MASK 		(0x80000000)
@@ -17,6 +16,8 @@
 
 #endif
 
+
+#include "l2.h"
 
 /* source vertex property process */
 #define PROP_COMPUTE_STAGE0(srcProp)                preprocessProperty(srcProp)

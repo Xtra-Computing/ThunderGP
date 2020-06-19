@@ -1,6 +1,10 @@
 #ifndef __L2_H__
 #define __L2_H__
 
+
+#define MAX_PROP            (INT_MAX - 1)
+
+
 /* source vertex property process */
 inline prop_t preprocessProperty(prop_t srcProp)
 {
