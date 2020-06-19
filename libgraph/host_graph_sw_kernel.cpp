@@ -68,7 +68,7 @@ void kernelInit(graphAccelerator * acc)
 
 void setGsKernel(int partId, int superStep, graphInfo *info)
 {
-    int currentPropId = superStep%2;
+    int currentPropId = superStep % 2;
 
 #if HAVE_GS
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
@@ -111,9 +111,10 @@ int applyGlobalMemoryIndex[] =
 
 void setApplyKernel(int partId, int superStep, graphInfo *info)
 {
+#if HAVE_APPLY
     int currentPropId = superStep % 2;
     int updatePropId  = (superStep + 1) % 2;
-#if HAVE_APPLY
+
     applyDescriptor * applyHandler = getApply();
     int argvi = 0;
     unsigned int argReg = dataPrepareGetArg(info);
