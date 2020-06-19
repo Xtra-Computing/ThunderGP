@@ -115,13 +115,6 @@ int getStartIndex(void)
 }
 
 
-int float2int(float a) {
-    return (int)(a * INT2FLOAT);
-}
-
-float int2float(int a) {
-    return ((float)a / INT2FLOAT);
-}
 
 double getCurrentTimestamp(void) {
     timespec a;

@@ -38,7 +38,9 @@ HOST_SRCS += ./libgraph/host_graph_sw_kernel.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_dataflow.cpp
 
 HOST_SRCS += ./libgraph/scheduler/host_graph_scheduler.cpp
-HOST_SRCS += ./libgraph/scheduler/secondOrderEstimator/scheduler.cpp
+HOST_SRCS += ./libgraph/scheduler/$(SCHEDULER)/scheduler.cpp
+
+HOST_SRCS += $(APPCONFIG)/l3DataPrepare.cpp
 
 
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))

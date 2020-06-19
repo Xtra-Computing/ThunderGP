@@ -6,6 +6,15 @@
 
 #include "config.h"
 
+#define PE_NUM              16
+#define EDGE_NUM            8
+#define LOG2_PE_NUM         4
+#define LOG2_EDGE_NUM       (LOG2_PE_NUM - 1)
+
+#define HASH_MASK           (PE_NUM - 1)
+
+
+
 #define DATA_WIDTH              (512)
 #define INT_WIDTH               (32)
 #define INT_WIDTH_SHIFT         (5)

@@ -13,9 +13,9 @@ void applyFunction(
 #endif
     hls::stream<burst_raw>          &vertexPropStream,
     hls::stream<burst_raw>          &tmpVertexPropStream,
-    unsigned int                    baseScore,
+    unsigned int                    argReg,
     hls::stream<burst_raw>          &newVertexPropStream,
-    int                             *error
+    int                             *outReg
 )
 {
     int infoArray[BURST_ALL_BITS / INT_WIDTH];
@@ -48,13 +48,11 @@ void applyFunction(
             prop_t uProp     = vertexProp.range(   (i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
 #if HAVE_APPLY_OUTDEG
             prop_t out_deg   = outDeg.range(       (i + 1) * INT_WIDTH - 1, i * INT_WIDTH );
-#endif
-
-#if HAVE_APPLY_OUTDEG
-            prop_t  wProp     = applyCalculation( tProp, uProp, out_deg, infoArray[i],  arg);
 #else
-            prop_t  wProp     = applyCalculation( tProp, uProp, 0, infoArray[i],  arg);
+            prop_t out_deg   = 0;
 #endif
+            prop_t  wProp    = applyCalculation( tProp, uProp, out_deg, infoArray[i],  argReg);
+
             newVertexProp.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH ) = wProp;
 
         }
@@ -68,7 +66,7 @@ void applyFunction(
         DEBUG_PRINTF("infoArray %d %d \n", i, infoArray[i]);
         infoAggregate += infoArray[i];
     }
-    error[0] = infoAggregate;
+    outReg[0] = infoAggregate;
 
 }
 
@@ -87,10 +85,10 @@ extern "C" {
 #if HAVE_APPLY_OUTDEG
         uint16        *outDegree,
 #endif
-        int           *error,
+        int           *outReg,
         unsigned int  vertexNum,
         unsigned int  addrOffset,
-        unsigned int  baseScore
+        unsigned int  argReg
     )
     {
 
@@ -129,8 +127,8 @@ extern "C" {
 
 
 
-#pragma HLS INTERFACE m_axi port=error offset=slave bundle=gmem5
-#pragma HLS INTERFACE s_axilite port=error bundle=control
+#pragma HLS INTERFACE m_axi port=outReg offset=slave bundle=gmem5
+#pragma HLS INTERFACE s_axilite port=outReg bundle=control
 
 
 #pragma HLS INTERFACE m_axi port=vertexProp offset=slave bundle=gmem6 max_read_burst_length=64
@@ -148,7 +146,7 @@ extern "C" {
 #endif
 
 #pragma HLS INTERFACE s_axilite port=vertexNum      bundle=control
-#pragma HLS INTERFACE s_axilite port=baseScore      bundle=control
+#pragma HLS INTERFACE s_axilite port=argReg         bundle=control
 #pragma HLS INTERFACE s_axilite port=addrOffset     bundle=control
 #pragma HLS INTERFACE s_axilite port=return         bundle=control
 
@@ -193,9 +191,9 @@ extern "C" {
 #endif
             vertexPropStream,
             tmpVertexPropStream,
-            baseScore,
+            argReg,
             newVertexPropStream,
-            error
+            outReg
         );
 
         cuDuplicate(loopNum , newVertexPropStream,

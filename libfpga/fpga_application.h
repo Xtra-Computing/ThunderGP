@@ -3,6 +3,21 @@
 
 #include "l2.h"
 
+
+#define VERTEX_ACTIVE_BIT_MASK 		(0x80000000)
+
+
+#if HAVE_VERTEX_ACTIVE_BIT
+
+#define IS_ACTIVE_VERTEX(a)			((((((a) & VERTEX_ACTIVE_BIT_MASK) == VERTEX_ACTIVE_BIT_MASK))) ? 1 : 0)
+
+#else
+
+#define IS_ACTIVE_VERTEX(a)			(1)
+
+#endif
+
+
 /* source vertex property process */
 #define PROP_COMPUTE_STAGE0(srcProp)                preprocessProperty(srcProp)
 

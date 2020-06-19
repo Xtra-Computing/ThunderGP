@@ -1,6 +1,10 @@
 
 #include "host_graph_sw.h"
 
+
+#define HW_EMU_DEBUG        (0)
+#define HW_EMU_DEBUG_SIZE   (16384 * 4)
+
 gatherScatterDescriptor localGsKernel[] = {
     {
         .name = "readEdgesCU1",
@@ -39,7 +43,6 @@ void kernelInit(graphAccelerator * acc)
 #if HAVE_GS
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
-        DEBUG_PRINTF("kernel init \n");
         getGatherScatter(i)->kernel = clCreateKernel(acc->program, getGatherScatter(i)->name, &status);
         checkStatus("Failed clCreateKernel gs.");
         acc->gsKernel[i] =  getGatherScatter(i);
@@ -109,8 +112,7 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
 #if HAVE_APPLY
     applyDescriptor * applyHandler = getApply();
     int argvi = 0;
-    int vertexNum = info->vertexNum;
-    int base_score = float2int((1.0f - kDamp) / vertexNum);
+    unsigned int argReg = dataPrepareGetArg(info);
     subPartitionDescriptor *p_partition = getSubPartition(partId * SUB_PARTITION_NUM);
 
     volatile unsigned int partitionVertexNum = ((p_partition->dstVertexEnd - p_partition->dstVertexStart)
@@ -121,6 +123,7 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
 
 
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(2)->prop.id));
+
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 2)->tmpProp.id));
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 1)->tmpProp.id));
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + 0)->tmpProp.id));
@@ -136,7 +139,7 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
 
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(int),    &sink_end);
     clSetKernelArg(applyHandler->kernel, argvi++, sizeof(int),    &offset);
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(int),    &base_score);
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(int),    &argReg);
 #endif
 }
 

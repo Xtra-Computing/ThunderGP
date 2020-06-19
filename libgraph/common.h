@@ -9,8 +9,6 @@
 
 #include "config.h"
 
-#define INT2FLOAT                   (pow(2,30))
-
 
 #if 1
 

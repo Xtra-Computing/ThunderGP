@@ -19,13 +19,11 @@
 #define MEM_ID_TMP_VERTEX_VERIFY    (6)
 #define MEM_ID_OUT_DEG              (7)
 #define MEM_ID_ERROR                (8)
-#define MEM_ID_APPLY_DEBUG          (9)
 #define MEM_ID_RPA                  (10)
 #define MEM_ID_CIA                  (11)
 #define MEM_ID_EDGE_PROP            (12)
-#define MEM_ID_TMP_VERTEX_SW        (13)
 #define MEM_ID_VERTEX_PROP_VERIFY   (14)
-#define MEM_ID_VERTEX_SCORE_CACHED  (15)
+#define MEM_ID_VERTEX_SCORE_MAPPED  (15)
 #define MEM_ID_VERTEX_INDEX_MAP     (16)
 #define MEM_ID_VERTEX_INDEX_REMAP   (17)
 #define MEM_ID_VERTEX_INDEX_BIT_ORI (18)
@@ -34,6 +32,7 @@
 #define MEM_ID_ACTIVE_VERTEX        (20)
 #define MEM_ID_ACTIVE_VERTEX_NUM    (21)
 
+#define MEM_ID_OUT_DEG_ORIGIN       (22)
 
 #define MEM_ID_PARTITION_BASE       (100)
 

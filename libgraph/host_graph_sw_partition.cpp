@@ -35,16 +35,17 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
 
     int *rpa        = (int*)get_host_mem_pointer(MEM_ID_RPA);
     int *cia        = (int*)get_host_mem_pointer(MEM_ID_CIA);
-    int *outDeg     = (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
 
+    int *outDeg         = (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
+    int *outDegOriginal = (int*)get_host_mem_pointer(MEM_ID_OUT_DEG_ORIGIN);
     for (int i = 0; i < vertexNum; i++) {
         if (i < csr->vertexNum) { // 'vertexNum' may be aligned.
             rpa[i] = csr->rpao[i];
-            outDeg[i] = csr->rpao[i + 1] - csr->rpao[i];
+            outDegOriginal[i] = csr->rpao[i + 1] - csr->rpao[i];
         }
         else {
             rpa[i] = 0;
-            outDeg[i] = 0;
+            outDegOriginal[i] = 0;
         }
     }
     rpa[vertexNum] = csr->rpao[vertexNum];
@@ -64,6 +65,7 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
         if (num != 0)
         {
             vertexRemap[mapedSourceIndex] = u;
+            outDeg[mapedSourceIndex] = num;
             mapedSourceIndex ++;
         }
     }
@@ -86,7 +88,7 @@ static void partitionTransfer(graphInfo *info)
     double  begin = getCurrentTimestamp();
 
     int base_mem_id[]  = {
-        MEM_ID_VERTEX_SCORE_CACHED,
+        MEM_ID_VERTEX_SCORE_MAPPED,
         MEM_ID_OUT_DEG,
         MEM_ID_ERROR
     };
@@ -115,14 +117,13 @@ static void partitionTransfer(graphInfo *info)
 }
 
 
-
 void partitionFunction(graphInfo *info)
 {
     graphAccelerator * acc = getAccelerator();
 
     int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
     int *cia = (int*)get_host_mem_pointer(MEM_ID_CIA);
-    int *vertexScoreCached    = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
+    int *vertexScoreMapped    = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
     int *vertexScore          = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
     unsigned int *vertexMap   = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
     unsigned int *vertexRemap = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
@@ -138,17 +139,14 @@ void partitionFunction(graphInfo *info)
         if (num != 0)
         {
 #if CAHCE_FETCH_DEBUG
-            vertexScoreCached[mapedSourceIndex] =  mapedSourceIndex;
+            vertexScoreMapped[mapedSourceIndex] =  mapedSourceIndex;
 #else
-            vertexScoreCached[mapedSourceIndex] =  vertexScore[u];
+            vertexScoreMapped[mapedSourceIndex] =  vertexScore[u];
 #endif
             vertexRemap[mapedSourceIndex] = u;
             mapedSourceIndex ++;
         }
     }
-
-    int startIndx = getStartIndex();
-    vertexScoreCached[startIndx] = 0x80000001;
 
     process_mem_init(acc->context);
 
@@ -204,7 +202,7 @@ void partitionFunction(graphInfo *info)
             edgesTuples[cur_edge_num] = (ENDFLAG - 1);
             edgeScoreMap[cur_edge_num] = edgeScoreMap[cur_edge_num - 1];
             edgeProp[cur_edge_num] = 0;
-            cur_edge_num ++; //printf("%d edge_tuple_range %d\n", k, cur_edge_num);
+            cur_edge_num ++;
         }
         partition->totalEdge = cur_edge_num;
 
@@ -287,12 +285,9 @@ void partitionFunction(graphInfo *info)
 
     int paddingVertexNum  = ((vertexNum  - 1) / (ALIGN_SIZE * 4) + 1 ) * (ALIGN_SIZE * 4);
     int *tmpVertexProp =  (int*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_PROP);
-    int *vertexProp    =  (int*)get_host_mem_pointer(MEM_ID_VERTEX_PROP);
-    int base_score = float2int((1.0f - kDamp) / vertexNum);
     for (int i = vertexNum; i < paddingVertexNum; i++)
     {
         tmpVertexProp[i] = 0;
-        vertexProp[i] = base_score;
     }
     partitionTransfer(info);
 }
@@ -300,43 +295,7 @@ void partitionFunction(graphInfo *info)
 int acceleratorDataPreprocess(graphInfo *info)
 {
     schedulerRegister();
-    int *vertexProp =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_PROP);
-    int *outDeg =           (int*)get_host_mem_pointer(MEM_ID_OUT_DEG);
-    int *vertexScore =      (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
-    unsigned int *activeVertexNum = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX_NUM);
-    unsigned int *activeVertices  = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX);
-
-
-    int vertexNum = info->vertexNum;
-    int edgeNum   = info->edgeNum;
-
-    float init_score_float = 1.0f / vertexNum;
-    int init_score_int = float2int(init_score_float);
-    printf("init_score %d\n", init_score_int);
-
-    /*
-    for (int i = 0; i < vertexNum; i++) {
-        vertexProp[i] = init_score_int;
-        if (outDeg[i] > 0)
-        {
-            vertexScore[i] =  vertexProp[i] / outDeg[i];
-            if (i < 128)
-            {
-                //printf("%d %d %d %d \n", i, vertexScore[i], vertexProp[i], outDeg[i] );
-            }
-        }
-        else
-        {
-            vertexScore[i]  = 0;
-        }
-    }
-    */
-    for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
-        vertexScore[i]    = MAX_PROP;
-    }
-    //vertexScore[source] = 0x80000001;
-    activeVertexNum[0] = 1;
-    activeVertices[0] =  getStartIndex();
+    dataPrepareProperty(info);
     partitionFunction(info);
     return 0;
 }

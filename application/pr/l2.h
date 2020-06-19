@@ -1,6 +1,10 @@
 #ifndef __L2_H__
 #define __L2_H__
 
+
+#define kDamp               (0.85f)
+#define kDampFixPoint       108//(0.85 << 7)  // * 128
+
 /* source vertex property process */
 inline prop_t preprocessProperty(prop_t srcProp)
 {

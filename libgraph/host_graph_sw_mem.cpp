@@ -49,10 +49,10 @@ static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, in
 
 void process_mem_init(cl_context &context)
 {
-    int *vertexProp =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
+    int *vertexScoreMapped =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
-        gs_mem_init(context, getGatherScatter(i), i, vertexProp);
+        gs_mem_init(context, getGatherScatter(i), i, vertexScoreMapped);
     }
 }
 

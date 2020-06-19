@@ -13,7 +13,7 @@ prop_t  applyVerfication(prop_t tProp, prop_t source, unsigned int outDeg, void 
 
     unsigned int temp;
     prop_t updateVerify;
-    updateVerify = applyCalculation(tProp,source,outDeg,temp, *(unsigned int *)arg);
+    updateVerify = applyCalculation(tProp, source, outDeg, temp, *(unsigned int *)arg);
 
     return updateVerify;
 }
@@ -23,7 +23,7 @@ void partitionApplyCModel(
     cl_context              &context,
     cl_device_id            &device,
     int                     partId,
-    unsigned int            baseScore
+    unsigned int            applyArg
 )
 {
     DEBUG_PRINTF("partId %d\n", partId);
@@ -33,9 +33,9 @@ void partitionApplyCModel(
 
     }
     prop_t * pCuData[SUB_PARTITION_NUM];
-    prop_t * updateVerify = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_PROP_VERIFY);
-    prop_t * outDeg       = (prop_t*)get_host_mem_pointer(MEM_ID_OUT_DEG);
-    prop_t * vertexProp   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
+    prop_t * updateVerify        = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_PROP_VERIFY);
+    prop_t * outDeg              = (prop_t*)get_host_mem_pointer(MEM_ID_OUT_DEG);
+    prop_t * vertexScoreMapped   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
 
     subPartitionDescriptor  *p_partition = getSubPartition(partId * SUB_PARTITION_NUM);
 
@@ -66,7 +66,7 @@ void partitionApplyCModel(
         }
 
         prop_t tProp = mergeData;
-        updateVerify[i] = applyVerfication(tProp,vertexProp[i + offset],outDeg[i + offset],(void *)&baseScore);
+        updateVerify[i] = applyVerfication(tProp, vertexScoreMapped[i + offset], outDeg[i + offset], (void *)&applyArg);
     }
 
     int error_count = 0;

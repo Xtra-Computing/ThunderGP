@@ -40,18 +40,18 @@ int main(int argc, char **argv) {
 
     acceleratorDataPreprocess(&graphDataInfo);
 
-    for (int superStep = 0 ; superStep < 3 ; superStep ++)
+    for (int runCounter = 0 ; runCounter < 3 ; runCounter ++)
     {
         double startStamp, endStamp;
 
         startStamp = getCurrentTimestamp();
 
-        acceleratorSuperStep(superStep, &graphDataInfo);
+        acceleratorSuperStep(0, &graphDataInfo);
 
         endStamp = getCurrentTimestamp();
 
         /* profile */
-        accelratorProfile(superStep, &graphDataInfo, endStamp - startStamp);
+        accelratorProfile(runCounter, &graphDataInfo, endStamp - startStamp);
     }
     acceleratorDeinit();
 

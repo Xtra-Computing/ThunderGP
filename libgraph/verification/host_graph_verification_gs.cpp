@@ -13,9 +13,9 @@ void partitionGatherScatterCModel(
     subPartitionDescriptor  *subPartitions
 )
 {
-    unsigned int  *edgesTuples   = (unsigned int *)get_host_mem_pointer(subPartitions->edge.id);
-    int *edgeScoreMap        = (int*)get_host_mem_pointer(subPartitions->edgeMap.id);
-    prop_t *vertexScore         = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_CACHED);
+    unsigned int  *edgesTuples  = (unsigned int *)get_host_mem_pointer(subPartitions->edge.id);
+    int *edgeScoreMap           = (int*)get_host_mem_pointer(subPartitions->edgeMap.id);
+    prop_t *vertexScoreMapped   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
     prop_t *tmpVertexPropVerify = (prop_t*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_VERIFY);
     prop_t *edgeProp            = (prop_t*)get_host_mem_pointer(subPartitions->edgeProp.id);
     clear_host_mem(MEM_ID_TMP_VERTEX_VERIFY);
@@ -25,9 +25,9 @@ void partitionGatherScatterCModel(
     {
         prop_t update = 0;
         unsigned int address = (edgesTuples[i] > subPartitions->dstVertexEnd) ? subPartitions->dstVertexEnd : edgesTuples[i];
-        if (IS_ACTIVE_VERTEX(vertexScore[edgeScoreMap[i]]))
+        if (IS_ACTIVE_VERTEX(vertexScoreMapped[edgeScoreMap[i]]))
         {
-            update = PROP_COMPUTE_STAGE0(vertexScore[edgeScoreMap[i]]);
+            update = PROP_COMPUTE_STAGE0(vertexScoreMapped[edgeScoreMap[i]]);
 #if HAVE_EDGE_PROP
             update = PROP_COMPUTE_STAGE1(update, edgeProp[i]);
 #else
@@ -40,16 +40,16 @@ void partitionGatherScatterCModel(
             DEBUG_PRINTF("[DUMP]  %d 0x%08x-->0x%08x 0x%08x with 0x%08x \n", i,
                          edgesTuples[i],
                          edgeScoreMap[i],
-                         vertexScore[edgeScoreMap[i]],
+                         vertexScoreMapped[edgeScoreMap[i]],
                          edgeProp[i]);
             DEBUG_PRINTF("[DUMP-2]  %d 0x%08x 0x%08x [%d] 0x%08x\n", i,
-                         vertexScore[i], update, address, tmpVertexPropVerify[address]);
+                         vertexScoreMapped[i], update, address, tmpVertexPropVerify[address]);
         }
 
 #ifdef PROBE_VERTEX
         if (edgesTuples[i] == PROBE_VERTEX)
         {
-            DEBUG_PRINTF("probe (%d): %d %d %d %d \n", edgesTuples[i], i, edgeScoreMap[i], vertexScore[edgeScoreMap[i]], tmpVertexPropVerify[edgesTuples[i]]);
+            DEBUG_PRINTF("probe (%d): %d %d %d %d \n", edgesTuples[i], i, edgeScoreMap[i], vertexScoreMapped[edgeScoreMap[i]], tmpVertexPropVerify[edgesTuples[i]]);
         }
 #endif
     }

@@ -10,13 +10,6 @@
 #include "he_mem.h"
 #include "he_mem_id.h"
 
-typedef struct
-{
-    int vertexNum;
-    int compressedVertexNum;
-    int edgeNum;
-    int blkNum;
-} graphInfo;
 
 
 #define MAX_PARTITIONS_NUM      (128)
@@ -33,6 +26,13 @@ typedef struct
     }                                               \
 }
 
+typedef struct
+{
+    int vertexNum;
+    int compressedVertexNum;
+    int edgeNum;
+    int blkNum;
+} graphInfo;
 
 typedef struct
 {
@@ -61,7 +61,6 @@ typedef struct
     profileLog log;
 } subPartitionDescriptor;
 
-
 typedef struct
 {
     subPartitionDescriptor  *sub[SUB_PARTITION_NUM];
@@ -72,7 +71,6 @@ typedef struct
     cl_event                applyEvent;
     double                  applyExeTime;
 } partitionDescriptor;
-
 
 typedef struct
 {
@@ -86,13 +84,11 @@ typedef struct
     he_mem_t  tmpProp;
 } gatherScatterDescriptor;
 
-
 typedef struct
 {
     const char* name;
     cl_kernel kernel;
 } applyDescriptor;
-
 
 typedef struct
 {
@@ -131,7 +127,6 @@ gatherScatterDescriptor * getGatherScatter(int kernelID);
 
 applyDescriptor * getApply(void);
 
-
 void kernelInit(graphAccelerator * acc);
 
 void setGsKernel(int partId, int superStep, graphInfo *info);
@@ -156,17 +151,6 @@ int acceleratorDeinit(void);
 
 
 
-
-int float2int(float a);
-float int2float(int a);
-double getCurrentTimestamp(void);
-
-
-Graph* createGraph(const std::string &gName, const std::string &mode);
-
-int getStartIndex(void);
-
-
 void partitionGatherScatterCModel(
     cl_context              &context,
     cl_device_id            &device,
@@ -174,13 +158,27 @@ void partitionGatherScatterCModel(
     subPartitionDescriptor  *subPartitions
 );
 
-
 void partitionApplyCModel(
     cl_context              &context,
     cl_device_id            &device,
     int                     partId,
-    unsigned int            baseScore
+    unsigned int            applyArg
 );
+
+unsigned int dataPrepareGetArg(graphInfo *info);
+
+int dataPrepareProperty(graphInfo *info);
+
+int getStartIndex(void);
+
+
+
+
+double getCurrentTimestamp(void);
+
+
+Graph* createGraph(const std::string &gName, const std::string &mode);
+
 
 
 #endif /* __HOST_GRAPH_SW_H__ */

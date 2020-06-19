@@ -9,3 +9,6 @@ HAVE_UNSIGNED_PROP=false
 HAVE_APPLY=true
 CUSTOMIZE_APPLY=false
 HAVE_APPLY_OUTDEG=true
+
+#scheduler
+SCHEDULER=secondOrderEstimator

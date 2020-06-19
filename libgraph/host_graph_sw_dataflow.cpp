@@ -89,7 +89,6 @@ int acceleratorSuperStep(int step, graphInfo *info)
 int accelratorProfile (int step, graphInfo *info, double exeTime)
 {
     graphAccelerator * acc = getAccelerator();
-    DEBUG_PRINTF("profile \n");
     int blkNum = info->blkNum;
     for (int i = 0; i < blkNum; i ++)
     {
@@ -109,11 +108,8 @@ int accelratorProfile (int step, graphInfo *info, double exeTime)
     }
 
     /* verification */
-    DEBUG_PRINTF("verification \n");
     if (step == 0)
     {
-        int baseScore = float2int((1.0f - kDamp) / info->vertexNum);
-        
         for (int i = 0; i < blkNum; i ++)
         {
             partitionDescriptor * partition = getPartition(i);
@@ -122,7 +118,7 @@ int accelratorProfile (int step, graphInfo *info, double exeTime)
                 partitionGatherScatterCModel(acc->context, acc->device, j, partition->sub[j]);
             }
 #if HAVE_APPLY
-            partitionApplyCModel(acc->context, acc->device, getArrangedPartitionID(i), baseScore);
+            partitionApplyCModel(acc->context, acc->device, getArrangedPartitionID(i), dataPrepareGetArg(info));
 #endif
         }
 

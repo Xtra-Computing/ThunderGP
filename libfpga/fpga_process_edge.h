@@ -100,14 +100,6 @@ void dstPropertyProcess(
     uint_raw vertexNum = dstEnd - dstStart;
 
 
-#if BRAM_INIT
-    for (int i = 0; i < ((VERTEX_MAX) >> (LOG2_PE_NUM + 1)); i++)
-    {
-#pragma HLS PIPELINE II=1
-        tmpVPropBuffer[i] = 0;
-    }
-#endif
-
     while (true) {
 #pragma HLS PIPELINE II=2
         int2 tmp_data;
