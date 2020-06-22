@@ -2,19 +2,18 @@
 # Algorithm Mapping
 In this section, we introduce how to map new algorithms to our framework with __L2__ level APIs provided by ThunderGP.
 
-Based on the execution flow of ThunderGP, there are two types of compute kernel: the scatter-gather and the apply. Mapping new graph analytic algorithms is equivalent to reconstruct or reconfigure these two compute kernels and it is easy to achieve by using the __L2__ interface provided by ThunderGP. Actually, the __L2__ functions act as hooks, meaning that ThunderGP will call them for processing specific event in the data-flow. The details of these hooks are available in following sections.
+Based on the execution flow of ThunderGP, there are two types of compute kernel: the scatter-gather and the apply. Mapping new graph analytic algorithms is equivalent to reconstruct or reconfigure these two compute kernels and it is easy to achieve by using the __L2__ interface provided by ThunderGP. Actually, the __L2__ functions act as hooks, meaning that ThunderGP will call them for processing specific event in the data-flow. 
+
+The below figure shows the mapping hooks with unique IDs. In the next, we shall enumerate the coding of hooks with an SpMV example. 
 
 ![l2dataflow](images/l2_dataflow.png)
 
 
-## Sparse Matrix-vector Multiplication as an Example
-
-Following section will take the SpMV application as an example to illustrated how to mapping the algorithm to ThunderGP. 
-
+## Sparse Matrix-vector Multiplication (SpMV) as an Example
 
 <img src="images/SPMV.png" alt="drawing" width="500"/>
 
-This figure illustrates a SpMV algorithm. The matrix **A** in CSR format can be mapped into the edges and the property of edges, and the vector **x** is the property of vertices. In here we have the following algorithms code:
+This figure illustrates a SpMV algorithm. The matrix **A** in CSR format can be mapped into the edges and the property of edges, and the vector **x** is the property of vertices. The compuation of SpMV is shown below:
 
 ```c
 for (r = 0; r < A.rows; r++)
@@ -30,7 +29,7 @@ for (r = 0; r < A.rows; r++)
 
 ## Compute Kernel - Scatter-Gather
 
-In our implementation, the gather and scatter stages are combined together by the internal shuffle data path(the shuffle stage), and the implementation of this compute kernel are highly hardware-specific, which is not friendly with the algorithm developers, and it is hiden by following hooks
+In our implementation, the gather and scatter stages are combined together by the internal shuffle data path(the shuffle stage), and the implementation of this compute kernel are highly hardware-specific, which is not friendly with the algorithm developers, and it is hiden by following hooks:
 
 
 ##### Hook Functions
@@ -43,7 +42,6 @@ In our implementation, the gather and scatter stages are combined together by th
 | updateDestination | 4 | Destination property update. | 
 
 Notes: 
-
 * The operation in ```updateDestination``` and ```updateMergeInRAWSolver``` can be very similar, the __difference__ is that  for ```updateDestination```, the data in on-chip memory is not initialized,  which means the accumulations are start from zero, but for ```updateMergeInRAWSolver```,  as the read-after-write hazard only happened in two very closed update tuples, we add a temporary buffer in RAWSolver to sift out the closed update and perform the update in the temporary buffer. Therefore if the update happened, the data in the temporary buffer is initialized. It should be considered when mapping an algorithm with bit-masked property(e.g. BFS).
 * If the accelerator configuration ```HAVE_EDGE_PROP``` is set to false the hook ```updateCalculation``` will not be called because there is no property of edges.
 
