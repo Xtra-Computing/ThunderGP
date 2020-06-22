@@ -1,5 +1,5 @@
 ## Scheduling
-Load-balancing among multiple compute unit highly influence the final performance.
+Load-balancing among multiple compute unit highly influences the final performance.
 
 ![normal](images/sche0.png)
 
