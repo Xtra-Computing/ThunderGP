@@ -78,14 +78,14 @@ Notes:
 
 ## Mapping the Apply Kernel
 
-The apply stage may need different types of data, and this variance makes the abstraction a little tough. Currently, ThunderGP provides __two__ methods to adopt apply stage into FPGA accelerator: 
-
-The first one for mapping apply stage of the graph algorithm is using the __L2__ hooks, but the date type is limited by existing data path. Currently, ThunderGP support load __four__ types of data for the application-specific calculation in apply stage:  
+The apply stage may need different types of data, and this variance makes the abstraction a little tough. ThunderGP provides a flexible mechanism for mapping algorithms to apply phase. Same as mapping scatter-gather kernel, users can use the __L2__ hooks. However, the number of date types is **limited by existing data path**. Currently, ThunderGP support automatically load __four__ types of data for the application-specific calculation in apply stage:  
 
 *  The property of vertices;
 *  The out-degree of vertices;
 *  The update value from scatter-gather stage;
 *  An additional big word;
+
+*(If you need more types of data in apply stage, please go to the bellowing __Customizating Apply__ section.)*
 
 Following table shows the hook functions for apply stage. Note:  ```applyMerge``` is only used in multiple-SLRs.
 
@@ -119,25 +119,21 @@ inline prop_t applyCalculation( prop_t tProp,
 
 
 ## Other Accelerator Configurations
-Developers also need to modify the accelerator configurations to fit their algorithm. 
+Developers also need to modify the accelerator configurations to fit their algorithm. This configurations locate in the ```build.mk``` in each application folder.
 
 | Configuration | Value | Description  |
 |---------------|-------|--------------|
 | HAVE_VERTEX_ACTIVE_BIT | true/false  | This is a bit-masked mechanism which control the tuple is going to update the property of corresponding vertex or not, it is used in BFS-like algorithms (e.g BFS, SSSP) which need to mark the active vertices. |
 | HAVE_EDGE_PROP |         true/false  | For some algorithms (e.g. SpMV, SSSP) they need the property of edges to make the calculation with the property of vertices, by setting this parameter, ThunderGP will automatically add a data path for load and process the property of edges. |
 | HAVE_UNSIGNED_PROP    |  true/false  | If you need a signed property, set it to false.  |
-
-by using __L2__ interface, mapping the scatter-gather stage of a new algorithm is very simple, it can also get a pretty good performance without touching the low-level code.
-
-
-| Configuration | Value | Description  |
-|---------------|-------|--------------|
 | HAVE_APPLY | true/false  |  This parameter decides whether the apply compute kernel is needed or not, because that some algorithms may not need apply stage (e.g. SpMV).    |
 | CUSTOMIZE_APPLY |         true/false  | If existing abstraction on apply stage can not fit your requirements, you should set it to true and build your specific data-flow using __L1__ function. The details is available in the next section.   |
 | HAVE_APPLY_OUTDEG    |  true/false  | This parameter controls whether there is an additional data path for load out-degree. |
 
 
-ThunderGP also provides a mechanism to using the low level APIs (__L1__) to build customize data-flow. Our existing code in template can be a reference. The customize steps are shown below:
+## Customizating Apply
+
+ThunderGP provides a mechanism to using the low level APIs (__L1__) to build **customize data-flow**. Our existing code in template can be a reference. The customize steps are shown below:
 
 * Modify the apply_kernel.mk, change the variable ```CUSTOMIZE_APPLY``` to true
 * Write the accelerator code in vertex_apply.cpp, a HLS function ```vertexApply``` is needed for building the accelerator
