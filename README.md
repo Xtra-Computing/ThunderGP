@@ -62,7 +62,7 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on VCU
 | SSSP   | 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
 
 
-Throughput (MTEPS) of different graph processing algorithms over datasets on U200 platform. (TBD)
+Throughput (MTEPS) of different graph processing algorithms over datasets on U200 platform. 
 
 | Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| twitter-2010|
 |-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
