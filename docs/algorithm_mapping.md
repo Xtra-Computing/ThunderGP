@@ -1,10 +1,9 @@
 
-# Algorithm Mapping
+# Algorithm Mapping 
 In this section, we introduce how to map new algorithms to our framework with __L2__ level APIs provided by ThunderGP.
 
-Based on the execution flow of ThunderGP, there are two types of compute kernel: the scatter-gather and the apply. Mapping new graph analytic algorithms is equivalent to reconstruct or reconfigure these two compute kernels and it is easy to achieve by using the __L2__ interface provided by ThunderGP. Actually, the __L2__ functions act as hooks, meaning that ThunderGP will call them for processing specific event in the data-flow. 
-
-The below figure shows the mapping hooks with unique IDs. In the next, we shall enumerate the coding of hooks with an Sparse Matrix-vector Multiplication (SpMV) example. 
+Based on the execution flow of ThunderGP, there are two types of compute kernel: the scatter-gather and the apply. Mapping new graph analytic algorithms is equivalent to reconstruct or reconfigure these two compute kernels and it is easy to achieve by using the __L2__ interface provided by ThunderGP. Actually, the __L2__ functions act as hooks, meaning that ThunderGP will call them for processing specific event in the data-flow. The below figure shows the mapping hooks with unique IDs.  
+## In the next, we shall enumerate the coding of hooks with an Sparse Matrix-vector Multiplication (SpMV) example. ##
 
 ![l2dataflow](images/l2_dataflow.png)
 
