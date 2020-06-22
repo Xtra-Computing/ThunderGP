@@ -88,7 +88,7 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 
    * [Memory Management](docs/memory.md) 
 
-   * [Scheduling](docs/scheduling.md) 
+   * [Scheduling across Multi SLRs](docs/scheduling.md) 
 
    * [Verification](docs/verification.md)
 
