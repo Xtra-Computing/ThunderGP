@@ -1,9 +1,11 @@
 
-### API Table (under construction)
-#### Stream operations
+# API Table
+
+## L1 
+### Stream Operations
 To provide more portability, ThunderGP warps some operations on steam channel
 
-| Module    | Description  |
+| Function  | Description  |
 |-----------|--------------|
 | read_from_stream    |  blocking read from stream   |
 | read_from_stream_nb | nonblocking read from stream |
@@ -11,21 +13,20 @@ To provide more portability, ThunderGP warps some operations on steam channel
 | clear_stream        |  clear the stream for next iteration |
 | empty_stream        |  clear the stream in some unexpected situations |
 
-
-#### L1 
+### Processing Modules
 | Module    | Description  |
 |-----------|--------------|
-| burstRead | Read data in bust mode from global memory and generate stream |
-|burstReadLite|Similar to burstRead, but do not send the END_FLAG token|
+| burstRead | read data in bust mode from global memory and generate stream |
+|burstReadLite|similar to burstRead, but do not send the END_FLAG token|
 | writeBack | write the stream data into global memory |
-|writeBackLite| Similar to writeBack, but do not check the END_FLAG token|
-| srcPropertyProcess | Manage the source vertex cache and output stream of edge tuples|
-| shuffleDecoder   | Shuffle decoder |
-| tupleFilter  | Filter valid data for PEs  |
-| rawSolver  | Read-after-write(RAW) hazard solver |
-| dstPropertyProcess | As gather PE, manage the destine destination vertices    |
-|  cuMerge         | Merge all the intermediate result for ***apply*** stage               |
-| cuDuplicate | Dispatch the updated results from ***apply*** to each group of gather-scatter kernels |
+|writeBackLite| similar to writeBack, but do not check the END_FLAG token|
+| srcPropertyProcess | manage the source vertex cache and output stream of edge tuples|
+| shuffleDecoder   | shuffle decoder |
+| tupleFilter  | filter valid data for PEs  |
+| rawSolver  | read-after-write(RAW) hazard solver |
+| dstPropertyProcess | as gather PE, manage the destine destination vertices    |
+|  cuMerge         | merge all the intermediate result for ***apply*** stage               |
+| cuDuplicate | dispatch the updated results from ***apply*** to each group of gather-scatter kernels |
 
 Example:
 
@@ -69,42 +70,118 @@ Example:
     }
 }
 ```
-#### L2
+## L2
 | Hooks    | Description  |
 |-----------|--------------|
-| preprocessProperty | Per-process the source vertex property. |
-| updateCalculation | Calculate the update value by using the edge property and source vertex property.  |
-| updateMergeInRAWSolver | Destination property update in RAW solver. | 
-| updateDestination | Destination property update. | 
-| applyMerge | Destination property merge from all of the scatter-gather CUs. | 
+| preprocessProperty | per-process the source vertex property. |
+| updateCalculation | calculate the update value by using the edge property and source vertex property.  |
+| updateMergeInRAWSolver | destination property update in RAW solver. | 
+| updateDestination | destination property update. | 
+| applyMerge | destination property merge from all of the scatter-gather CUs. | 
+| applyCalculation | calculate the new property value |
+
 
 
 Example:
 
 ```c
 
+/* source vertex property process */
+inline prop_t preprocessProperty(prop_t srcProp)
+{
+    return ((srcProp) + 1);
+}
+
 /* source vertex property & edge property */
-prop_t updateCalculation(prop_t srcProp,prop_t edgeProp)    
+inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
 {
-    return((srcProp) + (edgeProp))
+    return (srcProp);
 }
+
 /* destination property update in RAW solver */
-prop_t updateMergeInRAWSolver(prop_t ori,prop_t update)    
+inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
 {
-    return ((((ori)& (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK)))?(update):(ori))
+    return ((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) ? (update) : (ori));
 }
+
 /* destination property update dst buffer update */
-prop_t updateDestination(prop_t ori,prop_t update)   
+inline prop_t updateDestination(prop_t ori, prop_t update)
 {
-    return (((((ori)& (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) || (ori == 0x0))?(update):(ori))
+    return (((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) || (ori == 0x0)) ? (update) : (ori));
 }
 
 /* destination property merge */
-prop_t applyMerge(prop_t ori,prop_t update)   
+inline prop_t applyMerge(prop_t ori, prop_t update)
 {
+    return ((((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) && (update != 0)) || (ori == 0x0)) ? (update) : (ori));
+}
 
-    return ((((((ori)& (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) && (update != 0)) || (ori == 0x0))?(update):(ori))
+inline prop_t applyCalculation( prop_t tProp,
+                                prop_t source,
+                                prop_t outDeg,
+                                unsigned int &extra,
+                                unsigned int arg
+                              )
+{
+    prop_t update = 0;
+
+    prop_t uProp  = source;
+    prop_t wProp;
+    if ((uProp & 0x80000000) == (tProp & 0x80000000))
+    {
+        wProp = uProp & 0x7fffffff;  // last active vertex
+    }
+    else if ((tProp & 0x80000000) == 0x80000000)
+    {
+        extra ++;
+        wProp = tProp; // current active vertex
+    }
+    else
+    {
+        wProp = MAX_PROP; // not travsered
+    }
+    update = wProp;
+
+    return update;
 }
 ```
 
-#### L3
+## L3
+
+### Partition Descriptor
+
+| Function  | Description  |
+|-----------|--------------|
+| getSubPartition    | return the instance of sub-partition by the given ID   |
+| getPartition |  return the instance of partition by the given ID   |
+
+### Kernel Descriptor
+
+| Function  | Description  |
+|-----------|--------------|
+| kernelInit    | initialize the OpenCL kernels  |
+| getGatherScatter |  return the instance of gather-scatter kernel  |
+|getApply|  return the instance of apply kernel |
+|setGsKernel| setup the gather-scatter kernel for processing one partition data |
+|setApplyKernel| setup the apply kernel for processing one partition data|
+
+
+### Scheduler
+
+| Function  | Description  |
+|-----------|--------------|
+|registerScheduler  | register the customized scheduler into ThunderGP |
+
+
+### Accelerator
+
+
+| Function  | Description  |
+|-----------|--------------|
+|acceleratorInit  | initialize the the bitstream and hardware|
+|acceleratorDataPrepare  | load the graph data |
+|acceleratorDataPreprocess  | graph partitioning |
+|acceleratorSuperStep  | process all of the partitions once |
+|accelratorProfile  | profile the execution time and verify the result |
+|acceleratorDeinit  | release all the dynamic resources |
+

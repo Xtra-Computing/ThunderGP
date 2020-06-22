@@ -61,8 +61,6 @@ he_mem_t* get_he_mem(unsigned int id);
 
 void clear_host_mem(int id);
 
-void hardware_init(const char * name);
-
 int transfer_data_from_pl(cl_context &dev_context, cl_device_id device_id, int mem_id);
 
 int transfer_data_to_pl(cl_context &dev_context, cl_device_id device_id, int* id_array, int size);
