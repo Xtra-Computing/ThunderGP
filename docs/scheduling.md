@@ -1,4 +1,4 @@
-## Scheduling for Multiple-SLRs
+## Scheduling across Multi-SLRs
 Load-balancing among multiple compute units highly influences the final performance.
 
 ![normal](images/sche0.png)
