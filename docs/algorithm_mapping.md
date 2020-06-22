@@ -27,7 +27,7 @@ for (r = 0; r < A.rows; r++)
 
 
 
-## Customizing the Scatter-Gather Kernel
+## Mapping the Scatter-Gather Kernel
 
 In our implementation, the gather and scatter stages are combined together by the internal shuffle data path(the shuffle stage), and the implementation of this compute kernel are highly hardware-specific, which is not friendly with the algorithm developers, and it is hiden by following hooks:
 
@@ -76,9 +76,9 @@ Notes:
 * If the accelerator configuration ```HAVE_EDGE_PROP``` is set to false the hook ```updateCalculation``` will not be called because there is no property of edges.
 
 
-## Customizing the Apply Kernel
+## Mapping the Apply Kernel
 
-The apply stage of each graph analytic algorithm may need different types of data, and this variance makes the abstraction a little tough. Currently, ThunderGP provide __two__ methods to adopt apply stage into FPGA accelerator: 
+The apply stage may need different types of data, and this variance makes the abstraction a little tough. Currently, ThunderGP provides __two__ methods to adopt apply stage into FPGA accelerator: 
 
 The first one for mapping apply stage of the graph algorithm is using the __L2__ hooks, but the date type is limited by existing data path. Currently, ThunderGP support load __four__ types of data for the application-specific calculation in apply stage:  
 
@@ -87,7 +87,7 @@ The first one for mapping apply stage of the graph algorithm is using the __L2__
 *  The update value from scatter-gather stage;
 *  An additional big word;
 
-Following table shows the hook functions for apply stage. Note:  ```applyMerge``` only used in multiple-SLRs.
+Following table shows the hook functions for apply stage. Note:  ```applyMerge``` is only used in multiple-SLRs.
 
 ##### Hook Functions
 
@@ -119,7 +119,7 @@ inline prop_t applyCalculation( prop_t tProp,
 
 
 ## Other Accelerator Configurations
-Developers also need to modify the accelerator configuration to fit their algorithm. 
+Developers also need to modify the accelerator configurations to fit their algorithm. 
 
 | Configuration | Value | Description  |
 |---------------|-------|--------------|
@@ -137,7 +137,7 @@ by using __L2__ interface, mapping the scatter-gather stage of a new algorithm i
 | HAVE_APPLY_OUTDEG    |  true/false  | This parameter controls whether there is an additional data path for load out-degree. |
 
 
-The second one: ThunderGP also provides a mechanism to using the low level APIs (__L1__) to build customize data-flow. Our existing code in template can be a reference. The customize steps are shown below:
+ThunderGP also provides a mechanism to using the low level APIs (__L1__) to build customize data-flow. Our existing code in template can be a reference. The customize steps are shown below:
 
 * Modify the apply_kernel.mk, change the variable ```CUSTOMIZE_APPLY``` to true
 * Write the accelerator code in vertex_apply.cpp, a HLS function ```vertexApply``` is needed for building the accelerator
