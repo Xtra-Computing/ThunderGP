@@ -97,7 +97,7 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 
 ## Framework Overview
 
-### Adopted Computation Model
+### The Adopted Computation Model
 The Gather-Apply-Scatter (GAS) model is widely used for FPGA-based graph processing frameworks as computation model due to its extensibility to various graph processing algorithms. ThunderGP adopts a simplified version of GAS model by following work [*On-the-fly-data-shuffling-for-OpenCL-based-FPGAs*](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf)
 This model updates the vertex property by propagating from source vertex to destination vertex. The input for the model is an unordered set of directed edges of the graph. Undirected edges in a graph can be represented by a pair of directed edges. 
 
@@ -110,7 +110,7 @@ The process per iteration mainly contains three stages: **Scatter**, **Gather**,
 * The final **Apply** stage (shown in line 10 to 12) executes an apply function on all the vertices of the graph. 
 
 
-### Execution Flow of ThunderGP
+### The Execution Flow of ThunderGP
 
 ![overview](docs/images/overview.png)
 
