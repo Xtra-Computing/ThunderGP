@@ -1,9 +1,10 @@
 
 # Algorithm Mapping 
 In this section, we introduce how to map new algorithms to our framework with __L2__ level APIs provided by ThunderGP.
+Based on the execution flow of ThunderGP, users need to customize two compute kernels: **the scatter-gather** and **the apply**. 
+The __L2__ functions act as hooks, meaning that ThunderGP will call them for processing specific event in the data-flow. The below figure shows the mapping hooks with unique IDs.  
 
-Based on the execution flow of ThunderGP, there are two types of compute kernel: the scatter-gather and the apply. Mapping new graph analytic algorithms is equivalent to reconstruct or reconfigure these two compute kernels and it is easy to achieve by using the __L2__ interface provided by ThunderGP. Actually, the __L2__ functions act as hooks, meaning that ThunderGP will call them for processing specific event in the data-flow. The below figure shows the mapping hooks with unique IDs.  
-## In the next, we shall enumerate the coding of hooks with an Sparse Matrix-vector Multiplication (SpMV) example. ##
+**In the next, we shall enumerate the coding of hooks with an Sparse Matrix-vector Multiplication (SpMV) example.**
 
 ![l2dataflow](images/l2_dataflow.png)
 
@@ -26,7 +27,7 @@ for (r = 0; r < A.rows; r++)
 
 
 
-## Compute Kernel - Scatter-Gather
+## Customizing Scatter-Gather Kernel
 
 In our implementation, the gather and scatter stages are combined together by the internal shuffle data path(the shuffle stage), and the implementation of this compute kernel are highly hardware-specific, which is not friendly with the algorithm developers, and it is hiden by following hooks:
 
@@ -74,25 +75,10 @@ Notes:
 * The operation in ```updateDestination``` and ```updateMergeInRAWSolver``` can be very similar, the __difference__ is that  for ```updateDestination```, the data in on-chip memory is not initialized,  which means the accumulations are start from zero, but for ```updateMergeInRAWSolver```,  as the read-after-write hazard only happened in two very closed update tuples, we add a temporary buffer in RAWSolver to sift out the closed update and perform the update in the temporary buffer. Therefore if the update happened, the data in the temporary buffer is initialized. It should be considered when mapping an algorithm with bit-masked property(e.g. BFS).
 * If the accelerator configuration ```HAVE_EDGE_PROP``` is set to false the hook ```updateCalculation``` will not be called because there is no property of edges.
 
-##### Other Accelerator Configurations
 
-Developers also need to modify the accelerator configuration to fit their algorithm. 
-
-| Configuration | Value | Description  |
-|---------------|-------|--------------|
-| HAVE_VERTEX_ACTIVE_BIT | true/false  | This is a bit-masked mechanism which control the tuple is going to update the property of corresponding vertex or not, it is used in BFS-like algorithms (e.g BFS, SSSP) which need to mark the active vertices. |
-| HAVE_EDGE_PROP |         true/false  | For some algorithms (e.g. SpMV, SSSP) they need the property of edges to make the calculation with the property of vertices, by setting this parameter, ThunderGP will automatically add a data path for load and process the property of edges. |
-| HAVE_UNSIGNED_PROP    |  true/false  | If you need a signed property, set it to false.  |
-
-by using __L2__ interface, mapping the scatter-gather stage of a new algorithm is very simple, it can also get a pretty good performance without touching the low-level code.
-
-
-
-## Compute Kernel - Apply
+## Customizing Apply Kernel
 
 The apply stage of each graph analytic algorithm may need different types of data, and this variance makes the abstraction a little tough. Currently, ThunderGP provide __two__ methods to adopt apply stage into FPGA accelerator: 
-
-### Using Existing L2 APIs
 
 The first one for mapping apply stage of the graph algorithm is using the __L2__ hooks, but the date type is limited by existing data path. Currently, ThunderGP support load __four__ types of data for the application-specific calculation in apply stage:  
 
@@ -136,7 +122,17 @@ inline prop_t applyCalculation( prop_t tProp,
 ```
 
 
-##### Accelerator Configuration
+##### Accelerator Configurations
+Developers also need to modify the accelerator configuration to fit their algorithm. 
+
+| Configuration | Value | Description  |
+|---------------|-------|--------------|
+| HAVE_VERTEX_ACTIVE_BIT | true/false  | This is a bit-masked mechanism which control the tuple is going to update the property of corresponding vertex or not, it is used in BFS-like algorithms (e.g BFS, SSSP) which need to mark the active vertices. |
+| HAVE_EDGE_PROP |         true/false  | For some algorithms (e.g. SpMV, SSSP) they need the property of edges to make the calculation with the property of vertices, by setting this parameter, ThunderGP will automatically add a data path for load and process the property of edges. |
+| HAVE_UNSIGNED_PROP    |  true/false  | If you need a signed property, set it to false.  |
+
+by using __L2__ interface, mapping the scatter-gather stage of a new algorithm is very simple, it can also get a pretty good performance without touching the low-level code.
+
 
 | Configuration | Value | Description  |
 |---------------|-------|--------------|
@@ -144,8 +140,6 @@ inline prop_t applyCalculation( prop_t tProp,
 | CUSTOMIZE_APPLY |         true/false  | If existing abstraction on apply stage can not fit your requirements, you should set it to true and build your specific data-flow using __L1__ function. The details is available in the next section.   |
 | HAVE_APPLY_OUTDEG    |  true/false  | This parameter controls whether there is an additional data path for load out-degree. |
 
-
-### Customization
 
 The second one: ThunderGP also provides a mechanism to using the low level APIs (__L1__) to build customize data-flow. Our existing code in template can be a reference. The customize steps are shown below:
 
