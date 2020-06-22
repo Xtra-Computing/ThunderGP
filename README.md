@@ -92,7 +92,7 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 
    * [Verification](docs/verification.md)
 
-#### More details: [ThunderGP APIs ](docs/api_details.md)
+* More details: [ThunderGP APIs ](docs/api_details.md)
 
 
 ## Framework Overview
