@@ -3,8 +3,7 @@ Load-balancing among multiple compute unit highly influences the final performan
 
 ![normal](images/sche0.png)
 
-This figure shows a processing routine without scheduling, the sub-partitions are arranged in sequence (the 1st sub-partitions goes to 1st CU), and the partitions are processed in order. From our observation, this naive arrangement have significantly bad influence on the performance because the 
-unbalanced sub-partitions which have the same number of edges.
+This figure shows a processing routine without scheduling, the sub-partitions are arranged in sequence (the 1st sub-partitions goes to 1st CU), and the partitions are processed in order. From our observation, this naive arrangement have significantly bad influence on the performance because the unbalanced sub-partitions.
 
 ThunderGP schedules the sub-partitions in the following step:
 
