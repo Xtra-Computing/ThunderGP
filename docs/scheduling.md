@@ -5,7 +5,7 @@ Load-balancing among multiple compute unit highly influences the final performan
 
 This figure shows a processing routine without scheduling, the sub-partitions are arranged in sequence (the 1st sub-partitions goes to 1st CU), and the partitions are processed in order. From our observation, this naive arrangement have significantly bad influence on the performance because the unbalanced sub-partitions.
 
-ThunderGP schedules the sub-partitions in the following step:
+To solve this unbalancing problem, ThunderGP schedules the sub-partitions in the following step:
 
 * Calculate the estimated execution time of scheduled sub-partitions in each CUs.
 * Calculate the estimated execution time of  sub-partitions of the coming partition.
@@ -20,7 +20,7 @@ in here ThunderGP also build a performance estimator:
     * ***E***: the number of edges in this sub-partition
 
 * Sample some sub-partitions from the dataset, and get the real execution time in single compute unit.
-* Polynomial model is choosed to  represent this model,  we start fit the model parameters from high order polynomial, and iterativly decrease the order to find the best order.
+* Polynomial model is choosed to  represent this model,  we start fit the model parameters from high order polynomial, and iterativly decrease the order to find the best fitting and estimation.
 
 The result shows that this scheduling scheme have significant improvement on real graph dataset, comparing with the unbalanced order.  For Twitter-SoC dataset it have near **55%** throughput improvement and **21%** for Livejournal.
 
