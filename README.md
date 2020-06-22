@@ -66,10 +66,10 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on U20
 
 | Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| twitter-2010|
 |-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
-| PR     | 4,274  | 3,797  | 2,502  | 3,138  | 3,790  | 2,860  | 2,438  |
-| SpMV   | 4,759  | 4,396  | 2,018  | 3,043  | 3,871  | 3,133  | 2,561  |
-| BFS    | 5,395  | 4,619  | 2,431  | 3,775  | 4,072  | 3,490  | 3,004  |
-| SSSP   | 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
+| PR     | 4,151 | 3,689 | 3,019 |2,352 |3,670 | 2,734 | 2,319 |
+| SpMV   | 4,548 | 4,159 | 2,826 |1,820 |3,650 | 2,931 | 2,375 |
+| BFS    | 3,630 | 3,218 | 2,706 |1,620 |2,837 | 2,476 | 2,054 |
+| SSSP   | 5,226 | 4,437 | 3,614 |2,247 |3,883 | 3,336 | 2,849 |
 
 
 Throughput (MTEPS) of different graph processing algorithms over datasets on U250 platform. (TBD)
@@ -86,7 +86,7 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 
 * L3 provides the high-level APIs on host side to deploy or control graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
 
-   * [Memory management](docs/memory.md) 
+   * [Memory Management](docs/memory.md) 
 
    * [Scheduling](docs/scheduling.md) 
 
