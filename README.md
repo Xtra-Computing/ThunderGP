@@ -135,6 +135,6 @@ As shown in the above diagram, The edges in one partition are streamed into **Sc
 * Collaborators: [Yao Chen (ADSC)](https://microideax.github.io/) and [Deming Chen (UIUC)](http://dchen.ece.illinois.edu/)
 
 
-##Acknowledgement
+## Acknowledgement
 * [Xilinx Adaptive Compute Clusters (XACC) program](https://www.xilinx.com/support/university/XUP-XACC.html)
 * Singapore MoE Tier 2 grant (MOE2017-T2-1-122).
