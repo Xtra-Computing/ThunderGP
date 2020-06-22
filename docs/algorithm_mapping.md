@@ -27,7 +27,7 @@ for (r = 0; r < A.rows; r++)
 
 
 
-## Customizing Scatter-Gather Kernel
+## Customizing the Scatter-Gather Kernel
 
 In our implementation, the gather and scatter stages are combined together by the internal shuffle data path(the shuffle stage), and the implementation of this compute kernel are highly hardware-specific, which is not friendly with the algorithm developers, and it is hiden by following hooks:
 
@@ -76,7 +76,7 @@ Notes:
 * If the accelerator configuration ```HAVE_EDGE_PROP``` is set to false the hook ```updateCalculation``` will not be called because there is no property of edges.
 
 
-## Customizing Apply Kernel
+## Customizing the Apply Kernel
 
 The apply stage of each graph analytic algorithm may need different types of data, and this variance makes the abstraction a little tough. Currently, ThunderGP provide __two__ methods to adopt apply stage into FPGA accelerator: 
 
@@ -87,7 +87,7 @@ The first one for mapping apply stage of the graph algorithm is using the __L2__
 *  The update value from scatter-gather stage;
 *  An additional big word;
 
-Following table shows the hook functions for apply stage. 
+Following table shows the hook functions for apply stage. Note:  ```applyMerge``` only used in multiple-SLRs.
 
 ##### Hook Functions
 
@@ -95,10 +95,6 @@ Following table shows the hook functions for apply stage.
 |-----------|--|--------------|
 | applyMerge | 5 | Destination property merge from all of the scatter-gather CUs. | 
 | applyCalculation | 6 | Calculate the new property of vertices. | 
-
-*  ```applyMerge``` only used in multiple-SLRs.
-
-
 
 In SpMV, these hooks in Scatter-Gather can be easily instanced as follows:
 
@@ -122,7 +118,7 @@ inline prop_t applyCalculation( prop_t tProp,
 ```
 
 
-##### Accelerator Configurations
+## Other Accelerator Configurations
 Developers also need to modify the accelerator configuration to fit their algorithm. 
 
 | Configuration | Value | Description  |
