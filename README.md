@@ -127,3 +127,14 @@ As shown in the above diagram, The edges in one partition are streamed into **Sc
 ## Related systems
 * Graph systems on GPU: [G3](https://github.com/Xtra-Computing/G3) | [Medusa](https://github.com/Xtra-Computing/Medusa)
 * Other Thunder-series systems in Xtra NUS: [ThunderGBM](https://github.com/Xtra-Computing/thundergbm) | [ThunderSVM](https://github.com/Xtra-Computing/thundersvm)
+
+
+## Key members
+* Hongshi Tan, Xinyu Chen (NUS)
+* Advisor: [Bingsheng He](https://www.comp.nus.edu.sg/~hebs/) and [Weng-Fai Wong](https://www.comp.nus.edu.sg/~wongwf/), NUS
+* Collaborators: [Yao Chen (ADSC)](https://microideax.github.io/) and [Deming Chen (UIUC)](http://dchen.ece.illinois.edu/)
+
+
+##Acknowledgement
+* [Xilinx Adaptive Compute Clusters (XACC) program](https://www.xilinx.com/support/university/XUP-XACC.html)
+* Singapore MoE Tier 2 grant (MOE2017-T2-1-122).
