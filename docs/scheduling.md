@@ -40,7 +40,7 @@ ThunderGP also provides intreface for users to customize the scheduling method f
     * **```partitionArrangement```**: ② in the figure, orchestrates the partitions in a user-defined order.
 
 
-* When this two orchestrations are finished, it need to integrate into ThunderGP. Taking the existing scheduler as an example: ( ```libgraph/scheduler/normal/scheduler.cpp```)  
+* When this two orchestrations are finished, it need to be integrated into ThunderGP. Taking the existing scheduler as an example: ( ```libgraph/scheduler/normal/scheduler.cpp```)  
 ```c
 static graphStaticScheduler dut = {
     .init                   = normalInitHanlder,
