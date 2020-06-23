@@ -23,6 +23,9 @@
 #pragma HLS INTERFACE s_axilite port=sink_end       bundle=control
 #pragma HLS INTERFACE s_axilite port=return         bundle=control
 
+const int stream_depth_filter = QUEUE_SIZE_FILTER;
+
+const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 
 
     hls::stream<int2>           buildArray[PE_NUM];
@@ -38,7 +41,7 @@
 #pragma HLS stream variable=edgeTuplesArray  depth=2
 
     hls::stream<filter_type>    toFilterArray[PE_NUM];
-#pragma HLS stream variable=toFilterArray  depth=32
+#pragma HLS stream variable=toFilterArray  depth=stream_depth_filter
 
     hls::stream<filter_type>    toFilterArraySlice[PE_NUM];
 #pragma HLS stream variable=toFilterArraySlice  depth=4
@@ -62,14 +65,14 @@
     hls::stream<burst_raw>      edgeBurstStream;
 #pragma HLS stream variable=edgeBurstStream depth=2
     hls::stream<burst_raw>      edgeBurstStreamTmp;
-#pragma HLS stream variable=edgeBurstStreamTmp depth=512
+#pragma HLS stream variable=edgeBurstStreamTmp depth=stream_depth_memory
 
     hls::stream<burst_raw>      mapSliceStream;
 #pragma HLS stream variable=mapSliceStream depth=2
     hls::stream<burst_raw>      mapStream;
 #pragma HLS stream variable=mapStream depth=2
     hls::stream<burst_raw>      mapStreamTmp;
-#pragma HLS stream variable=mapStreamTmp depth=512
+#pragma HLS stream variable=mapStreamTmp depth=stream_depth_memory
 
 #if HAVE_EDGE_PROP
     hls::stream<burst_raw>      edgePropSliceStream;
@@ -77,7 +80,7 @@
     hls::stream<burst_raw>      edgePropStream;
 #pragma HLS stream variable=edgePropStream depth=2
     hls::stream<burst_raw>      edgePropStreamTmp;
-#pragma HLS stream variable=edgePropStreamTmp depth=512
+#pragma HLS stream variable=edgePropStreamTmp depth=stream_depth_memory
 
 #endif
 

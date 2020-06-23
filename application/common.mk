@@ -78,7 +78,7 @@ CLFLAGS += -I $(APPCONFIG)
 CLFLAGS += --xp prop:solution.kernel_compiler_margin=10%
 
 # Kernel linker flags
-LDCLFLAGS += --xp prop:solution.kernel_compiler_margin=10% --kernel_frequency=280
+LDCLFLAGS += --xp prop:solution.kernel_compiler_margin=10% --kernel_frequency=$(FREQ)
 
 EXECUTABLE = host_graph_fpga_$(APP)
 
@@ -98,7 +98,7 @@ HOST_SRCS += $(xcl_SRCS)
 
 #############################################################################
 #                                                                           #
-#                     Specific build configuration                          #
+#                     Specific Build Configuration                          #
 #                                                                           #
 #############################################################################
 
@@ -158,3 +158,14 @@ else
 CXXFLAGS += -DCUSTOMIZE_APPLY=0
 CLFLAGS  += -DCUSTOMIZE_APPLY=0
 endif
+
+
+#############################################################################
+#                                                                           #
+#                     Specific Configuration                                #
+#                                                                           #
+#############################################################################
+
+CLFLAGS  += -DQUEUE_SIZE_FILTER=$(QUEUE_SIZE_FILTER)
+CLFLAGS  += -DQUEUE_SIZE_MEMORY=$(QUEUE_SIZE_MEMORY)
+CLFLAGS  += -DLOG_SCATTER_CACHE_BURST_SIZE=$(LOG_SCATTER_CACHE_BURST_SIZE)

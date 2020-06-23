@@ -212,7 +212,7 @@ void partitionFunction(graphInfo *info)
             partition->sub[subIndex]->compressRatio = (double (mapedSourceIndex)) / vertexNum;
             DEBUG_PRINTF("ratio %d / %d is %lf \n", mapedSourceIndex, vertexNum, partition->sub[subIndex]->compressRatio);
             partition->sub[subIndex]->dstVertexStart = VERTEX_MAX * (i);
-            partition->sub[subIndex]->dstVertexEnd   = ((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1) ;
+            partition->sub[subIndex]->dstVertexEnd   = (((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1)) - 1;
             volatile int subPartitionSize = ((partition->totalEdge / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
             partition->subPartitionSize = subPartitionSize;
             partition->sub[subIndex]->srcVertexStart =  edgeScoreMap[subPartitionSize * subIndex];
