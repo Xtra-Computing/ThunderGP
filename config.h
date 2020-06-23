@@ -17,8 +17,9 @@ typedef  int       			prop_t;
 #define ENDFLAG             0xffffffff
 
 
-#define BURSTBUFFERSIZE         (128)
 #define LOG_BURSTBUFFERSIZE     (7)
+#define BURSTBUFFERSIZE         (1<<7)
+
 
 #define ALIGN_SIZE              (BURSTBUFFERSIZE * 16)
 
