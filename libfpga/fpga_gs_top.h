@@ -23,9 +23,9 @@
 #pragma HLS INTERFACE s_axilite port=sink_end       bundle=control
 #pragma HLS INTERFACE s_axilite port=return         bundle=control
 
-const int stream_depth_filter = QUEUE_SIZE_FILTER
+const int stream_depth_filter = QUEUE_SIZE_FILTER;
 
-const int stream_depth_memory = QUEUE_SIZE_MEMORY
+const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 
 
     hls::stream<int2>           buildArray[PE_NUM];

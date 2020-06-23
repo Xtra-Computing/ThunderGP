@@ -18,7 +18,7 @@ void applyFunction(
     int                             *outReg
 )
 {
-    int infoArray[BURST_ALL_BITS / INT_WIDTH];
+    unsigned int infoArray[BURST_ALL_BITS / INT_WIDTH];
 #pragma HLS ARRAY_PARTITION variable=infoArray dim=0 complete
     for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i++)
     {
