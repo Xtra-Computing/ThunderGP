@@ -141,7 +141,7 @@ int accelratorProfile (int superStep, int runCounter, graphInfo *info, double ex
                 }
                 DEBUG_PRINTF("[INFO] part_gs %d cu%d exe: %f \n", i, j, partition->sub[j]->log.fpgaExeTime / 1000000.0);
             }
-            end2end_runtime_total = exeTime;
+            end2end_runtime_total = exeTime * 1000;
             fpga_runtime_total    += max_fpga_exe / 1000000.0;
             DEBUG_PRINTF("[INFO] part_apply %d exe: %f \n", i, partition->applyExeTime / 1000000.0);
 #if 0
@@ -157,7 +157,7 @@ int accelratorProfile (int superStep, int runCounter, graphInfo *info, double ex
 #endif
 
         }
-        DEBUG_PRINTF("[INFO] summary e2e %lf fpga %lf\n",
+        DEBUG_PRINTF("[INFO] summary e2e %lf ms, fpga %lf ms\n",
                      end2end_runtime_total,
                      fpga_runtime_total)
     }
