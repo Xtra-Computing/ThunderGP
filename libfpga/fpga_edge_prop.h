@@ -6,20 +6,20 @@
 #include "fpga_application.h"
 
 void halfEdgeProp(
-    hls::stream<burst_raw>      &input,
+    hls::stream<burst_token>    &input,
     hls::stream<burst_half>     &output
 )
 {
     while (true)
     {
 #pragma HLS PIPELINE II=2
-        burst_raw  tmp;
+        burst_token  tmp;
         read_from_stream(input, tmp);
-        burst_half out1 = tmp.range(255,   0);
-        burst_half out2 = tmp.range(511, 256);
+        burst_half out1 = tmp.data.range(255,   0);
+        burst_half out2 = tmp.data.range(511, 256);
         write_to_stream(output, out1);
         write_to_stream(output, out2);
-        if (tmp.range(31, 0) == ENDFLAG)
+        if (tmp.flag == FLAG_SET)
         {
             break;
         }
@@ -47,18 +47,18 @@ void edgePropCouple (
 #pragma HLS UNROLL
             out.data[i].x = tuples.data[i].x;
             out.data[i].y =  PROP_COMPUTE_STAGE1(tuples.data[i].y, prop.range(31 + 32 * i, 0 + 32 * i));
+            out.flag = tuples.flag;
         }
         write_to_stream(output, out);
-        if (tuples.data[EDGE_NUM - 1].x == ENDFLAG)
+        if (tuples.flag == FLAG_SET)
         {
             break;
         }
     }
-    clear_stream(input);
     clear_stream(edgeProp);
 }
 
-void propProcess( hls::stream<burst_raw>       &propInput,
+void propProcess( hls::stream<burst_token>     &propInput,
                   hls::stream<edge_tuples_t>   &tupleInput,
                   hls::stream<edge_tuples_t>   &tupleOuput
                 )
@@ -93,12 +93,11 @@ void propProcessSelf( hls::stream<edge_tuples_t>   &tupleInput,
             out.data[i].y = PROP_COMPUTE_STAGE0(in.data[i].y);
         }
         write_to_stream(tupleOuput, out);
-        if (in.data[EDGE_NUM - 1].x == ENDFLAG)
+        if (in.flag == FLAG_SET)
         {
             break;
         }
     }
-    clear_stream(tupleInput);
 }
 
 #endif /* __FPGA_EDGE_PROP_H__ */

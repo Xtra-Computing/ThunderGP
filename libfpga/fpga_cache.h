@@ -17,6 +17,7 @@ typedef  struct
 {
     uint_raw idx;
     uint_raw size;
+    ap_uint<1> flag;
 } cache_command;
 
 #define URAM_DEPTH              (4096)
@@ -29,6 +30,7 @@ typedef struct
 {
     burst_raw tuples;
     burst_raw score;
+    ap_uint<1> flag;
 } edgeBlock;
 
 
@@ -46,22 +48,23 @@ void streamMerge(
         T         tempScore;
         read_from_stream(edge , tempEdge);
         read_from_stream(score, tempScore);
-        tempEdgeBlock.tuples = tempEdge;
-        tempEdgeBlock.score = tempScore;
+        tempEdgeBlock.tuples = tempEdge.data;
+        tempEdgeBlock.score = tempScore.data;
+        tempEdgeBlock.flag = tempEdge.flag;
         write_to_stream(edgeBlockStream, tempEdgeBlock);
-        if (tempEdge.range(31, 0) == ENDFLAG)
+        if (tempEdge.flag == FLAG_SET)
         {
             break;
         }
     }
+    /* TODO  control signal improvement*/
     {
         edgeBlock end;
-        end.tuples = 0x0;
-        end.score = 0x0;
+        end.flag = FLAG_SET;
         write_to_stream(edgeBlockStream, end);
     }
-    empty_stream(edge);
-    empty_stream(score);
+    //empty_stream(edge);
+    //empty_stream(score);
 
 }
 
@@ -110,7 +113,6 @@ void  duplicateStreamForCache(hls::stream<T>       &input,
                               hls::stream<T>       &output2)
 {
 #pragma HLS function_instantiate variable=input
-    T lastUnit = 0;
     while (true)
     {
 #pragma HLS PIPELINE II=1
@@ -121,8 +123,7 @@ void  duplicateStreamForCache(hls::stream<T>       &input,
         {
             write_to_stream(output2, unit);
         }
-        lastUnit = unit;
-        if (unit.range(31, 0) == ENDFLAG)
+        if (unit.flag == FLAG_SET)
         {
             break;
         }
@@ -132,23 +133,19 @@ void  duplicateStreamForCache(hls::stream<T>       &input,
 #define CACHE_UPDATE_BURST  (1<<LOG_CACHEUPDATEBURST)
 #define LOG_CACHEUPDATEBURST (LOG_SCATTER_CACHE_BURST_SIZE)
 
-void stream2Command(hls::stream<burst_raw>          &mapStream,
+void stream2Command(hls::stream<burst_token>        &mapStream,
                     hls::stream<cache_command>      &cmdStream)
 {
     uint_raw last_index = ENDFLAG - 1;
     ap_uint<1> update_flag = 0;
     while (true)
     {
-        burst_raw map;
+        burst_token map;
         cache_command cmd;
         read_from_stream(mapStream, map);
-        if (map.range(31, 0) == ENDFLAG)
-        {
-            break;
-        }
 
-        uint_raw min_index = (map.range(31, 0) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
-        uint_raw max_index = ((map.range(511, 480) + 64) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
+        uint_raw min_index = (map.data.range(31, 0) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
+        uint_raw max_index = ((map.data.range(511, 480) + 64) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
         if ((last_index == (ENDFLAG - 1)) || (min_index > last_index) || (max_index > last_index))
         {
             update_flag = 1;
@@ -168,17 +165,17 @@ void stream2Command(hls::stream<burst_raw>          &mapStream,
             {
                 min_bound = last_index + 1;
             }
-            cmd.idx = min_bound;
+            cmd.idx  =  min_bound;
             cmd.size =  max_index + 2 - min_bound;
+            cmd.flag =  map.flag;
             write_to_stream(cmdStream, cmd);
             last_index = max_index + 1;
         }
+        if (map.flag == FLAG_SET)
+        {
+            break;
+        }
     }
-    cache_command end_cmd;
-    end_cmd.idx = ENDFLAG;
-    end_cmd.size =  0;
-    write_to_stream(cmdStream, end_cmd);
-
 }
 
 
@@ -220,7 +217,7 @@ void streamDelayScheme1(hls::stream<burst_raw>  &in, hls::stream<burst_raw>   &o
 }
 
 
-void streamDelayScheme2(hls::stream<burst_raw>  &in, hls::stream<burst_raw>   &out)
+void streamDelayScheme2(hls::stream<burst_token>  &in, hls::stream<burst_token>   &out)
 {
     burst_raw  buffer[POOL_SIZE];
 #pragma HLS RESOURCE variable=buffer core=XPM_MEMORY uram
@@ -245,7 +242,10 @@ void streamDelayScheme2(hls::stream<burst_raw>  &in, hls::stream<burst_raw>   &o
         {
             if (!out.full())
             {
-                write_to_stream(out, out_data);
+                burst_token out_token;
+                out_token.data = out_data;
+                out_token.flag = FLAG_RESET;
+                write_to_stream(out, out_token);
                 gw_counter ++;
             }
         }
@@ -254,11 +254,11 @@ void streamDelayScheme2(hls::stream<burst_raw>  &in, hls::stream<burst_raw>   &o
         {
             if (!in.empty())
             {
-                burst_raw in_data;
+                burst_token in_data;
                 read_from_stream(in, in_data);
-                buffer[r_counter & (POOL_SIZE - 1)] = in_data;
+                buffer[r_counter & (POOL_SIZE - 1)] = in_data.data;
                 gr_counter ++;
-                if (in_data.range(31, 0) == ENDFLAG)
+                if (in_data.flag == FLAG_SET)
                 {
                     end_flag = 1;
                 }
@@ -275,9 +275,16 @@ void streamDelayScheme2(hls::stream<burst_raw>  &in, hls::stream<burst_raw>   &o
     }
     for (int i = gw_counter; i < gr_counter; i ++)
     {
-        burst_raw end_data;
-        end_data = buffer[i & (POOL_SIZE - 1)];
-        write_to_stream(out, end_data);
+        burst_token end_token;
+        end_token.data = buffer[i & (POOL_SIZE - 1)];
+        if (i == (gr_counter - 1))
+        {
+            end_token.flag = FLAG_SET;
+        } else
+        {
+            end_token.flag = FLAG_RESET;
+        }
+        write_to_stream(out, end_token);
     }
 
 }
@@ -293,10 +300,6 @@ void updateVertexCache(uint16                          *input,
     {
         cache_command cmd;
         read_from_stream(cmdStream, cmd);
-        if (cmd.idx == ENDFLAG)
-        {
-            break;
-        }
 
         C_PRINTF("updating %d  %d  from %d \n", (int)min_index, (int)max_index, (int)last_index)
         for (uint_raw i = 0; i < cmd.size ; i ++)
@@ -326,6 +329,10 @@ void updateVertexCache(uint16                          *input,
 #endif
             }
         }
+        if (cmd.flag == FLAG_SET)
+        {
+            break;
+        }
     }
     {
         cache_line  end;
@@ -348,7 +355,6 @@ void  readEdgesStage(
 #pragma HLS DEPENDENCE variable=vertexScoreCache intra false
 
     C_PRINTF("%s \n", "start readedges");
-    uint_raw end_value = 0;
     ap_uint<1>  break_flag = 0;
     uint_raw caching_value = 0;
     uint_raw processing_value = 0;
@@ -423,20 +429,13 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
                         }
 #endif
                     }
+                    tuples[unit_cycle].flag = (unit_cycle & tmpBlock[1].flag);
                 }
                 writeTuples(edgeTuplesBuffer, tuples);
-                end_value = tmpBlock[1].tuples.range(31, 0);
+                break_flag = tmpBlock[1].flag;
             }
             tmpBlock[1] = tmpBlock[0];
             processing_counter ++;
-        }
-        if (end_value == ENDFLAG)
-        {
-            break_flag = 1;
-        }
-        else
-        {
-            break_flag = 0;
         }
     }
 
@@ -447,11 +446,11 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
     return;
 
 }
-void srcPropertyProcess( uint16                           *vertexScore,
-                   hls::stream<burst_raw>           &edgeBurstStream,
-                   hls::stream<burst_raw>           &mapStream,
-                   hls::stream<edge_tuples_t>       &edgeTuplesBuffer
-                 )
+void srcPropertyProcess( uint16                             *vertexScore,
+                         hls::stream<burst_token>           &edgeBurstStream,
+                         hls::stream<burst_token>           &mapStream,
+                         hls::stream<edge_tuples_t>         &edgeTuplesBuffer
+                       )
 {
 #pragma HLS DATAFLOW
     uint_uram vertexScoreCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH];
@@ -468,13 +467,13 @@ void srcPropertyProcess( uint16                           *vertexScore,
     hls::stream<cache_command>    cmdStream;
 #pragma HLS stream variable=cmdStream  depth=512
 
-    hls::stream<burst_raw>      delayingMapStream;
+    hls::stream<burst_token>      delayingMapStream;
 #pragma HLS stream variable=delayingMapStream depth=2
 
-    hls::stream<burst_raw>      delayedMapStream;
+    hls::stream<burst_token>      delayedMapStream;
 #pragma HLS stream variable=delayedMapStream depth=2
 
-    hls::stream<burst_raw>      map4CacheStream;
+    hls::stream<burst_token>      map4CacheStream;
 #pragma HLS stream variable=map4CacheStream depth=2
 
     hls::stream<edgeBlock>      edgeBlockStream;

@@ -12,7 +12,7 @@ include $(UTILS_PATH)/help.mk
 include $(UTILS_PATH)/utils.mk
 
 #export  XCL_EMULATION_MODE=sw_emu
-TARGETS := hw
+TARGETS := hw_emu
 TARGET  := $(TARGETS)
 DEVICES := xilinx_vcu1525_xdma_201830_1
 # device list:

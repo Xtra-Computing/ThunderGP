@@ -61,7 +61,7 @@ void shuffleEntry (
             valid_r[j] = 0;
             idx[j] = 0;
         }
-        end_flag_shift = (tuples.data[EDGE_NUM - 1].x == ENDFLAG) ? 1 : 0;
+        end_flag_shift = tuples.flag;
 
         //data_r = tuples.data;
 
@@ -119,7 +119,6 @@ void shuffleEntry (
             break;
         }
     }
-    clear_stream(edgeTuplesArray);
     return;
 }
 

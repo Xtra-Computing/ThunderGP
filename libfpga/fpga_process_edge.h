@@ -88,7 +88,7 @@ void dstPropertyProcess(
     uint_raw                sink_end,
     uint_uram               tmpVPropBuffer[(VERTEX_MAX / 2) >> LOG2_PE_NUM],
     //uint_raw                bitmap[BITMAP_SLICE_SIZE][BITMAP_SUB_SIZE],
-    hls::stream<int2>       &buildArray,
+    hls::stream<int2_token> &buildArray,
     hls::stream<uint_uram>  &writeArray
 )
 {
@@ -103,16 +103,18 @@ void dstPropertyProcess(
     while (true) {
 #pragma HLS PIPELINE II=2
         int2 tmp_data;
-        read_from_stream(buildArray, tmp_data);
+        int2_token in_token;
+        read_from_stream(buildArray, in_token);
+        tmp_data = in_token.data;
+        if (in_token.flag == FLAG_SET)
+        {
+            break;
+        }
         uint_raw idx;
         {
 #pragma HLS latency min=0 max=0
             uint_raw dstVidx  = tmp_data.x;
             idx = ((dstVidx - dstStart) >> LOG2_PE_NUM ) & ((VERTEX_MAX >> LOG2_PE_NUM) - 1);
-            if (dstVidx == ENDFLAG)
-            {
-                break;
-            }
         }
 
         {

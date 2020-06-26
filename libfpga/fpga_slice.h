@@ -14,7 +14,7 @@ void  sliceStream(hls::stream<T>       &input,
         T  unit;
         read_from_stream(input, unit);
         write_to_stream(output, unit);
-        if (unit.range(31, 0) == ENDFLAG)
+        if (unit.flag == FLAG_SET)
         {
             break;
         }
@@ -62,7 +62,7 @@ void  duplicateStream4(hls::stream<T>       &input,
         write_to_stream(output2, unit);
         write_to_stream(output3, unit);
         write_to_stream(output4, unit);
-        if (unit.data[EDGE_NUM - 1].x == ENDFLAG)
+        if (unit.flag == FLAG_SET)
         {
             break;
         }
@@ -86,25 +86,24 @@ void  duplicateStream4WithClear(hls::stream<T>       &input,
         write_to_stream(output2, unit);
         write_to_stream(output3, unit);
         write_to_stream(output4, unit);
-        if (unit.data[EDGE_NUM - 1].x == ENDFLAG)
+        if (unit.flag == FLAG_SET)
         {
             break;
         }
     }
-    clear_stream(input);
 }
 
 
 
-void processEdgesBuildSlice(hls::stream<int2>  &in , hls::stream<int2> &out)
+void processEdgesBuildSlice(hls::stream<int2_token>  &in , hls::stream<int2> &out)
 {
 #pragma HLS function_instantiate variable=in
     while (true)
     {
-        int2 tmp_data;
+        int2_token tmp_data;
         read_from_stream(in, tmp_data);
-        write_to_stream(out, tmp_data);
-        if (tmp_data.x == ENDFLAG)
+        write_to_stream(out, tmp_data.data);
+        if (tmp_data.flag == FLAG_SET)
         {
             break;
         }

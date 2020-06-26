@@ -71,7 +71,8 @@ LDFLAGS += -lrt -lstdc++  -lxilinxopencl
 
 
 # Kernel compiler global settings
-CLFLAGS = -t $(TARGET) --platform $(DEVICE) --save-temps  -O3
+CLFLAGS = -g 
+CLFLAGS += -t $(TARGET) --platform $(DEVICE) --save-temps  -O3
 CLFLAGS += -I ./
 CLFLAGS += -I ./libfpga
 CLFLAGS += -I $(APPCONFIG)
@@ -93,7 +94,6 @@ include $(UTILS_PATH)/xcl/xcl.mk
 CXXFLAGS +=  $(xcl_CXXFLAGS)
 LDFLAGS +=   $(xcl_CXXFLAGS)
 HOST_SRCS += $(xcl_SRCS)
-
 
 
 #############################################################################

@@ -28,7 +28,7 @@ void burstRead(
     unsigned int end = ((edge_end - 1) >> (LOG2_SIZE_BY_INT + LOG_BURSTBUFFERSIZE)) + 1;
 
 
-    T read_buffer[BURSTBUFFERSIZE];
+    burst_raw read_buffer[BURSTBUFFERSIZE];
 
     {
 
@@ -58,19 +58,18 @@ timeLineLoop : for (unsigned int i = (offset); i < (end); i ++)
             for (int inner_idx = 0; inner_idx < chunk_size; inner_idx++)
             {
 #pragma HLS PIPELINE II=1
-                write_to_stream(outputstream, read_buffer[inner_idx]);
+                burst_token token;
+                token.data = read_buffer[inner_idx];
+                token.flag = FLAG_RESET;
+                write_to_stream(outputstream, token);
             }
         }
     }
 
     {
-        burst_raw end_packed;
-        end_packed   = 0x0;
-        end_packed = ~end_packed;
-        //write_to_stream(outputstream, end_packed);
-        //write_to_stream(outputstream, end_packed);
-        //write_to_stream(outputstream, end_packed);
-        write_to_stream(outputstream, end_packed);
+        burst_token token;
+        token.flag = FLAG_SET;
+        write_to_stream(outputstream, token);
         return;
     }
 

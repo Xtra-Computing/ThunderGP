@@ -28,10 +28,10 @@ const int stream_depth_filter = QUEUE_SIZE_FILTER;
 const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 
 
-    hls::stream<int2>           buildArray[PE_NUM];
+    hls::stream<int2_token>           buildArray[PE_NUM];
 #pragma HLS stream variable=buildArray  depth=2
 
-    hls::stream<int2>           buildArrayRes[PE_NUM];
+    hls::stream<int2_token>           buildArrayRes[PE_NUM];
 #pragma HLS stream variable=buildArrayRes  depth=2
 
     hls::stream<int2>           buildArraySlice[PE_NUM];
@@ -60,26 +60,26 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 #pragma HLS stream variable=writeArrayLayer1  depth=2
 
 
-    hls::stream<burst_raw>      edgeBurstSliceStream;
+    hls::stream<burst_token>      edgeBurstSliceStream;
 #pragma HLS stream variable=edgeBurstSliceStream depth=2
-    hls::stream<burst_raw>      edgeBurstStream;
+    hls::stream<burst_token>      edgeBurstStream;
 #pragma HLS stream variable=edgeBurstStream depth=2
-    hls::stream<burst_raw>      edgeBurstStreamTmp;
+    hls::stream<burst_token>      edgeBurstStreamTmp;
 #pragma HLS stream variable=edgeBurstStreamTmp depth=stream_depth_memory
 
-    hls::stream<burst_raw>      mapSliceStream;
+    hls::stream<burst_token>      mapSliceStream;
 #pragma HLS stream variable=mapSliceStream depth=2
-    hls::stream<burst_raw>      mapStream;
+    hls::stream<burst_token>      mapStream;
 #pragma HLS stream variable=mapStream depth=2
-    hls::stream<burst_raw>      mapStreamTmp;
+    hls::stream<burst_token>      mapStreamTmp;
 #pragma HLS stream variable=mapStreamTmp depth=stream_depth_memory
 
 #if HAVE_EDGE_PROP
-    hls::stream<burst_raw>      edgePropSliceStream;
+    hls::stream<burst_token>      edgePropSliceStream;
 #pragma HLS stream variable=edgePropSliceStream depth=2
-    hls::stream<burst_raw>      edgePropStream;
+    hls::stream<burst_token>      edgePropStream;
 #pragma HLS stream variable=edgePropStream depth=2
-    hls::stream<burst_raw>      edgePropStreamTmp;
+    hls::stream<burst_token>      edgePropStreamTmp;
 #pragma HLS stream variable=edgePropStreamTmp depth=stream_depth_memory
 
 #endif
@@ -144,7 +144,7 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
     propProcessSelf(edgeTuplesBuffer, edgeTuplesCoupled);
 #endif
     /* timing */
-    duplicateStream4WithClear(edgeTuplesCoupled, edgeTuplesLayer1[0], edgeTuplesLayer1[1], edgeTuplesLayer1[2], edgeTuplesLayer1[3]);
+    duplicateStream4(edgeTuplesCoupled, edgeTuplesLayer1[0], edgeTuplesLayer1[1], edgeTuplesLayer1[2], edgeTuplesLayer1[3]);
 
     for (int i = 0; i < 4 ; i++)
     {

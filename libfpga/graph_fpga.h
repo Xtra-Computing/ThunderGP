@@ -15,6 +15,9 @@
 
 
 
+#define FLAG_SET                (1u)
+#define FLAG_RESET              (0u)
+
 #define DATA_WIDTH              (512)
 #define INT_WIDTH               (32)
 #define INT_WIDTH_SHIFT         (5)
@@ -42,7 +45,14 @@ typedef ap_uint<DATA_WIDTH>         uint16;
 
 typedef ap_uint<128>                uint4_raw;
 
+
 typedef ap_uint<BURST_ALL_BITS>     burst_raw;
+
+
+typedef struct {
+    burst_raw                       data;
+    ap_uint<1>                      flag;
+} burst_token;
 
 typedef ap_uint<BURST_ALL_BITS/2>   burst_half;
 
@@ -74,8 +84,15 @@ typedef struct __int2__
 } int2;
 
 
+typedef struct 
+{
+    int2        data;
+    ap_uint<1>  flag;
+} int2_token;
+
 typedef struct EdgeInfo {
     int2 data[EDGE_NUM];
+    ap_uint<1> flag;
 } edge_tuples_t;
 
 typedef struct shuffledData {

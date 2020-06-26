@@ -68,7 +68,7 @@ void processEdgesReorderStreamScheme1(hls::stream<int2>  &in , hls::stream<int2>
 
 
 /* 4 distance */
-void rawSolver(hls::stream<int2>  &in , hls::stream<int2> &out)
+void rawSolver(hls::stream<int2>  &in , hls::stream<int2_token> &out)
 {
 #pragma HLS function_instantiate variable=in
     int2 local_buffer[5];
@@ -222,7 +222,10 @@ void rawSolver(hls::stream<int2>  &in , hls::stream<int2> &out)
 #pragma HLS UNROLL
                     lastSendBuffered[k] = send.x;
                 }
-                write_to_stream(out, send);
+                int2_token send_token;
+                send_token.data = send;
+                send_token.flag = FLAG_RESET;
+                write_to_stream(out, send_token);
             }
         }
 
@@ -236,19 +239,23 @@ void rawSolver(hls::stream<int2>  &in , hls::stream<int2> &out)
             int2 send;
             send.x = local_buffer[i].x + DST_INTERVEL;
             send.y = 0;
-            write_to_stream(out, send);
-            write_to_stream(out, send);
-            write_to_stream(out, local_buffer[i]);
+
+            int2_token send_token;
+            send_token.data = send;
+            send_token.flag = FLAG_RESET;
+            write_to_stream(out, send_token);
+            write_to_stream(out, send_token);
+            send_token.data = local_buffer[i];
+            write_to_stream(out, send_token);
         }
     }
 
     //write_to_stream(out, local_buffer[buffered_size & 0x01]);
     empty_stream(in);
 
-    int2 tmp_data;
-    tmp_data.x = ENDFLAG;
-    tmp_data.y = ENDFLAG;
-    write_to_stream(out, tmp_data);
+    int2_token send_token;
+    send_token.flag = FLAG_SET;
+    write_to_stream(out, send_token);
 }
 
 

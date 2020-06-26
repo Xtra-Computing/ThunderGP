@@ -3,14 +3,14 @@
 # be overridden through the make command line
 #+-------------------------------------------------------------------------------
 
-PROFILE := no
+PROFILE := yes
 
 #Generates profile summary report
 ifeq ($(PROFILE), yes)
 LDCLFLAGS += --profile_kernel data:all:all:all
 endif
 
-DEBUG := no
+DEBUG := yes
 
 #Generates debug summary report
 ifeq ($(DEBUG), yes)
