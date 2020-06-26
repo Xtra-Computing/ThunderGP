@@ -167,7 +167,7 @@ void stream2Command(hls::stream<burst_token>        &mapStream,
             }
             cmd.idx  =  min_bound;
             cmd.size =  max_index + 2 - min_bound;
-            cmd.flag =  map.flag;
+            cmd.flag =  FLAG_RESET;
             write_to_stream(cmdStream, cmd);
             last_index = max_index + 1;
         }
@@ -176,6 +176,9 @@ void stream2Command(hls::stream<burst_token>        &mapStream,
             break;
         }
     }
+    cache_command cmd;
+    cmd.flag = FLAG_SET;
+    write_to_stream(cmdStream, cmd);
 }
 
 

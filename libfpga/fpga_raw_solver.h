@@ -68,7 +68,7 @@ void processEdgesReorderStreamScheme1(hls::stream<int2>  &in , hls::stream<int2>
 
 
 /* 4 distance */
-void rawSolver(hls::stream<int2>  &in , hls::stream<int2_token> &out)
+void rawSolver(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
 {
 #pragma HLS function_instantiate variable=in
     int2 local_buffer[5];
@@ -98,6 +98,8 @@ void rawSolver(hls::stream<int2>  &in , hls::stream<int2_token> &out)
     {
 #pragma HLS PIPELINE II=2
         int2 tmp_data;
+        int2_token in_token;
+        tmp_data = in_token.data;
 
         ap_uint<3> select_index = 4;
         read_from_stream(in, tmp_data);

@@ -95,14 +95,14 @@ void  duplicateStream4WithClear(hls::stream<T>       &input,
 
 
 
-void processEdgesBuildSlice(hls::stream<int2_token>  &in , hls::stream<int2> &out)
+void processEdgesBuildSlice(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
 {
 #pragma HLS function_instantiate variable=in
     while (true)
     {
         int2_token tmp_data;
         read_from_stream(in, tmp_data);
-        write_to_stream(out, tmp_data.data);
+        write_to_stream(out, tmp_data);
         if (tmp_data.flag == FLAG_SET)
         {
             break;

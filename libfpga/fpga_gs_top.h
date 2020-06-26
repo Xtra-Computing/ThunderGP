@@ -34,7 +34,7 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
     hls::stream<int2_token>           buildArrayRes[PE_NUM];
 #pragma HLS stream variable=buildArrayRes  depth=2
 
-    hls::stream<int2>           buildArraySlice[PE_NUM];
+    hls::stream<int2_token>           buildArraySlice[PE_NUM];
 #pragma HLS stream variable=buildArraySlice  depth=2
 
     hls::stream<edge_tuples_t>   edgeTuplesArray[PE_NUM];
