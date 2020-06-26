@@ -104,3 +104,4 @@ cleanall: clean
 cleandir: cleanall
 	-$(RMDIR) host_graph_fpga*
 	-$(RMDIR) xclbin*
+	-$(RMDIR) .run

@@ -99,17 +99,18 @@ void rawSolver(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
 #pragma HLS PIPELINE II=2
         int2 tmp_data;
         int2_token in_token;
-        tmp_data = in_token.data;
+
 
         ap_uint<3> select_index = 4;
-        read_from_stream(in, tmp_data);
+        read_from_stream(in, in_token);
+        tmp_data = in_token.data;
         uint_raw dstVidx  = tmp_data.x;
 
         ap_uint<1> flag[4];
         // (ENDFLAG -1) for partition align
         // (ENDFLAG)    for stream end,
         // we cut the write stream here to avoid the flag be added to cache
-        if ((dstVidx & ( ENDFLAG - 1 )) == (ENDFLAG - 1))
+        if ((dstVidx & ( ENDFLAG - 1 )) == (ENDFLAG - 1) || (in_token.flag == FLAG_SET))
         {
             break;
         }
