@@ -1,4 +1,4 @@
-HAVE_FULL_SLR=false
+HAVE_FULL_SLR=true
 
 #scatter-gather kernel
 HAVE_VERTEX_ACTIVE_BIT=false
