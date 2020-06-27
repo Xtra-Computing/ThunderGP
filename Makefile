@@ -1,5 +1,5 @@
 
-
+SHELL := /bin/bash
 
 # Points to Utility Directory
 COMMON_REPO = ./
