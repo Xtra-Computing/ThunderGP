@@ -91,6 +91,7 @@ void propProcessSelf( hls::stream<edge_tuples_t>   &tupleInput,
 #pragma HLS UNROLL
             out.data[i].x = in.data[i].x;
             out.data[i].y = PROP_COMPUTE_STAGE0(in.data[i].y);
+            out.flag = in.flag;
         }
         write_to_stream(tupleOuput, out);
         if (in.flag == FLAG_SET)
