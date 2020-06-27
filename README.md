@@ -68,8 +68,9 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on U20
 |-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
 | PR     | 4,151 | 3,689 | 3,019 |2,352 |3,670 | 2,734 | 2,319 |
 | SpMV   | 4,548 | 4,159 | 2,826 |1,820 |3,650 | 2,931 | 2,375 |
-| BFS    | 3,630 | 3,218 | 2,706 |1,620 |2,837 | 2,476 | 2,054 |
-| SSSP   | 5,226 | 4,437 | 3,614 |2,247 |3,883 | 3,336 | 2,849 |
+| BFS    | 5,226 | 4,437 | 3,614 |2,247 |3,883 | 3,336 | 2,849 |
+| SSSP   | 3,630 | 3,218 | 2,706 |1,620 |2,837 | 2,476 | 2,054 |
+
 
 
 Throughput (MTEPS) of different graph processing algorithms over datasets on U250 platform. (TBD)

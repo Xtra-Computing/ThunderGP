@@ -51,7 +51,12 @@ void applyFunction(
 #else
             prop_t out_deg   = 0;
 #endif
-            prop_t  wProp    = applyCalculation( tProp, uProp, out_deg, infoArray[i],  argReg);
+            unsigned int tmpInfoArray[BURST_ALL_BITS / INT_WIDTH];
+#pragma HLS ARRAY_PARTITION variable=tmpInfoArray dim=0 complete
+//#pragma HLS DEPENDENCE variable=tmpInfoArray inter false
+
+            prop_t  wProp    = applyCalculation( tProp, uProp, out_deg, tmpInfoArray[i],  argReg);
+            infoArray[i] += tmpInfoArray[i]; 
 
             newVertexProp.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH ) = wProp;
 

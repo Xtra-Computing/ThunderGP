@@ -8,7 +8,7 @@ void tupleFilter(
     filter_type                 &filter,
     uint_raw                    &filter_num,
     hls::stream<filter_type>    &toFilterItem,
-    hls::stream<int2>           &buildArray
+    hls::stream<int2_token>     &buildArray
 )
 {
 #pragma HLS function_instantiate variable=filter_num
@@ -35,7 +35,10 @@ void tupleFilter(
             else
             */
             {
-                write_to_stream(buildArray, filter.data[j]);
+                int2_token token;
+                token.data = filter.data[j];
+                token.flag = (j == (filter_num - 1 ))? filter.end: 0;
+                write_to_stream(buildArray, token);
             }
         }
         if (filter_end)
@@ -44,7 +47,7 @@ void tupleFilter(
         }
 
     }
-    clear_stream(toFilterItem);
+    //clear_stream(toFilterItem);
     return;
 }
 

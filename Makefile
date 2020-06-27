@@ -1,5 +1,5 @@
 
-
+SHELL := /bin/bash
 
 # Points to Utility Directory
 COMMON_REPO = ./
@@ -18,6 +18,7 @@ DEVICES := xilinx_vcu1525_xdma_201830_1
 # device list:
 # xilinx_vcu1525_xdma_201830_1
 # xilinx_u200_xdma_201830_2
+# xilinx_u250_xdma_201830_2
 
 DEVICE  := $(DEVICES)
 
@@ -71,6 +72,18 @@ emconfig:$(EMCONFIG_DIR)/emconfig.json
 $(EMCONFIG_DIR)/emconfig.json:
 	emconfigutil --platform $(DEVICE) --od $(EMCONFIG_DIR)
 
+.PHONY: hwemuprepare
+hwemuprepare:
+ifeq ($(TARGET),$(filter $(TARGET), hw_emu))
+	@echo "prepare for hw_emu"
+	$(CP) $(EMCONFIG_DIR)/emconfig.json .
+	$(CP) $(UTILS_PATH)/sdaccel.ini .
+	source $(UTILS_PATH)/hw_emu.sh
+else
+	@echo "prepare for hw"
+endif
+
+
 check: all 
 
 ifeq ($(TARGET),$(filter $(TARGET),sw_emu hw_emu))
@@ -104,3 +117,4 @@ cleanall: clean
 cleandir: cleanall
 	-$(RMDIR) host_graph_fpga*
 	-$(RMDIR) xclbin*
+	-$(RMDIR) .run

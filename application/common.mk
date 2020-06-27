@@ -70,8 +70,15 @@ LDFLAGS := $(opencl_LDFLAGS)
 LDFLAGS += -lrt -lstdc++  -lxilinxopencl
 
 
+ifeq ($(TARGET),$(filter $(TARGET), hw_emu))
+CLFLAGS = -g -t $(TARGET)
+else
+CLFLAGS = -t $(TARGET)
+endif
+
 # Kernel compiler global settings
-CLFLAGS = -t $(TARGET) --platform $(DEVICE) --save-temps  -O3
+
+CLFLAGS += --platform $(DEVICE) --save-temps  -O3
 CLFLAGS += -I ./
 CLFLAGS += -I ./libfpga
 CLFLAGS += -I $(APPCONFIG)
@@ -93,7 +100,6 @@ include $(UTILS_PATH)/xcl/xcl.mk
 CXXFLAGS +=  $(xcl_CXXFLAGS)
 LDFLAGS +=   $(xcl_CXXFLAGS)
 HOST_SRCS += $(xcl_SRCS)
-
 
 
 #############################################################################

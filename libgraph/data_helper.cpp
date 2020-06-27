@@ -103,7 +103,7 @@ Graph* createGraph(const std::string &gName, const std::string &mode) {
         gptr = new Graph(dir +  "rmat-24-16.txt");
     }
     else {
-        gptr = new Graph(dir +  gName);
+        gptr = new Graph(gName);
     }
     startIdx = localGetStartIndex(gName);
     return gptr;

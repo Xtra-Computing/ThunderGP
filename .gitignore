@@ -11,3 +11,7 @@ sdx_*
 release*
 test_log*
 xclbin*
+*.protoinst
+*.csv
+sdaccel.ini
+.run

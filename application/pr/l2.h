@@ -55,7 +55,7 @@ inline prop_t applyCalculation( prop_t tProp,
 	{
 		update = 0;
 	}
-	extra += (new_score - old_score) > 0 ? (new_score - old_score) : (old_score - new_score) ;
+	extra = (new_score - old_score) > 0 ? (new_score - old_score) : (old_score - new_score) ;
 
 	return update;
 }

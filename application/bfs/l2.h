@@ -51,7 +51,7 @@ inline prop_t applyCalculation( prop_t tProp,
     }
     else if ((tProp & 0x80000000) == 0x80000000)
     {
-        extra ++;
+        extra = 1;
         wProp = tProp; // current active vertex
     }
     else
