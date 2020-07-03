@@ -45,16 +45,18 @@ inline prop_t applyCalculation( prop_t tProp,
 
 	prop_t old_score = source;
 	prop_t new_score = arg  + ((kDampFixPoint * tProp) >> 7);
-
-	prop_t update = 0;
+	prop_t tmp;
 	if (outDeg != 0)
 	{
-		update = new_score / outDeg;
+		tmp = (1 << 7 ) / outDeg;
 	}
 	else
 	{
-		update = 0;
+		tmp = 0;
 	}
+
+	prop_t update = (new_score * tmp) >> 7;
+
 	extra = (new_score - old_score) > 0 ? (new_score - old_score) : (old_score - new_score) ;
 
 	return update;

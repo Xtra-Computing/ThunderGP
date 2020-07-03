@@ -99,6 +99,7 @@ void propProcessSelf( hls::stream<edge_tuples_t>   &tupleInput,
             break;
         }
     }
+    clear_stream(edgeProp);
 }
 
 #endif /* __FPGA_EDGE_PROP_H__ */
