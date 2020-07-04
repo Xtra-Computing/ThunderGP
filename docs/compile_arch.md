@@ -70,6 +70,7 @@ Xilinx provide real-time waveform display in __hw_emu__ mode, but it need many s
 
 * Change the ```TARGETS``` to ```hw_emu``` in main Makefile, or directly pass this argument from the make command.
 * After the application has been built, run ```make hwemuprepare```
+* Run env setup script:```source ./utils/hw_emu.sh ```
 * Start the program
 
 __Notes__:

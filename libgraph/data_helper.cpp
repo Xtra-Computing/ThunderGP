@@ -22,11 +22,7 @@ int localGetStartIndex(const std::string &name)
 Graph* createGraph(const std::string &gName, const std::string &mode) {
     Graph* gptr;
     std::string dir;
-    if (mode == "harp") dir = "/upb/departments/pc2/groups/harp2/x/xchen/bdw_fpga_design/bin/";
-    else if (mode == "sim") dir = "/home/xinyuc/Dataset/graphs/";
-    else if (mode == "rmat") dir = "/home/xinyuc/Dataset/krongen/";
-    else if (mode == "de5_rmat") dir = "/home/xinyu/Dataset/krongen/";
-    else if (mode == "de5_run") dir = "/home/tanhs/Data/";
+    if (mode == "normal") dir = "/graph_data/";
 
     else {
         std::cout << "unknown execution environment." << std::endl;
@@ -50,6 +46,9 @@ Graph* createGraph(const std::string &gName, const std::string &mode) {
     }
     else if (gName == "lj1") {
         gptr = new Graph(dir + "LiveJournal1.txt");
+    }
+    else if (gName == "rmat-12-8") {
+        gptr = new Graph(dir + "rmat-12-8.txt");
     }
     else if (gName == "rmat-21-32") {
         gptr = new Graph(dir + "rmat-21-32.txt");

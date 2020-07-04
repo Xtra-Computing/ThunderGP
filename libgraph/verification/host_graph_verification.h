@@ -7,9 +7,9 @@
 
 #define DEBUG_DUMP_VERTEX_SIZE          (1024)
 
-#define DATA_DUMP                       (  i < 50)
+#define DATA_DUMP                       (0)//(i < 50)
 
-#define PROBE_VERTEX                    (0)
+//#define PROBE_VERTEX                    (0)
 
 
 
