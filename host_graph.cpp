@@ -27,16 +27,22 @@ int main(int argc, char **argv) {
     {
         gName = "wiki-talk";
     }
-    std::string mode = "de5_run"; // or harp
-
+    std::string mode = "normal";
+#if 0
+    Graph* gptr = createGraph(gName, mode);
+    CSR* csr    = new CSR(*gptr);
+    csr->save2File(gName);
+    free(gptr);
+    return 0;
+#endif
 
 
 
     DEBUG_PRINTF("start main\n");
- 
+
     acceleratorInit("graph_fpga", xcl_file);
 
-    acceleratorDataPrepare(gName,mode,&graphDataInfo);
+    acceleratorDataPrepare(gName, mode, &graphDataInfo);
 
     acceleratorDataPreprocess(&graphDataInfo);
 

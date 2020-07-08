@@ -71,6 +71,7 @@ class CSR{
 
         // The CSR is constructed based on the simple graph
         explicit CSR(const Graph &g);
+        int save2File(const std::string & fName);
 		~CSR();
 };
 

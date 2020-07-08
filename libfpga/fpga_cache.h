@@ -432,7 +432,7 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
                         }
 #endif
                     }
-                    tuples[unit_cycle].flag = (unit_cycle & tmpBlock[1].flag);
+                    tuples[unit_cycle].flag = (tmpBlock[1].flag);
                 }
                 writeTuples(edgeTuplesBuffer, tuples);
                 break_flag = tmpBlock[1].flag;
