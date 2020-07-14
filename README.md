@@ -5,6 +5,10 @@
 
 # ThunderGP: Fast Graph Processing for HLS-based FPGAs
 
+## What's new?
+
+ThunderGP is featured at [Xilinx Apps and Libraries](https://www.xilinx.com/products/apps-and-libraries.html)
+
 ## Introduction
 
 ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based graph processing without compromising ***programmability***. ***To our best knowledge and experiments, this is the fastest graph processing framework on HLS-based FPGAs.***
