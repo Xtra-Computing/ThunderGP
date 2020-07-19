@@ -293,6 +293,7 @@ void streamDelayScheme2(hls::stream<burst_token>  &in, hls::stream<burst_token> 
 }
 
 
+
 void updateVertexCache(uint16                          *input,
                        hls::stream<cache_command>      &cmdStream,
                        hls::stream<cache_line>         &cacheStream)
@@ -416,11 +417,12 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
 #pragma HLS latency min=1 max=3
                             tmp = vertexScoreCache[k][bit][address];
                         }
-
+                        prop_union_t u;
                         if (vertex_index & 0x01)
-                            tuples[unit_cycle].data[k].y = tmp.range(63, 32);
+                            u.ui  = tmp.range(63, 32);
                         else
-                            tuples[unit_cycle].data[k].y = tmp.range(31,  0);
+                            u.ui  = tmp.range(31,  0);
+                        tuples[unit_cycle].data[k].y =  u.f;
 #if CAHCE_FETCH_DEBUG
                         if (tuples[unit_cycle].data[k].y != vertex_index)
                         {

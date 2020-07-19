@@ -5,12 +5,10 @@
 #include <math.h>
 
 
-#if HAVE_UNSIGNED_PROP	
-typedef  unsigned int       prop_t;
-#else
-typedef  int       			prop_t;
-#endif 
 
+typedef  float       prop_t;
+
+typedef union {prop_t f; unsigned int ui;} prop_union_t; 
 
 #define BLK_SIZE            (512*1024)
 #define VERTEX_MAX          (BLK_SIZE)

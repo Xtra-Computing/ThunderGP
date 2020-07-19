@@ -127,18 +127,24 @@ void dstPropertyProcess(
             else
                 origin_value = updated_value.range(31, 0);
 
-            origin_value = PROP_COMPUTE_STAGE3(origin_value, tmp_data.y);
+            prop_union_t in;
+            prop_union_t out;
+
+            in.ui = origin_value;
+
+
+            out.f = PROP_COMPUTE_STAGE3(in.f, tmp_data.y);
 
             uint_uram tmp;
             if (idx & 0x01)
             {
-                tmp.range(63, 32) = origin_value;
+                tmp.range(63, 32) = out.ui;
                 tmp.range(31,  0) = updated_value.range(31, 0);
             }
             else
             {
                 tmp.range(63, 32) = updated_value.range(63, 32);
-                tmp.range(31,  0) = origin_value;
+                tmp.range(31,  0) = out.ui;
             }
             tmpVPropBuffer[(idx >> 1)] = tmp;
         }

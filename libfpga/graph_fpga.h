@@ -76,11 +76,7 @@ typedef ap_uint<64>                 uint_uram;
 typedef struct __int2__
 {
     int x;
-#if HAVE_UNSIGNED_PROP
-    uint_raw y;
-#else
-    int y;
-#endif
+    prop_t y;
 } int2;
 
 

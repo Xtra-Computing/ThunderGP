@@ -66,9 +66,119 @@ void processEdgesReorderStreamScheme1(hls::stream<int2>  &in , hls::stream<int2>
     write_to_stream(out, tmp_data);
 }
 
+#define ABS_DIFF(a,b)   ((a>b)?(a-b):(b-a))
+
+
+#define flush_one_buffer                     {                                  \
+    last_index =  local_buffer[wid].x;                                          \
+    if (ABS_DIFF(last_index, local_buffer[wid].x) > (DISTANCE * PE_NUM))        \
+    {                                                                           \
+        int2_token send_token;                                                  \
+        send_token.data = local_buffer[wid];                                    \
+        send_token.flag = FLAG_RESET;                                           \
+        write_to_stream(out, send_token);                                       \
+    }                                                                           \
+    else                                                                        \
+    {                                                                           \
+        int tmp_index = local_buffer[wid].x;                                    \
+        int2_token send_token;                                                  \
+        send_token.data.x = tmp_index;                                          \
+        send_token.data.y = 0;                                                  \
+        send_token.flag = FLAG_RESET;                                           \
+        for (int i = 0; i < DISTANCE; i++)                                      \
+        {                                                                       \
+            write_to_stream(out, send_token);                                   \
+        }                                                                       \
+    }                                                                           \
+    wid ++;                                                                     \
+}
+
+
+
+
+void rawSolver(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
+{
+#pragma HLS function_instantiate variable=in
+
+#define DISTANCE        (8)
+    int2 local_buffer[DISTANCE];
+#pragma HLS dependence variable=local_buffer inter false
+
+    ap_uint<1> end_flag;
+
+    uint_raw rid, wid;
+    uint_raw last_index;
+
+    wid = 0;
+    rid = 0;
+    end_flag = 0;
+    last_index = ENDFLAG;
+
+    for (int i = 0; i < DISTANCE ; i++)
+    {
+        local_buffer[i].x = 0;
+        local_buffer[i].y = 0;
+    }
+
+
+solver: while (true)
+    {
+        int2_token in_token;
+flow: while (true)
+        {
+#pragma HLS PIPELINE II=2
+            int2 tmp_data;
+
+            read_from_stream(in, in_token);
+            tmp_data = in_token.data;
+            uint_raw dstVidx  = tmp_data.x;
+
+            if ((dstVidx & ( ENDFLAG - 1 )) == (ENDFLAG - 1) || (in_token.flag == FLAG_SET))
+            {
+                end_flag = FLAG_SET;
+                break;
+            }
+            if ((last_index == ENDFLAG) || (ABS_DIFF(last_index , tmp_data.x) > (DISTANCE * PE_NUM)))
+            {
+                int2_token send_token;
+                send_token.data = tmp_data;
+                send_token.flag = FLAG_RESET;
+                write_to_stream(out, send_token);
+                last_index = send_token.data.x;
+            }
+            else
+            {
+                local_buffer[rid] = tmp_data;
+                rid ++;
+                if (rid - wid >= DISTANCE - 1)
+                {
+                    break;
+                }
+            }
+        }
+        if (end_flag  == FLAG_SET)
+        {
+            int remaining = (rid - wid);
+            for (int k = 0; k < remaining ; k++)
+            {
+                flush_one_buffer;
+            }
+            break;
+        }
+        else
+        {
+            flush_one_buffer;
+        }
+    }
+     empty_stream(in);
+
+    int2_token send_token;
+    send_token.flag = FLAG_SET;
+    write_to_stream(out, send_token);
+}
 
 /* 4 distance */
-void rawSolver(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
+void rawSolver2(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
 {
 #pragma HLS function_instantiate variable=in
     int2 local_buffer[5];
@@ -114,7 +224,7 @@ void rawSolver(hls::stream<int2_token>  &in , hls::stream<int2_token> &out)
         {
             break;
         }
-        for (int i = 0; i < 4; i++)
+accumlate: for (int i = 0; i < 4; i++)
         {
 #pragma HLS UNROLL
             if ((vaild_flag[i] == 1) && (local_buffer[i].x  ==  dstVidx))
