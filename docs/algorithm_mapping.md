@@ -40,7 +40,8 @@ In our implementation, the gather and scatter stages are combined together by th
 | updateCalculation | 2 | Calculate the update value by using the edge property and source vertex property.  |
 | updateMergeInRAWSolver| 3 | Destination property update in RAW solver. | 
 | updateDestination | 4 | Destination property update. | 
-
+| applyMerge | 5 | Destination property merge from all of the scatter-gather CUs. | 
+| applyCalculation | 6 | Calculate the new property of vertices. | 
 
 In SpMV, these hooks in Scatter-Gather can be easily instanced as follows:
 
