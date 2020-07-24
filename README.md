@@ -58,7 +58,7 @@ $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.
 
 Throughput (MTEPS) of different graph processing algorithms over datasets on VCU1525 platform.
 
-| Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| twitter-2010|
+| Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
 |-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
 | PR     | 4,274  | 3,797  | 2,502  | 3,138  | 3,790  | 2,860  | 2,438  |
 | SpMV   | 4,759  | 4,396  | 2,018  | 3,043  | 3,871  | 3,133  | 2,561  |
@@ -68,7 +68,7 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on VCU
 
 Throughput (MTEPS) of different graph processing algorithms over datasets on U200 platform. 
 
-| Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| twitter-2010|
+| Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
 |-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
 | PR     | 4,151 | 3,689 | 3,019 |2,352 |3,670 | 2,734 | 2,319 |
 | SpMV   | 4,548 | 4,159 | 2,826 |1,820 |3,650 | 2,931 | 2,375 |
