@@ -29,7 +29,7 @@ The property of vertices and the property of edges are __32-bit__ value (can be 
 
 ## Resource Utilizations
 
-###VCU1525 Platform
+### VCU1525 Platform
 |algo.   | Frequency |BRAM   |URAM | CLB | DSP | Power (W)
 |--------|-----------|-------|-----|-----|-----|------- |
 |SpMV    | 256MHz    | 62%   | 43% | 88% | 2%  | 42.3   |    
@@ -38,7 +38,7 @@ The property of vertices and the property of edges are __32-bit__ value (can be 
 |SSSP    | 248MHz    | 75%   | 43% | 92% | 1%  | 48.9   |    
 
 
-###U200 Platform
+### U200 Platform
 |algo.   | Frequency |BRAM   |URAM | CLB | DSP | Power (W)
 |--------|-----------|-------|-----|-----|-----|------- |
 |SpMV    | 260MHz    | 63%   | 43% | 91% | 2%  | 45.1   |    
@@ -46,7 +46,7 @@ The property of vertices and the property of edges are __32-bit__ value (can be 
 |BFS     | 243MHz    | 69%   | 43% | 92% | 1%  | 45.2   |    
 |SSSP    | 255MHz    | 76%   | 43% | 93% | 1%  | 49.6   |    
 
-###U250 Platform
+### U250 Platform
 |algo.   | Frequency |BRAM   |URAM | CLB | DSP | Power (W)
 |--------|-----------|-------|-----|-----|-----|------- |
 |SpMV    | 250MHz    | 47%   | 33% | 62% | 2%  | 43.4   |  
@@ -59,7 +59,7 @@ The property of vertices and the property of edges are __32-bit__ value (can be 
 
 Throughput (MTEPS) is used here to measure the performance of ThunderGP.
 
-###VCU1525 Platform
+### VCU1525 Platform
 | Algo.     | rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
 |-------    |-------    |-------    |-------    |-------    |-------    |-------    |-------    |
 | PR     | 4,274  | 3,797  | 2,502  | 3,138  | 3,790  | 2,860  | 2,438  |
@@ -68,7 +68,7 @@ Throughput (MTEPS) is used here to measure the performance of ThunderGP.
 | SSSP   | 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
 
 
-###U200 Platform
+### U200 Platform
 | Algo.     | rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
 |-------    |-------    |-------    |-------    |-------    |-------    |-------    |-------    |
 | PR     | 4,151 | 3,689 | 3,019 |2,352 |3,670 | 2,734 | 2,319 |
@@ -77,7 +77,7 @@ Throughput (MTEPS) is used here to measure the performance of ThunderGP.
 | SSSP   | 3,630 | 3,218 | 2,706 |1,620 |2,837 | 2,476 | 2,054 |
 
 
-###U200 Platform
+### U200 Platform
 
 | Algo.     | rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
 |-------    |-------    |-------    |-------    |-------    |-------    |-------    |-------    |
