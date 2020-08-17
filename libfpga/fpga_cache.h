@@ -132,7 +132,7 @@ void  duplicateStreamForCache(hls::stream<T>       &input,
 
 #define CACHE_UPDATE_BURST  (1<<LOG_CACHEUPDATEBURST)
 #define LOG_CACHEUPDATEBURST (LOG_SCATTER_CACHE_BURST_SIZE)
-
+/* TODO: support narrow burst */
 void stream2Command(hls::stream<burst_token>        &mapStream,
                     hls::stream<cache_command>      &cmdStream)
 {

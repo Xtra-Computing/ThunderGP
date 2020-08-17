@@ -109,7 +109,7 @@ int accelratorProfile (int superStep, int runCounter, graphInfo *info, double ex
     }
 
     /* verification */
-    if (runCounter == 0)
+    //if (runCounter == 0)
     {
         for (int i = 0; i < blkNum; i ++)
         {
@@ -173,3 +173,21 @@ int acceleratorDeinit(void)
 
     return 0;
 }
+
+
+void* acceleratorQueryRegister(void)
+{
+    graphAccelerator * acc = getAccelerator();
+    transfer_data_from_pl(acc->context, acc->device,MEM_ID_RESULT_REG);
+    return get_host_mem_pointer(MEM_ID_RESULT_REG);
+}
+
+prop_t* acceleratorQueryProperty(int step)
+{
+    graphAccelerator * acc = getAccelerator();
+    transfer_data_from_pl(acc->context, acc->device, getGatherScatter(0)->prop[step].id);
+    prop_t * propValue = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->prop[step].id);
+
+    return propValue;
+}
+

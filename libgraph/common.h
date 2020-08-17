@@ -10,9 +10,14 @@
 #include "config.h"
 
 
+
+#define FLAG_SET                (1u)
+#define FLAG_RESET              (0u)
+
+
 #if 1
 
-#define DEBUG_PRINTF(fmt,...)   printf(fmt,##__VA_ARGS__); fflush(stdout);
+#define DEBUG_PRINTF(fmt,...)   printf(fmt,##__VA_ARGS__);
 
 #else
 

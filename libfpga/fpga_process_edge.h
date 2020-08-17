@@ -41,7 +41,7 @@ void processEdgeWrite(
         tmpWriteValue[i] = 0;
     }
 
-    for (int i = 0; i < ((VERTEX_MAX) >> ( LOG2_BURST_WRITE_SIZE + LOG2_SIZE_BY_INT)); i++)
+    for (int i = 0; i < ((MAX_VERTICES_IN_ONE_PARTITION) >> ( LOG2_BURST_WRITE_SIZE + LOG2_SIZE_BY_INT)); i++)
     {
         for (int sr_idx = 0; sr_idx < TOTAL_STEAM_READ_NUM; sr_idx++)
         {
@@ -86,7 +86,7 @@ void dstPropertyProcess(
     int                     index,
     uint_raw                sink_offset,
     uint_raw                sink_end,
-    uint_uram               tmpVPropBuffer[(VERTEX_MAX / 2) >> LOG2_PE_NUM],
+    uint_uram               tmpVPropBuffer[(MAX_VERTICES_IN_ONE_PARTITION / 2) >> LOG2_PE_NUM],
     //uint_raw                bitmap[BITMAP_SLICE_SIZE][BITMAP_SUB_SIZE],
     hls::stream<int2_token> &buildArray,
     hls::stream<uint_uram>  &writeArray
@@ -114,7 +114,7 @@ void dstPropertyProcess(
         {
 #pragma HLS latency min=0 max=0
             uint_raw dstVidx  = tmp_data.x;
-            idx = ((dstVidx - dstStart) >> LOG2_PE_NUM ) & ((VERTEX_MAX >> LOG2_PE_NUM) - 1);
+            idx = ((dstVidx - dstStart) >> LOG2_PE_NUM ) & ((MAX_VERTICES_IN_ONE_PARTITION >> LOG2_PE_NUM) - 1);
         }
 
         {
@@ -162,7 +162,7 @@ void dstPropertyProcess(
     //        break;
     //    }
     //}
-    for (int i = 0; i < ((VERTEX_MAX ) >> (LOG2_PE_NUM + 1)); i++)
+    for (int i = 0; i < ((MAX_VERTICES_IN_ONE_PARTITION ) >> (LOG2_PE_NUM + 1)); i++)
     {
 #pragma HLS PIPELINE II=1
         uint_uram tmp = tmpVPropBuffer[i];

@@ -38,6 +38,8 @@ typedef struct
     void                *data;
     cl_mem              device;
     cl_mem_ext_ptr_t    ext_attr;
+
+    unsigned int        dirty_flags;
 } he_mem_t;
 
 typedef struct 
@@ -66,5 +68,11 @@ int transfer_data_from_pl(cl_context &dev_context, cl_device_id device_id, int m
 int transfer_data_to_pl(cl_context &dev_context, cl_device_id device_id, int* id_array, int size);
 
 
+/************* host & device memory coherent *******************/
+int he_set_dirty(int id);
+
+int he_set_clean(int id);
+
+int he_get_dirty_flag(int id);
 
 #endif /* __HE_MEM_H__ */

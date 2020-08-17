@@ -78,11 +78,11 @@ he_mem_t local_mem[] =
         SIZE_IN_VERTEX,
     },
     {
-        MEM_ID_ERROR,
+        MEM_ID_RESULT_REG,
         "error",
         ATTR_PL_DDR2,
-        sizeof(int) * 4,
-        SIZE_IN_VERTEX,
+        sizeof(int) * 64,
+        SIZE_USER_DEFINE,
     },
     {
         MEM_ID_RPA,

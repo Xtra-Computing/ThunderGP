@@ -27,6 +27,8 @@ void partitionApplyCModel(
     unsigned int            applyArg
 )
 {
+    int currentPropId = superStep % 2;
+    int resultPropId = (superStep + 1) % 2;
     DEBUG_PRINTF("partId %d\n", partId);
     for (int i  = 0; i < SUB_PARTITION_NUM; i++)
     {
@@ -36,7 +38,9 @@ void partitionApplyCModel(
     prop_t * pCuData[SUB_PARTITION_NUM];
     prop_t * updateVerify        = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_PROP_VERIFY);
     prop_t * outDeg              = (prop_t*)get_host_mem_pointer(MEM_ID_OUT_DEG);
-    prop_t * vertexScoreMapped   = (prop_t*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
+
+    transfer_data_from_pl(context, device, getGatherScatter(0)->prop[currentPropId].id);
+    prop_t * propValue           = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->prop[currentPropId].id);
 
     subPartitionDescriptor  *p_partition = getSubPartition(partId * SUB_PARTITION_NUM);
 
@@ -51,7 +55,7 @@ void partitionApplyCModel(
 
     int offset = getSubPartition(partId * SUB_PARTITION_NUM)->dstVertexStart;
 
-    for (int i = 0; i < VERTEX_MAX; i++)
+    for (int i = 0; i < MAX_VERTICES_IN_ONE_PARTITION; i++)
     {
         prop_t mergeData = 0;
         for (int j = 0 ; j < SUB_PARTITION_NUM; j++)
@@ -67,12 +71,12 @@ void partitionApplyCModel(
         }
 
         prop_t tProp = mergeData;
-        updateVerify[i] = applyVerfication(tProp, vertexScoreMapped[i + offset], outDeg[i + offset], (void *)&applyArg);
+        updateVerify[i] = applyVerfication(tProp, propValue[i + offset], outDeg[i + offset], (void *)&applyArg);
     }
 
     int error_count = 0;
-    transfer_data_from_pl(context, device, getGatherScatter(0)->prop[1].id);
-    prop_t* hwUpdate = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->prop[1].id);
+    transfer_data_from_pl(context, device, getGatherScatter(0)->prop[resultPropId].id);
+    prop_t* hwUpdate = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->prop[resultPropId].id);
     for (unsigned int i = 0; i < p_partition->dstVertexEnd - p_partition->dstVertexStart + 1; i++)
     {
         if (updateVerify[i] !=  hwUpdate[i + offset])

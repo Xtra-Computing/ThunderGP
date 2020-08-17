@@ -115,7 +115,7 @@ void processEdgesBuildSlice(hls::stream<int2_token>  &in , hls::stream<int2_toke
 void processEdgesSlice(hls::stream<uint_uram>  &input, hls::stream<uint_uram>  &output)
 {
 #pragma HLS function_instantiate variable=input
-    for (int i = 0; i < ((VERTEX_MAX ) >> (LOG2_PE_NUM + 1)); i++)
+    for (int i = 0; i < ((MAX_VERTICES_IN_ONE_PARTITION ) >> (LOG2_PE_NUM + 1)); i++)
     {
 #pragma HLS PIPELINE II=1
         uint_uram tmp;

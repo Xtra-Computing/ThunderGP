@@ -107,7 +107,7 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 #pragma HLS ARRAY_PARTITION variable=shuff_ifo dim=0 complete
 
 
-    uint_uram tmpVPropBuffer[PE_NUM][(VERTEX_MAX / 2) >> (LOG2_PE_NUM)];
+    uint_uram tmpVPropBuffer[PE_NUM][(MAX_VERTICES_IN_ONE_PARTITION / 2) >> (LOG2_PE_NUM)];
 #pragma HLS ARRAY_PARTITION variable=tmpVPropBuffer dim=1 complete
 #pragma HLS RESOURCE variable=tmpVPropBuffer core=XPM_MEMORY uram
 

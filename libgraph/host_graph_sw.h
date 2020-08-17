@@ -148,6 +148,10 @@ int accelratorProfile (int superStep, int runCounter, graphInfo *info, double ex
 
 int acceleratorDeinit(void);
 
+void* acceleratorQueryRegister(void);
+
+prop_t* acceleratorQueryProperty(int step);
+
 
 
 void partitionGatherScatterCModel(

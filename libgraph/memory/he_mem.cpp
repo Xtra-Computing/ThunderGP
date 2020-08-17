@@ -8,11 +8,50 @@
 #include "he_mem_attr.h"
 
 
+//#define HE_DEBUG(fmt,...)   printf(fmt,##__VA_ARGS__); fflush(stdout);
+#define HE_DEBUG(fmt,...) ;
+
+int he_set_dirty(int id)
+{
+    he_mem_t * p_mem = get_he_mem(id);
+    if (p_mem)
+    {
+        HE_DEBUG("[HE_DEBUG] 0x%08x set dirty\n",id);
+        p_mem->dirty_flags = FLAG_SET;
+        return 0;
+    }
+    return -1;
+}
+
+
+int he_set_clean(int id)
+{
+    he_mem_t * p_mem = get_he_mem(id);
+    if (p_mem)
+    {
+        HE_DEBUG("[HE_DEBUG] 0x%08x set clean\n",id);
+        p_mem->dirty_flags = FLAG_RESET;
+        return 0;
+    }
+    return -1;
+}
+
+int he_get_dirty_flag(int id)
+{
+    he_mem_t * p_mem = get_he_mem(id);
+    if (p_mem)
+    {
+        return p_mem->dirty_flags;
+    }
+    return -1;
+}
+
+
 static std::vector<he_mem_lookup_t> mem_list;
 
-int register_size_attribute(unsigned int attr_id,int value)
+int register_size_attribute(unsigned int attr_id, int value)
 {
-    for(unsigned int i = 0; i < ARRAY_SIZE(local_size_ctrl); i++)
+    for (unsigned int i = 0; i < ARRAY_SIZE(local_size_ctrl); i++)
     {
         if (attr_id == local_size_ctrl[i].size_attr)
         {
@@ -26,7 +65,7 @@ int register_size_attribute(unsigned int attr_id,int value)
 unsigned int get_size_attribute(unsigned int attr_id)
 {
     int value = 1;
-    for(unsigned int i = 0; i < ARRAY_SIZE(local_size_ctrl); i++)
+    for (unsigned int i = 0; i < ARRAY_SIZE(local_size_ctrl); i++)
     {
         if (attr_id == local_size_ctrl[i].size_attr)
         {
@@ -110,6 +149,7 @@ int he_mem_init(cl_context &dev_context, he_mem_t * item)
         }
         item->device = clCreateBuffer(dev_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR |  CL_MEM_EXT_PTR_XILINX,
                                       item->size  , &item->ext_attr, &status);
+        item->dirty_flags = FLAG_RESET;
         if (status != CL_SUCCESS) {
             DEBUG_PRINTF("[INIT] cl mem error %s %d in %d\n", item->name, item->attr, status);
             exit(1);
@@ -129,7 +169,7 @@ he_mem_t* get_he_mem(unsigned int id)
             return lut_item.p_mem;
         }
     }
-    DEBUG_PRINTF("[ERROR] get he mem error %d \n",id);
+    DEBUG_PRINTF("[ERROR] get he mem error %d \n", id);
     return NULL;
 }
 
@@ -161,12 +201,12 @@ cl_mem* get_cl_mem_pointer(int id)
     {
         if (p_mem->attr == ATTR_HOST_ONLY)
         {
-            DEBUG_PRINTF("[ERROR] cl mem %d %s is host only\n",id,p_mem->name );
+            DEBUG_PRINTF("[ERROR] cl mem %d %s is host only\n", id, p_mem->name );
             return NULL;
         }
         return &(p_mem->device);
     }
-    DEBUG_PRINTF("cl mem %d do not found \n",id );
+    DEBUG_PRINTF("cl mem %d do not found \n", id );
     return NULL;
 }
 
@@ -193,7 +233,7 @@ int transfer_data_to_pl(cl_context &dev_context, cl_device_id device_id, int* id
             continue;
         }
         DEBUG_PRINTF("[HEME] %s enqueue size %d @ %p\n", p_mem->name, p_mem->size, p_mem->data );
-        status = clEnqueueMigrateMemObjects(ops, 1,&p_mem->device, 0, 0, NULL, NULL);
+        status = clEnqueueMigrateMemObjects(ops, 1, &p_mem->device, 0, 0, NULL, NULL);
         if (status != CL_SUCCESS) {
             DEBUG_PRINTF("%s enqueue failed %d\n", p_mem->name, status);
             exit(1);
@@ -214,8 +254,18 @@ int transfer_data_from_pl(cl_context &dev_context, cl_device_id device_id, int m
         DEBUG_PRINTF("%s error memid %d\n", __FUNCTION__, mem_id);
         return -1;
     }
+    if (p_mem->dirty_flags == FLAG_RESET)
+    {
+        HE_DEBUG("0x%08x is clean\n", mem_id);
+    }
+    else
+    {
+        HE_DEBUG("0x%08x is dirty\n", mem_id);
+        status = clEnqueueMigrateMemObjects(ops, 1, &p_mem->device, CL_MIGRATE_MEM_OBJECT_HOST, 0, NULL, NULL);
+        clFinish(ops);
+        p_mem->dirty_flags = FLAG_RESET;
+    }
     //status = clEnqueueReadBuffer(ops, p_mem->device, CL_TRUE, 0, p_mem->size , p_mem->data, 0, NULL, NULL);
-    status = clEnqueueMigrateMemObjects(ops, 1,&p_mem->device, CL_MIGRATE_MEM_OBJECT_HOST, 0, NULL, NULL);
-    clFinish(ops);
+
     return 0;
 }

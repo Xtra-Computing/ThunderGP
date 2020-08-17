@@ -1,3 +1,4 @@
+/* DEFAULT_ENTRY in build.mk */
 
 #include <stdio.h>
 #include <string.h>
@@ -46,18 +47,18 @@ int main(int argc, char **argv) {
 
     acceleratorDataPreprocess(&graphDataInfo);
 
-    for (int runCounter = 0 ; runCounter < 3 ; runCounter ++)
+    for (int runCounter = 0 ; runCounter < 5 ; runCounter ++)
     {
         double startStamp, endStamp;
-
+        DEBUG_PRINTF("super step ************************************************\n");
         startStamp = getCurrentTimestamp();
 
-        acceleratorSuperStep(0, &graphDataInfo);
+        acceleratorSuperStep(runCounter, &graphDataInfo);
 
         endStamp = getCurrentTimestamp();
 
         /* profile */
-        accelratorProfile(0, runCounter, &graphDataInfo, endStamp - startStamp);
+        accelratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
     }
     acceleratorDeinit();
 

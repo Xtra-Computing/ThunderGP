@@ -6,7 +6,7 @@
 
 
 #define EDEG_MEMORY_SIZE        ((edgeNum + (ALIGN_SIZE * 4) * 128) * 1)
-#define VERTEX_MEMORY_SIZE      (((vertexNum - 1)/VERTEX_MAX + 1) * VERTEX_MAX)
+#define VERTEX_MEMORY_SIZE      (((vertexNum - 1)/MAX_VERTICES_IN_ONE_PARTITION + 1) * MAX_VERTICES_IN_ONE_PARTITION)
 
 extern void base_mem_init(cl_context &context);
 extern void process_mem_init(cl_context &context);
@@ -90,7 +90,7 @@ static void partitionTransfer(graphInfo *info)
     int base_mem_id[]  = {
         MEM_ID_VERTEX_SCORE_MAPPED,
         MEM_ID_OUT_DEG,
-        MEM_ID_ERROR
+        MEM_ID_RESULT_REG
     };
     DEBUG_PRINTF("%s", "transfer base mem\n");
     transfer_data_to_pl(acc->context, acc->device, base_mem_id, ARRAY_SIZE(base_mem_id));
@@ -177,7 +177,7 @@ void partitionFunction(graphInfo *info)
                 //tmpVertexProp[cia[start + j]] += vertexScore[u];//vertexProp[u] / (csr->rpao[u+1] - csr->rpao[u]);
                 int cia_idx = start + j; //printf("cia_idx %d\n",cia_idx );
                 int vertex_idx = vertexMap[cia[cia_idx]];
-                if ((vertex_idx >= i * VERTEX_MAX) && (vertex_idx < (i + 1) * VERTEX_MAX)) {
+                if ((vertex_idx >= i * MAX_VERTICES_IN_ONE_PARTITION) && (vertex_idx < (i + 1) * MAX_VERTICES_IN_ONE_PARTITION)) {
                     edgesTuples[cur_edge_num] = vertex_idx;
                     edgeScoreMap[cur_edge_num] = mapedSourceIndex;
                     //edgeProp[cur_edge_num] = cur_edge_num & 0xFFFFFF; //SpMV test
@@ -211,8 +211,8 @@ void partitionFunction(graphInfo *info)
         {
             partition->sub[subIndex]->compressRatio = (double (mapedSourceIndex)) / vertexNum;
             DEBUG_PRINTF("ratio %d / %d is %lf \n", mapedSourceIndex, vertexNum, partition->sub[subIndex]->compressRatio);
-            partition->sub[subIndex]->dstVertexStart = VERTEX_MAX * (i);
-            partition->sub[subIndex]->dstVertexEnd   = (((unsigned int)(VERTEX_MAX * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : VERTEX_MAX * (i + 1)) - 1;
+            partition->sub[subIndex]->dstVertexStart = MAX_VERTICES_IN_ONE_PARTITION * (i);
+            partition->sub[subIndex]->dstVertexEnd   = (((unsigned int)(MAX_VERTICES_IN_ONE_PARTITION * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : MAX_VERTICES_IN_ONE_PARTITION * (i + 1)) - 1;
             volatile int subPartitionSize = ((partition->totalEdge / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
             partition->subPartitionSize = subPartitionSize;
             partition->sub[subIndex]->srcVertexStart =  edgeScoreMap[subPartitionSize * subIndex];
@@ -318,7 +318,7 @@ int delta_index = (BURSTBUFFERSIZE / 2);
         for (int j = 0; j < num; j++) {
             int cia_idx = start + j; //printf("cia_idx %d\n",cia_idx );
             int vertex_idx = vertexMap[cia[cia_idx]];
-            if ((vertex_idx >= i * VERTEX_MAX) && (vertex_idx < (i + 1) * VERTEX_MAX)) {
+            if ((vertex_idx >= i * MAX_VERTICES_IN_ONE_PARTITION) && (vertex_idx < (i + 1) * MAX_VERTICES_IN_ONE_PARTITION)) {
                 bitmapOri[mapedSourceIndex / DELTA] = 1;
             }
         }

@@ -11,3 +11,9 @@ HAVE_APPLY=true/false
 CUSTOMIZE_APPLY=true/false
 HAVE_APPLY_OUTDEG=true/false
 
+#scheduler
+SCHEDULER=secondOrderEstimator
+
+#entry
+DEFAULT_ENTRY=true
+

@@ -18,7 +18,7 @@
 #define MEM_ID_TMP_VERTEX_PROP      (5)
 #define MEM_ID_TMP_VERTEX_VERIFY    (6)
 #define MEM_ID_OUT_DEG              (7)
-#define MEM_ID_ERROR                (8)
+#define MEM_ID_RESULT_REG           (8)
 #define MEM_ID_RPA                  (10)
 #define MEM_ID_CIA                  (11)
 #define MEM_ID_EDGE_PROP            (12)

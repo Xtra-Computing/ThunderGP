@@ -89,8 +89,9 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
         partitionItem->tmpProp.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 3;
         partitionItem->tmpProp.name = "partition tmpProp";
         partitionItem->tmpProp.attr = PARTITION_DDR;
-        partitionItem->tmpProp.unit_size = VERTEX_MAX * sizeof(int);
+        partitionItem->tmpProp.unit_size = MAX_VERTICES_IN_ONE_PARTITION * sizeof(int);
         partitionItem->tmpProp.size_attr = SIZE_USER_DEFINE;
         he_mem_init(context, &partitionItem->tmpProp);
     }
 }
+

@@ -48,6 +48,7 @@ inline prop_t applyCalculation( prop_t tProp,
     prop_t wProp;
     if ((uProp & 0x80000000) == (tProp & 0x80000000))
     {
+        extra = 0;
         wProp = uProp & 0x7fffffff;  // last active vertex
     }
     else if ((tProp & 0x80000000) == 0x80000000)
@@ -57,6 +58,7 @@ inline prop_t applyCalculation( prop_t tProp,
     }
     else
     {
+        extra = 0;
         wProp = MAX_PROP; // not travsered
     }
     update = wProp;

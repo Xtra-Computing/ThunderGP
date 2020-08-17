@@ -27,7 +27,14 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 #--xp prop:solution.kernel_compiler_margin=<Frequency Percentage>
 #--xp param:compiler.enableAutoFrequencyScaling=0
 
-HOST_SRCS = ./host_graph.cpp ./libgraph/graph.cpp ./libgraph/data_helper.cpp
+HOST_SRCS = ./libgraph/graph.cpp ./libgraph/data_helper.cpp
+
+ifeq ($(strip $(DEFAULT_ENTRY)), $(strip $(VAR_TRUE)))
+	HOST_SRCS +=  ./host_graph.cpp
+else
+	HOST_SRCS +=  $(APPCONFIG)/main.cpp
+endif
+
 
 HOST_SRCS += ./libgraph/memory/he_mem.cpp 
 

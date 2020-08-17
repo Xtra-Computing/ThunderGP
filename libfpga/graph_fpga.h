@@ -14,10 +14,6 @@
 #define HASH_MASK           (PE_NUM - 1)
 
 
-
-#define FLAG_SET                (1u)
-#define FLAG_RESET              (0u)
-
 #define DATA_WIDTH              (512)
 #define INT_WIDTH               (32)
 #define INT_WIDTH_SHIFT         (5)
@@ -68,6 +64,15 @@ typedef ap_uint<64>                 uint_uram;
 #define PAD_TYPE        int16
 #define PAD_WITH        16
 
+
+
+#ifndef FLAG_SET
+#define FLAG_SET                (1u)
+#endif
+
+#ifndef FLAG_RESET
+#define FLAG_RESET              (0u)
+#endif
 
 
 #define uchar unsigned char
