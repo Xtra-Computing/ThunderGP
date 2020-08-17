@@ -105,7 +105,7 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
 
 #if  CUSTOMIZE_APPLY == 0
 
-static int applyGlobalMemoryIndex[] =
+const int applyGlobalMemoryIndex[] =
 {
     2, 1, 0, 3
 };

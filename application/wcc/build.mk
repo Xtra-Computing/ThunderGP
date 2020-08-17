@@ -1,0 +1,18 @@
+HAVE_FULL_SLR=false
+
+#scatter-gather kernel
+HAVE_VERTEX_ACTIVE_BIT=true
+HAVE_EDGE_PROP=false
+HAVE_UNSIGNED_PROP=true
+
+#apply kernel
+HAVE_APPLY=false
+CUSTOMIZE_APPLY=false
+HAVE_APPLY_OUTDEG=false
+
+#scheduler
+SCHEDULER=secondOrderEstimator
+
+#entry
+DEFAULT_ENTRY=true
+

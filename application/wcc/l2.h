@@ -1,0 +1,56 @@
+#ifndef __L2_H__
+#define __L2_H__
+
+
+/*
+    Reference the mapping method in TABLE 1 from hitgraph:
+    Zhou, Shijie, et al. "HitGraph: High-throughput graph processing framework on FPGA."
+    IEEE Transactions on Parallel and Distributed Systems 30.10 (2019): 2249-2264.
+
+    but we change the min operation to max, for the initialization of BRAM is zero
+    and do not use another memory interface to reload data from DRAM.
+    Note: this implementation ONLY for comparison now!
+*/
+
+
+/* source vertex property process */
+inline prop_t preprocessProperty(prop_t srcProp)
+{
+    return (srcProp);
+}
+
+/* source vertex property & edge property */
+inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
+{
+    return (srcProp);
+}
+
+/* destination property update in RAW solver */
+inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
+{
+    return (update > ori) ? update : ori;
+}
+
+/* destination property update dst buffer update */
+inline prop_t updateDestination(prop_t ori, prop_t update)
+{
+    return (update > ori) ? update : ori;
+}
+
+/* destination property merge */
+inline prop_t applyMerge(prop_t ori, prop_t update)
+{
+    return (update > ori) ? update : ori;
+}
+
+inline prop_t applyCalculation( prop_t tProp,
+                                prop_t source,
+                                prop_t outDeg,
+                                unsigned int &extra,
+                                unsigned int arg
+                              )
+{
+    return tProp;
+}
+
+#endif /* __L2_H__ */

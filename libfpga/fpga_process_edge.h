@@ -21,9 +21,7 @@ void processEdgeWrite(
     uint16                  *tmpVertexProp
 )
 {
-    uint_raw dstStart = sink_offset;
     uint_raw dstEnd   = sink_end;
-    uint_raw vertexNum = dstEnd - dstStart;
 
 
     uint16 writeBuffer[BURST_WRITE_SIZE];
@@ -67,9 +65,8 @@ void processEdgeWrite(
         {
 #pragma HLS PIPELINE II=1
 #pragma HLS loop_flatten off
-            //DEBUG_PRINTF("%d \n", int (((dstStart >> LOG2_SIZE_BY_INT)) + (i << LOG2_BURST_WRITE_SIZE) + burst_index));
 
-            tmpVertexProp[((dstStart >> LOG2_SIZE_BY_INT)) + (i << LOG2_BURST_WRITE_SIZE) + burst_index ]
+            tmpVertexProp[(i << LOG2_BURST_WRITE_SIZE) + burst_index ]
                 = writeBuffer[burst_index];
 
         }
@@ -95,13 +92,13 @@ void dstPropertyProcess(
 #pragma HLS function_instantiate variable=index
 #pragma HLS dependence variable=tmpVPropBuffer inter false
 
-    uint_raw dstStart = sink_offset;
     uint_raw dstEnd   = sink_end;
-    uint_raw vertexNum = dstEnd - dstStart;
 
 
     while (true) {
 #pragma HLS PIPELINE II=2
+#pragma HLS latency min=2 max=2
+
         int2 tmp_data;
         int2_token in_token;
         read_from_stream(buildArray, in_token);
@@ -110,37 +107,44 @@ void dstPropertyProcess(
         {
             break;
         }
-        uint_raw idx;
+        else
         {
-#pragma HLS latency min=0 max=0
+            uint_raw idx;
+
             uint_raw dstVidx  = tmp_data.x;
-            idx = ((dstVidx - dstStart) >> LOG2_PE_NUM ) & ((MAX_VERTICES_IN_ONE_PARTITION >> LOG2_PE_NUM) - 1);
-        }
+            idx = (dstVidx >> LOG2_PE_NUM ) & ((MAX_VERTICES_IN_ONE_PARTITION >> LOG2_PE_NUM) - 1);
+            uint_raw addr = (idx >> 1);
 
-        {
-#pragma HLS latency min=3 max=3
-            uint_uram updated_value = tmpVPropBuffer[(idx >> 1)];
-            uint_raw origin_value;
 
-            if (idx & 0x01)
-                origin_value = updated_value.range(63, 32);
-            else
-                origin_value = updated_value.range(31, 0);
-
-            origin_value = PROP_COMPUTE_STAGE3(origin_value, tmp_data.y);
-
-            uint_uram tmp;
-            if (idx & 0x01)
             {
-                tmp.range(63, 32) = origin_value;
-                tmp.range(31,  0) = updated_value.range(31, 0);
+#pragma HLS latency min=1 max=2
+                uint_uram updated_value = tmpVPropBuffer[addr];
+                uint_uram temp_updated_value = updated_value;
+
+                uint_raw msb = updated_value.range(63, 32);
+                uint_raw lsb = updated_value.range(31, 0);
+
+                uint_raw msb_out = PROP_COMPUTE_STAGE3(msb, tmp_data.y);
+                uint_raw lsb_out = PROP_COMPUTE_STAGE3(lsb, tmp_data.y);
+
+                uint_uram accumulate_msb;
+                uint_uram accumulate_lsb;
+
+                accumulate_msb.range(63, 32) = msb_out;
+                accumulate_msb.range(31,  0) = temp_updated_value.range(31, 0);
+
+                accumulate_lsb.range(63, 32) = temp_updated_value.range(63, 32);
+                accumulate_lsb.range(31,  0) = lsb_out;
+
+                if (idx & 0x01)
+                {
+                    tmpVPropBuffer[addr] = accumulate_msb;
+                }
+                else
+                {
+                    tmpVPropBuffer[addr] = accumulate_lsb;
+                }
             }
-            else
-            {
-                tmp.range(63, 32) = updated_value.range(63, 32);
-                tmp.range(31,  0) = origin_value;
-            }
-            tmpVPropBuffer[(idx >> 1)] = tmp;
         }
 
 
