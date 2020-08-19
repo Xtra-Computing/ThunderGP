@@ -32,7 +32,7 @@
 #define PROP_COMPUTE_STAGE3(ori,update)             updateDestination(ori, update)
 
 /* destination property merge */
-#define PROP_COMPUTE_STAGE4(ori,update)             applyMerge(ori, update)
+#define PROP_COMPUTE_STAGE4(ori,update)             updateDestination(ori, update)
 
 
 #endif /* __FPGA_APPLICATION_H__ */

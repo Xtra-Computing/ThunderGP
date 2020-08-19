@@ -25,10 +25,5 @@ inline prop_t updateDestination(prop_t ori, prop_t update)
     return 0;
 }
 
-/* destination property merge */
-inline prop_t applyMerge(prop_t ori, prop_t update)
-{
-    return 0;
-}
 
 #endif /* __L2_H__ */

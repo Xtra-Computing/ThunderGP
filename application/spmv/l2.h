@@ -25,12 +25,6 @@ inline prop_t updateDestination(prop_t ori, prop_t update)
     return ((ori) + (update));
 }
 
-/* destination property merge */
-inline prop_t applyMerge(prop_t ori, prop_t update)
-{
-    return ((ori) + (update));
-}
-
 inline prop_t applyCalculation( prop_t tProp,
                                 prop_t source,
                                 prop_t outDeg,

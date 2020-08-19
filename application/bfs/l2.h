@@ -25,13 +25,15 @@ inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
 /* destination property update dst buffer update */
 inline prop_t updateDestination(prop_t ori, prop_t update)
 {
-    return (((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) || (ori == 0x0)) ? (update) : (ori));
-}
-
-/* destination property merge */
-inline prop_t applyMerge(prop_t ori, prop_t update)
-{
-    return ((((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) && (update != 0)) || (ori == 0x0)) ? (update) : (ori));
+    return (
+               (
+                   (
+                       (((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK)))
+                       && (update != 0)
+                   )
+                   || (ori == 0x0)
+               ) ? (update) : (ori)
+           );
 }
 
 inline prop_t applyCalculation( prop_t tProp,
@@ -45,7 +47,7 @@ inline prop_t applyCalculation( prop_t tProp,
 
     prop_t uProp  = source;
     prop_t wProp;
-    if ((uProp & 0x80000000) == (tProp & 0x80000000))
+    if  (((tProp & 0x80000000) == 0x80000000) && ((uProp & 0x80000000) == 0x80000000))
     {
         extra = 0;
         wProp = uProp & 0x7fffffff;  // last active vertex

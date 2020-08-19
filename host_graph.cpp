@@ -50,7 +50,6 @@ int main(int argc, char **argv) {
     for (int runCounter = 0 ; runCounter < 5 ; runCounter ++)
     {
         double startStamp, endStamp;
-        DEBUG_PRINTF("super step ************************************************\n");
         startStamp = getCurrentTimestamp();
 
         acceleratorSuperStep(runCounter, &graphDataInfo);
