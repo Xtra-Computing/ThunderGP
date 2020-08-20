@@ -18,9 +18,9 @@ unsigned int dataPrepareGetArg(graphInfo *info)
 
 int dataPrepareProperty(graphInfo *info)
 {
-    int *vertexProp =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_PROP);
-    int *outDeg =           (int*)get_host_mem_pointer(MEM_ID_OUT_DEG_ORIGIN);
-    int *vertexScore =      (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
+    int *tempPropValue   =  (int*)get_host_mem_pointer(MEM_ID_PROP_FOR_DATAPREPARE);
+    int *outDeg          =  (int*)get_host_mem_pointer(MEM_ID_OUT_DEG_ORIGIN);
+    int *vertexPushinProp     =  (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
 
     int vertexNum = info->vertexNum;
 
@@ -29,19 +29,19 @@ int dataPrepareProperty(graphInfo *info)
 
     
     for (int i = 0; i < vertexNum; i++) {
-        vertexProp[i] = init_score_int;
+        tempPropValue[i] = init_score_int;
         if (outDeg[i] > 0)
         {
-            vertexScore[i] =  vertexProp[i] / outDeg[i];
+            vertexPushinProp[i] =  tempPropValue[i] / outDeg[i];
         }
         else
         {
-            vertexScore[i]  = 0;
+            vertexPushinProp[i]  = 0;
         }
     }
     
     for (int i = vertexNum; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
-        vertexScore[i]  = 0;
+        vertexPushinProp[i]  = 0;
     }
     return 0;
 }

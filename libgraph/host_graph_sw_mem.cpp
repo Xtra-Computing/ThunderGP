@@ -48,10 +48,10 @@ static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, in
 
 void process_mem_init(cl_context &context)
 {
-    int *vertexScoreMapped =       (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
+    int *vertexPushinPropMapped = (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP_MAPPED);
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
-        gs_mem_init(context, getGatherScatter(i), i, vertexScoreMapped);
+        gs_mem_init(context, getGatherScatter(i), i, vertexPushinPropMapped);
     }
 }
 
@@ -61,19 +61,19 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
     subPartitionDescriptor *partitionItem  = getSubPartition(i);
     {
         partitionItem->cuIndex = cuIndex;
-        partitionItem->edge.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET;
-        partitionItem->edge.name = "partition edge";
-        partitionItem->edge.attr = PARTITION_DDR;
-        partitionItem->edge.unit_size = size * sizeof(int);
-        partitionItem->edge.size_attr = SIZE_USER_DEFINE;
-        he_mem_init(context, &partitionItem->edge);
+        partitionItem->edgeTail.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET;
+        partitionItem->edgeTail.name = "partition edgeTail";
+        partitionItem->edgeTail.attr = PARTITION_DDR;
+        partitionItem->edgeTail.unit_size = size * sizeof(int);
+        partitionItem->edgeTail.size_attr = SIZE_USER_DEFINE;
+        he_mem_init(context, &partitionItem->edgeTail);
 
-        partitionItem->edgeMap.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 1;
-        partitionItem->edgeMap.name = "partition edgeMap";
-        partitionItem->edgeMap.attr = PARTITION_DDR;
-        partitionItem->edgeMap.unit_size = size * sizeof(int);
-        partitionItem->edgeMap.size_attr = SIZE_USER_DEFINE;
-        he_mem_init(context, &partitionItem->edgeMap);
+        partitionItem->edgeHead.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 1;
+        partitionItem->edgeHead.name = "partition edgeHead";
+        partitionItem->edgeHead.attr = PARTITION_DDR;
+        partitionItem->edgeHead.unit_size = size * sizeof(int);
+        partitionItem->edgeHead.size_attr = SIZE_USER_DEFINE;
+        he_mem_init(context, &partitionItem->edgeHead);
 
         partitionItem->edgeProp.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 2;
         partitionItem->edgeProp.name = "partition edgeProp";

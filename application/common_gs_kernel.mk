@@ -3,9 +3,9 @@ $(XCLBIN)/readEdgesCU1.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu1.cpp
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU1 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU1.$(TARGET).$(DSA).xo
 BINARY_LINK_OBJS    += --nk  readEdgesCU1:1
-BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.edgeScoreMap:DDR[3]
-BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.edges:DDR[3]
-BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.vertexScore:DDR[3]
+BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.edgesHeadArray:DDR[3]
+BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.edgesTailArray:DDR[3]
+BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.vertexPushinProp:DDR[3]
 BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.tmpVertexProp:DDR[3]
 ifeq ($(strip $(HAVE_EDGE_PROP)), $(strip $(VAR_TRUE)))
 BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.edgeProp:DDR[3]
@@ -20,9 +20,9 @@ $(XCLBIN)/readEdgesCU2.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu2.cpp
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU2 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU2.$(TARGET).$(DSA).xo
 BINARY_LINK_OBJS    += --nk  readEdgesCU2:1
-BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.edgeScoreMap:DDR[2]
-BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.edges:DDR[2]
-BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.vertexScore:DDR[2]
+BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.edgesHeadArray:DDR[2]
+BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.edgesTailArray:DDR[2]
+BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.vertexPushinProp:DDR[2]
 BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.tmpVertexProp:DDR[2]
 ifeq ($(strip $(HAVE_EDGE_PROP)), $(strip $(VAR_TRUE)))
 BINARY_LINK_OBJS    += --sp  readEdgesCU2_1.edgeProp:DDR[2]
@@ -36,9 +36,9 @@ $(XCLBIN)/readEdgesCU3.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu3.cpp
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU3 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU3.$(TARGET).$(DSA).xo
 BINARY_LINK_OBJS    += --nk  readEdgesCU3:1
-BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.edgeScoreMap:DDR[1]
-BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.edges:DDR[1]
-BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.vertexScore:DDR[1]
+BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.edgesHeadArray:DDR[1]
+BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.edgesTailArray:DDR[1]
+BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.vertexPushinProp:DDR[1]
 BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.tmpVertexProp:DDR[1]
 ifeq ($(strip $(HAVE_EDGE_PROP)), $(strip $(VAR_TRUE)))
 BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.edgeProp:DDR[1]
@@ -52,9 +52,9 @@ $(XCLBIN)/readEdgesCU4.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu4.cpp
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU4 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU4.$(TARGET).$(DSA).xo
 BINARY_LINK_OBJS    += --nk  readEdgesCU4:1
-BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.edgeScoreMap:DDR[0]
-BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.edges:DDR[0]
-BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.vertexScore:DDR[0]
+BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.edgesHeadArray:DDR[0]
+BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.edgesTailArray:DDR[0]
+BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.vertexPushinProp:DDR[0]
 BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.tmpVertexProp:DDR[0]
 ifeq ($(strip $(HAVE_EDGE_PROP)), $(strip $(VAR_TRUE)))
 BINARY_LINK_OBJS    += --sp  readEdgesCU4_1.edgeProp:DDR[0]

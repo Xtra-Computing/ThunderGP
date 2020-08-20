@@ -1,16 +1,16 @@
 
 {
-#pragma HLS INTERFACE m_axi port=edgeScoreMap offset=slave bundle=gmem0 max_read_burst_length=64
-#pragma HLS INTERFACE s_axilite port=edgeScoreMap bundle=control
+#pragma HLS INTERFACE m_axi port=edgesHeadArray offset=slave bundle=gmem0 max_read_burst_length=64
+#pragma HLS INTERFACE s_axilite port=edgesHeadArray bundle=control
 
-#pragma HLS INTERFACE m_axi port=edges offset=slave bundle=gmem2 max_read_burst_length=64
-#pragma HLS INTERFACE s_axilite port=edges bundle=control
+#pragma HLS INTERFACE m_axi port=edgesTailArray offset=slave bundle=gmem2 max_read_burst_length=64
+#pragma HLS INTERFACE s_axilite port=edgesTailArray bundle=control
 
 #pragma HLS INTERFACE m_axi port=tmpVertexProp offset=slave bundle=gmem1 max_read_burst_length=64 num_write_outstanding=4
 #pragma HLS INTERFACE s_axilite port=tmpVertexProp bundle=control
 
-#pragma HLS INTERFACE m_axi port=vertexScore offset=slave bundle=gmem1 max_read_burst_length=64 num_write_outstanding=4
-#pragma HLS INTERFACE s_axilite port=vertexScore bundle=control
+#pragma HLS INTERFACE m_axi port=vertexPushinProp offset=slave bundle=gmem1 max_read_burst_length=64 num_write_outstanding=4
+#pragma HLS INTERFACE s_axilite port=vertexPushinProp bundle=control
 
 #if HAVE_EDGE_PROP
 
@@ -120,11 +120,11 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 
 #pragma HLS DATAFLOW
     //printf("%d %d \n",(int)edge_offset,(int)edge_end );
-    burstRead(0, edge_end, edges, edgeBurstStream);
+    burstRead(0, edge_end, edgesTailArray, edgeBurstStream);
     sliceStream(edgeBurstStream, edgeBurstStreamTmp);
     sliceStream(edgeBurstStreamTmp, edgeBurstSliceStream);
 
-    burstRead(0, edge_end, edgeScoreMap, mapStream);
+    burstRead(0, edge_end, edgesHeadArray, mapStream);
     sliceStream(mapStream, mapStreamTmp);
     sliceStream(mapStreamTmp, mapSliceStream);
 
@@ -136,7 +136,7 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 
 #endif
 
-    srcPropertyProcess(vertexScore, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
+    srcPropertyProcess(vertexPushinProp, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
 
 #if HAVE_EDGE_PROP
     propProcess(edgePropSliceStream, edgeTuplesBuffer, edgeTuplesCoupled);

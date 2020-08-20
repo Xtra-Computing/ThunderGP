@@ -17,6 +17,7 @@
 #define DEFAULT_KERNEL_ID       (0)
 
 
+
 #define checkStatus(str) {                          \
     if (status != 0 || status != CL_SUCCESS) {      \
         printf("Error code: %d\n", status);         \
@@ -52,8 +53,8 @@ typedef struct
     unsigned int  srcVertexEnd;
     float         scatterCacheRatio;
     float         compressRatio;
-    he_mem_t      edge;
-    he_mem_t      edgeMap;
+    he_mem_t      edgeTail;
+    he_mem_t      edgeHead;
     he_mem_t      edgeProp;
     he_mem_t      tmpProp;
     unsigned int  mapedTotalIndex;

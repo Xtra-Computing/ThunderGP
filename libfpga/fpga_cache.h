@@ -84,7 +84,7 @@ void writeTuples( hls::stream<edge_tuples_t>  &edgeTuplesBuffer, edge_tuples_t (
 // the preload size is calculated by
 inline uint_raw cacheUpdateByAddr(
     cache_line                      &cache_data,
-    uint_uram                       vertexScoreCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH])
+    uint_uram                       vertexPropCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH])
 {
 #pragma HLS INLINE
     {
@@ -95,10 +95,10 @@ inline uint_raw cacheUpdateByAddr(
             for (int k = 0; k < EDGE_NUM; k++)
             {
 #pragma HLS UNROLL
-                vertexScoreCache[k][0][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 0, 0 + (j << 8) + 64 * 0);
-                vertexScoreCache[k][1][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 1, 0 + (j << 8) + 64 * 1);
-                vertexScoreCache[k][2][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 2, 0 + (j << 8) + 64 * 2);
-                vertexScoreCache[k][3][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 3, 0 + (j << 8) + 64 * 3);
+                vertexPropCache[k][0][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 0, 0 + (j << 8) + 64 * 0);
+                vertexPropCache[k][1][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 1, 0 + (j << 8) + 64 * 1);
+                vertexPropCache[k][2][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 2, 0 + (j << 8) + 64 * 2);
+                vertexPropCache[k][3][uram_addr + j] = cache_data.data.range(63 +  (j << 8) + 64 * 3, 0 + (j << 8) + 64 * 3);
             }
         }
         return cache_data.addr;
@@ -325,8 +325,8 @@ void updateVertexCache(uint16                          *input,
                     for (int k = 0; k < EDGE_NUM; k++)
                     {
 #pragma HLS UNROLL
-                        vertexScoreCache[k][0][address + (inner_idx << 2) + j] = read_buffer[inner_idx].range(63 +  (j << 7), 0 + (j << 7));
-                        vertexScoreCache[k][1][address + (inner_idx << 2) + j] = read_buffer[inner_idx].range(63 +  (j << 7) + 64, 0 + (j << 7) + 64);
+                        vertexPropCache[k][0][address + (inner_idx << 2) + j] = read_buffer[inner_idx].range(63 +  (j << 7), 0 + (j << 7));
+                        vertexPropCache[k][1][address + (inner_idx << 2) + j] = read_buffer[inner_idx].range(63 +  (j << 7) + 64, 0 + (j << 7) + 64);
                     }
                 }
 #endif
@@ -351,11 +351,11 @@ void  readEdgesStage(
     hls::stream<edge_tuples_t>      &edgeTuplesBuffer,
     hls::stream<edgeBlock>          &edgeBlockStream,
     hls::stream<cache_line>         &cacheStream,
-    uint_uram                       vertexScoreCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH]
+    uint_uram                       vertexPropCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH]
 )
 {
-#pragma HLS dependence variable=vertexScoreCache inter false
-#pragma HLS DEPENDENCE variable=vertexScoreCache intra false
+#pragma HLS dependence variable=vertexPropCache inter false
+#pragma HLS DEPENDENCE variable=vertexPropCache intra false
 
     C_PRINTF("%s \n", "start readedges");
     ap_uint<1>  break_flag = 0;
@@ -380,7 +380,7 @@ void  readEdgesStage(
             caching_value = (cache_data[0].addr);
             if (caching_counter > 0)
             {
-                cacheUpdateByAddr(cache_data[1], vertexScoreCache);
+                cacheUpdateByAddr(cache_data[1], vertexPropCache);
             }
             cache_data[1] = cache_data[0];
             caching_counter ++;
@@ -406,7 +406,7 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
                             tmpBlock[1].tuples.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
                         unsigned int vertex_index =
                             tmpBlock[1].score.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
-                        //tuples[0].data[k].y = get_cached_value(vertex_index, vertexScoreCache);
+                        //tuples[0].data[k].y = get_cached_value(vertex_index, vertexPropCache);
 
                         unsigned int address = (vertex_index & CACHE_ADDRESS_MASK) >> 3;
                         unsigned int bit =  ((vertex_index & CACHE_ADDRESS_MASK) >> 1) & (URAM_PER_EDGE - 1);
@@ -414,7 +414,7 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
                         uint_uram tmp;
                         {
 #pragma HLS latency min=1 max=3
-                            tmp = vertexScoreCache[k][bit][address];
+                            tmp = vertexPropCache[k][bit][address];
                         }
 
                         if (vertex_index & 0x01)
@@ -449,20 +449,20 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
     return;
 
 }
-void srcPropertyProcess( uint16                             *vertexScore,
+void srcPropertyProcess( uint16                             *vertexPushinProp,
                          hls::stream<burst_token>           &edgeBurstStream,
                          hls::stream<burst_token>           &mapStream,
                          hls::stream<edge_tuples_t>         &edgeTuplesBuffer
                        )
 {
 #pragma HLS DATAFLOW
-    uint_uram vertexScoreCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH];
-#pragma HLS ARRAY_PARTITION variable=vertexScoreCache dim=1 complete
-#pragma HLS ARRAY_PARTITION variable=vertexScoreCache dim=2 complete
-#pragma HLS RESOURCE variable=vertexScoreCache core=XPM_MEMORY uram
+    uint_uram vertexPropCache[EDGE_NUM][URAM_PER_EDGE][URAM_DEPTH];
+#pragma HLS ARRAY_PARTITION variable=vertexPropCache dim=1 complete
+#pragma HLS ARRAY_PARTITION variable=vertexPropCache dim=2 complete
+#pragma HLS RESOURCE variable=vertexPropCache core=XPM_MEMORY uram
 
-#pragma HLS DEPENDENCE variable=vertexScoreCache inter false
-#pragma HLS DEPENDENCE variable=vertexScoreCache intra false
+#pragma HLS DEPENDENCE variable=vertexPropCache inter false
+#pragma HLS DEPENDENCE variable=vertexPropCache intra false
 
     hls::stream<cache_line>    cacheUpdateStream;
 #pragma HLS stream variable=cacheUpdateStream  depth=512
@@ -490,9 +490,9 @@ void srcPropertyProcess( uint16                             *vertexScore,
 
     stream2Command(map4CacheStream, cmdStream);
 
-    updateVertexCache(vertexScore , cmdStream, cacheUpdateStream);
+    updateVertexCache(vertexPushinProp , cmdStream, cacheUpdateStream);
 
-    readEdgesStage(edgeTuplesBuffer, edgeBlockStream, cacheUpdateStream, vertexScoreCache);
+    readEdgesStage(edgeTuplesBuffer, edgeBlockStream, cacheUpdateStream, vertexPropCache);
 }
 
 #endif /* __FPGA_CACHE_H__ */

@@ -16,3 +16,4 @@ xclbin*
 sdaccel.ini
 .run
 csr
+*.xclbin

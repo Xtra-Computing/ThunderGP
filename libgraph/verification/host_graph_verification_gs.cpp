@@ -1,6 +1,6 @@
 #include "host_graph_sw.h"
 
-#include "config.h"
+#include "global_config.h"
 #include "fpga_application.h"
 
 #include "host_graph_verification.h"
@@ -18,11 +18,11 @@ void partitionGatherScatterCModel(
     //int resultPropId = (superStep + 1) % 2;
 
 
-    unsigned int  *edgesTuples  = (unsigned int *)get_host_mem_pointer(subPartitions->edge.id);
-    int *edgeScoreMap           = (int*)get_host_mem_pointer(subPartitions->edgeMap.id);
+    int *edgesTailArray   = (int *)get_host_mem_pointer(subPartitions->edgeTail.id);
+    int *edgesHeadArray   = (int *)get_host_mem_pointer(subPartitions->edgeHead.id);
 
     transfer_data_from_pl(context, device, getGatherScatter(0)->prop[currentPropId].id);
-    prop_t *propValue           = (prop_t *)get_host_mem_pointer(getGatherScatter(0)->prop[currentPropId].id);
+    prop_t *propValue           = (prop_t*)get_host_mem_pointer(getGatherScatter(0)->prop[currentPropId].id);
     prop_t *tmpVertexPropVerify = (prop_t*)get_host_mem_pointer(MEM_ID_TMP_VERTEX_VERIFY);
     prop_t *edgeProp            = (prop_t*)get_host_mem_pointer(subPartitions->edgeProp.id);
     clear_host_mem(MEM_ID_TMP_VERTEX_VERIFY);
@@ -31,10 +31,10 @@ void partitionGatherScatterCModel(
     for (unsigned int i = 0; i < subPartitions->listEnd; i++)
     {
         prop_t update = 0;
-        unsigned int address = (edgesTuples[i] > subPartitions->dstVertexEnd) ? subPartitions->dstVertexEnd : edgesTuples[i];
-        if (IS_ACTIVE_VERTEX(propValue[edgeScoreMap[i]]))
+        int address = (edgesTailArray[i] > ((int)subPartitions->dstVertexEnd)) ? subPartitions->dstVertexEnd : edgesTailArray[i];
+        if (IS_ACTIVE_VERTEX(propValue[edgesHeadArray[i]]))
         {
-            update = PROP_COMPUTE_STAGE0(propValue[edgeScoreMap[i]]);
+            update = PROP_COMPUTE_STAGE0(propValue[edgesHeadArray[i]]);
 #if HAVE_EDGE_PROP
             update = PROP_COMPUTE_STAGE1(update, edgeProp[i]);
 #else
@@ -45,18 +45,18 @@ void partitionGatherScatterCModel(
         if (DATA_DUMP)
         {
             DEBUG_PRINTF("[DUMP]  %d 0x%08x-->0x%08x 0x%08x with 0x%08x \n", i,
-                         edgesTuples[i],
-                         edgeScoreMap[i],
-                         propValue[edgeScoreMap[i]],
+                         edgesTailArray[i],
+                         edgesHeadArray[i],
+                         propValue[edgesHeadArray[i]],
                          edgeProp[i]);
             DEBUG_PRINTF("[DUMP-2]  %d 0x%08x 0x%08x [%d] 0x%08x\n", i,
                          propValue[i], update, address, tmpVertexPropVerify[address]);
         }
 
 #ifdef PROBE_VERTEX
-        if (edgesTuples[i] == PROBE_VERTEX)
+        if (edgesTailArray[i] == PROBE_VERTEX)
         {
-            DEBUG_PRINTF("probe (%d): %x %x %x %x \n", edgesTuples[i], i, edgeScoreMap[i], propValue[edgeScoreMap[i]], tmpVertexPropVerify[edgesTuples[i]]);
+            DEBUG_PRINTF("probe (%d): %x %x %x %x \n", edgesTailArray[i], i, edgesHeadArray[i], propValue[edgesHeadArray[i]], tmpVertexPropVerify[edgesTailArray[i]]);
         }
 #endif
     }

@@ -30,7 +30,7 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 HOST_SRCS = ./libgraph/graph.cpp ./libgraph/data_helper.cpp
 
 ifeq ($(strip $(DEFAULT_ENTRY)), $(strip $(VAR_TRUE)))
-	HOST_SRCS +=  ./host_graph.cpp
+	HOST_SRCS +=  ./libgraph/default_entry.cpp
 else
 	HOST_SRCS +=  $(APPCONFIG)/main.cpp
 endif
@@ -71,6 +71,7 @@ CXXFLAGS += -I ./libgraph/memory
 CXXFLAGS += -I ./libgraph/scheduler
 CXXFLAGS += -I ./libgraph/verification
 CXXFLAGS += -I $(APPCONFIG)
+CXXFLAGS += -I ./application
 
 # Host linker flags
 LDFLAGS := $(opencl_LDFLAGS)
@@ -84,14 +85,15 @@ CLFLAGS = -t $(TARGET)
 endif
 
 # Kernel compiler global settings
-
 CLFLAGS += --platform $(DEVICE) --save-temps  -O3
 CLFLAGS += -I ./
 CLFLAGS += -I ./libfpga
 CLFLAGS += -I $(APPCONFIG)
+CLFLAGS += -I ./application
 CLFLAGS += --xp prop:solution.kernel_compiler_margin=10%
 
 # Kernel linker flags
+
 LDCLFLAGS += --xp prop:solution.kernel_compiler_margin=10% --kernel_frequency=$(FREQ)
 
 EXECUTABLE = host_graph_fpga_$(APP)
@@ -179,6 +181,12 @@ endif
 #                                                                           #
 #############################################################################
 
+## for hardware
 CLFLAGS  += -DQUEUE_SIZE_FILTER=$(QUEUE_SIZE_FILTER)
 CLFLAGS  += -DQUEUE_SIZE_MEMORY=$(QUEUE_SIZE_MEMORY)
 CLFLAGS  += -DLOG_SCATTER_CACHE_BURST_SIZE=$(LOG_SCATTER_CACHE_BURST_SIZE)
+CLFLAGS  += -DAPPLY_REF_ARRAY_SIZE=$(APPLY_REF_ARRAY_SIZE)
+
+#for software
+CXXFLAGS  += -DAPPLY_REF_ARRAY_SIZE=$(APPLY_REF_ARRAY_SIZE)
+

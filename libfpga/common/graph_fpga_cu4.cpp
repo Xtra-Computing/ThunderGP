@@ -15,9 +15,9 @@
 
 extern "C" {
     void  readEdgesCU4(
-        uint16          *edgeScoreMap,
-        uint16          *vertexScore,
-        uint16          *edges,
+        uint16          *edgesHeadArray,
+        uint16          *vertexPushinProp,
+        uint16          *edgesTailArray,
         uint16          *tmpVertexProp,
 #if HAVE_EDGE_PROP
         uint16          *edgeProp,

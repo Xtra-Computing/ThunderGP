@@ -1,7 +1,7 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
 
-#include "config.h"
+#include "global_config.h"
 #include <vector>
 #include <fstream>
 #include <iostream>

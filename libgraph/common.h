@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-#include "config.h"
+#include "global_config.h"
 
 
 

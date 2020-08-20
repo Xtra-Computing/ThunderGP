@@ -11,10 +11,10 @@
 
 
 
-#define MEM_ID_EDGE_TUPLES          (1)
-#define MEM_ID_EDGE_SCORE_MAP       (2)
-#define MEM_ID_VERTEX_SCORE         (3)
-#define MEM_ID_VERTEX_PROP          (4)
+#define MEM_ID_EDGE_TAIL            (1)
+#define MEM_ID_EDGE_HEAD            (2)
+#define MEM_ID_PUSHIN_PROP          (3)
+#define MEM_ID_PROP_FOR_DATAPREPARE (4)
 #define MEM_ID_TMP_VERTEX_PROP      (5)
 #define MEM_ID_TMP_VERTEX_VERIFY    (6)
 #define MEM_ID_OUT_DEG              (7)
@@ -23,7 +23,7 @@
 #define MEM_ID_CIA                  (11)
 #define MEM_ID_EDGE_PROP            (12)
 #define MEM_ID_VERTEX_PROP_VERIFY   (14)
-#define MEM_ID_VERTEX_SCORE_MAPPED  (15)
+#define MEM_ID_PUSHIN_PROP_MAPPED   (15)
 #define MEM_ID_VERTEX_INDEX_MAP     (16)
 #define MEM_ID_VERTEX_INDEX_REMAP   (17)
 #define MEM_ID_VERTEX_INDEX_BIT_ORI (18)

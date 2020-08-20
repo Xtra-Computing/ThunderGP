@@ -1,22 +1,14 @@
 
 #include "host_graph_sw.h"
 
-#include "config.h"
+#include "global_config.h"
 #include "fpga_application.h"
 
 #include "host_graph_verification.h"
 
 #if  CUSTOMIZE_APPLY == 0
 
-prop_t  applyVerfication(prop_t tProp, prop_t source, unsigned int outDeg, void * arg)
-{
 
-    unsigned int temp;
-    prop_t updateVerify;
-    updateVerify = applyCalculation(tProp, source, outDeg, temp, *(unsigned int *)arg);
-
-    return updateVerify;
-}
 
 
 void partitionApplyCModel(
@@ -29,7 +21,16 @@ void partitionApplyCModel(
 {
     int currentPropId = superStep % 2;
     int resultPropId = (superStep + 1) % 2;
-    DEBUG_PRINTF("partId %d\n", partId);
+    unsigned int applyArgReg = applyArg;
+
+    unsigned int infoArrayVerify[APPLY_REF_ARRAY_SIZE];
+
+    for (int i = 0; i < APPLY_REF_ARRAY_SIZE; i++)
+    {
+        infoArrayVerify[i] = 0;
+    }
+
+
     for (int i  = 0; i < SUB_PARTITION_NUM; i++)
     {
         transfer_data_from_pl(context, device, getSubPartition(partId * SUB_PARTITION_NUM + i)->tmpProp.id);
@@ -71,7 +72,7 @@ void partitionApplyCModel(
         }
 
         prop_t tProp = mergeData;
-        updateVerify[i] = applyVerfication(tProp, propValue[i + offset], outDeg[i + offset], (void *)&applyArg);
+        updateVerify[i] = applyCalculation(tProp, propValue[i + offset], outDeg[i + offset], infoArrayVerify, *(unsigned int *)&applyArgReg);
     }
 
     int error_count = 0;

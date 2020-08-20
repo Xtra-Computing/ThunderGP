@@ -18,11 +18,14 @@ void applyFunction(
     int                             *outReg
 )
 {
-    unsigned int infoArray[BURST_ALL_BITS / INT_WIDTH];
+    unsigned int infoArray[BURST_ALL_BITS / INT_WIDTH][APPLY_REF_ARRAY_SIZE];
 #pragma HLS ARRAY_PARTITION variable=infoArray dim=0 complete
     for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i++)
     {
-        infoArray[i] = 0;
+        for(int j = 0; j < APPLY_REF_ARRAY_SIZE; j++)
+        {
+            infoArray[i][j] = 0;
+        }
     }
     for (int loopCount = 0; loopCount < loopNum; loopCount ++)
     {
@@ -51,28 +54,32 @@ void applyFunction(
 #else
             prop_t out_deg   = 0;
 #endif
-            unsigned int tmpInfoArray[BURST_ALL_BITS / INT_WIDTH];
+            unsigned int tmpInfoArray[BURST_ALL_BITS / INT_WIDTH][APPLY_REF_ARRAY_SIZE];
 #pragma HLS ARRAY_PARTITION variable=tmpInfoArray dim=0 complete
 //#pragma HLS DEPENDENCE variable=tmpInfoArray inter false
 
             prop_t  wProp    = applyCalculation( tProp, uProp, out_deg, tmpInfoArray[i],  argReg);
-            infoArray[i] += tmpInfoArray[i]; 
-
+            for (int j = 0; j < APPLY_REF_ARRAY_SIZE; j++)
+            {
+                infoArray[i][j] += tmpInfoArray[i][j];
+            }
             newVertexProp.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH ) = wProp;
 
         }
         write_to_stream(newVertexPropStream, newVertexProp);
     }
 
-    int infoAggregate = 0;
-
-    for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i ++)
+    for (int j = 0; j < APPLY_REF_ARRAY_SIZE; j++)
     {
-        DEBUG_PRINTF("infoArray %d %d \n", i, infoArray[i]);
-        infoAggregate += infoArray[i];
-    }
-    outReg[0] = infoAggregate;
+        int infoAggregate = 0;
 
+        for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i ++)
+        {
+            DEBUG_PRINTF("infoArray %d %d \n", i, infoArray[i]);
+            infoAggregate += infoArray[i][j];
+        }
+        outReg[0] = infoAggregate;
+    }
 }
 
 

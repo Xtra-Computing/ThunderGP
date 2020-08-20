@@ -8,12 +8,12 @@ unsigned int dataPrepareGetArg(graphInfo *info)
 
 int dataPrepareProperty(graphInfo *info)
 {
-    int *vertexScore =      (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
+    int *vertexPushinProp =      (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
 
     int vertexNum = info->vertexNum;
 
     for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
-        vertexScore[i]    = i;
+        vertexPushinProp[i]    = i;
     }
     return 0;
 }

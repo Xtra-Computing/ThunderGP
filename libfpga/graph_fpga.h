@@ -4,7 +4,7 @@
 #define AP_INT_MAX_W 4096
 #include <ap_int.h>
 
-#include "config.h"
+#include "global_config.h"
 
 #define PE_NUM              16
 #define EDGE_NUM            8

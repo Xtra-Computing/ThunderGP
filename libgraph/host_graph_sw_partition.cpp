@@ -88,7 +88,7 @@ static void partitionTransfer(graphInfo *info)
     double  begin = getCurrentTimestamp();
 
     int base_mem_id[]  = {
-        MEM_ID_VERTEX_SCORE_MAPPED,
+        MEM_ID_PUSHIN_PROP_MAPPED,
         MEM_ID_OUT_DEG,
         MEM_ID_RESULT_REG
     };
@@ -97,8 +97,8 @@ static void partitionTransfer(graphInfo *info)
     DEBUG_PRINTF("%s", "transfer subPartitions mem\n");
     for (int i = 0; i < info->blkNum; i ++) {
         int mem_id[3];
-        mem_id[0] = getSubPartition(i)->edge.id;
-        mem_id[1] = getSubPartition(i)->edgeMap.id;
+        mem_id[0] = getSubPartition(i)->edgeTail.id;
+        mem_id[1] = getSubPartition(i)->edgeHead.id;
         mem_id[2] = getSubPartition(i)->edgeProp.id;
         transfer_data_to_pl(acc->context, acc->device, mem_id, ARRAY_SIZE(mem_id));
     }
@@ -123,10 +123,10 @@ void partitionFunction(graphInfo *info)
 
     int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
     int *cia = (int*)get_host_mem_pointer(MEM_ID_CIA);
-    int *vertexScoreMapped    = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE_MAPPED);
-    int *vertexScore          = (int*)get_host_mem_pointer(MEM_ID_VERTEX_SCORE);
-    unsigned int *vertexMap   = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
-    unsigned int *vertexRemap = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
+    int *vertexPushinPropMapped  = (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP_MAPPED);
+    int *vertexPushinProp        = (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
+    unsigned int *vertexMap      = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
+    unsigned int *vertexRemap    = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
 
     schedulerInit(NULL);
 
@@ -139,9 +139,9 @@ void partitionFunction(graphInfo *info)
         if (num != 0)
         {
 #if CAHCE_FETCH_DEBUG
-            vertexScoreMapped[mapedSourceIndex] =  mapedSourceIndex;
+            vertexPushinPropMapped[mapedSourceIndex] =  mapedSourceIndex;
 #else
-            vertexScoreMapped[mapedSourceIndex] =  vertexScore[u];
+            vertexPushinPropMapped[mapedSourceIndex] =  vertexPushinProp[u];
 #endif
             vertexRemap[mapedSourceIndex] = u;
             mapedSourceIndex ++;
@@ -165,8 +165,8 @@ void partitionFunction(graphInfo *info)
 
         /****************************************************************************************************************/
         uint cur_edge_num = 0;
-        int *edgesTuples  = (int*)get_host_mem_pointer(MEM_ID_EDGE_TUPLES);
-        int *edgeScoreMap = (int*)get_host_mem_pointer(MEM_ID_EDGE_SCORE_MAP);
+        int *edgesTailArray = (int*)get_host_mem_pointer(MEM_ID_EDGE_TAIL);
+        int *edgesHeadArray = (int*)get_host_mem_pointer(MEM_ID_EDGE_HEAD);
         int *edgeProp     = (int*)get_host_mem_pointer(MEM_ID_EDGE_PROP);
         mapedSourceIndex = 0;
 
@@ -174,12 +174,12 @@ void partitionFunction(graphInfo *info)
             int start = rpa[u];
             int num = rpa[u + 1] - rpa[u];
             for (int j = 0; j < num; j++) {
-                //tmpVertexProp[cia[start + j]] += vertexScore[u];//vertexProp[u] / (csr->rpao[u+1] - csr->rpao[u]);
+                //tmpVertexProp[cia[start + j]] += vertexPushinProp[u];//vertexProp[u] / (csr->rpao[u+1] - csr->rpao[u]);
                 int cia_idx = start + j; //printf("cia_idx %d\n",cia_idx );
                 int vertex_idx = vertexMap[cia[cia_idx]];
                 if ((vertex_idx >= i * MAX_VERTICES_IN_ONE_PARTITION) && (vertex_idx < (i + 1) * MAX_VERTICES_IN_ONE_PARTITION)) {
-                    edgesTuples[cur_edge_num] = vertex_idx;
-                    edgeScoreMap[cur_edge_num] = mapedSourceIndex;
+                    edgesTailArray[cur_edge_num] = vertex_idx;
+                    edgesHeadArray[cur_edge_num] = mapedSourceIndex;
                     //edgeProp[cur_edge_num] = cur_edge_num & 0xFFFFFF; //SpMV test
                     edgeProp[cur_edge_num] = 1;
                     cur_edge_num ++;
@@ -199,8 +199,8 @@ void partitionFunction(graphInfo *info)
         //align at 4k
 
         for (int k = 0; k < (ALIGN_SIZE - (unpad_edge_num % ALIGN_SIZE)); k ++) {
-            edgesTuples[cur_edge_num] = (ENDFLAG - 1);
-            edgeScoreMap[cur_edge_num] = edgeScoreMap[cur_edge_num - 1];
+            edgesTailArray[cur_edge_num] = (ENDFLAG - 1);
+            edgesHeadArray[cur_edge_num] = edgesHeadArray[cur_edge_num - 1];
             edgeProp[cur_edge_num] = 0;
             cur_edge_num ++;
         }
@@ -215,8 +215,8 @@ void partitionFunction(graphInfo *info)
             partition->sub[subIndex]->dstVertexEnd   = (((unsigned int)(MAX_VERTICES_IN_ONE_PARTITION * (i + 1)) > mapedSourceIndex) ? mapedSourceIndex : MAX_VERTICES_IN_ONE_PARTITION * (i + 1)) - 1;
             volatile int subPartitionSize = ((partition->totalEdge / SUB_PARTITION_NUM) / ALIGN_SIZE) * ALIGN_SIZE;
             partition->subPartitionSize = subPartitionSize;
-            partition->sub[subIndex]->srcVertexStart =  edgeScoreMap[subPartitionSize * subIndex];
-            partition->sub[subIndex]->srcVertexEnd   =  edgeScoreMap[subPartitionSize * (subIndex + 1) - 1];
+            partition->sub[subIndex]->srcVertexStart =  edgesHeadArray[subPartitionSize * subIndex];
+            partition->sub[subIndex]->srcVertexEnd   =  edgesHeadArray[subPartitionSize * (subIndex + 1) - 1];
         }
         schedulerSubPartitionArrangement(i);
 
@@ -231,13 +231,13 @@ void partitionFunction(graphInfo *info)
             partition->sub[subIndex]->listStart =  0;
             partition->sub[subIndex]->listEnd = (bound > partition->totalEdge) ? (partition->totalEdge - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
             partition->sub[subIndex]->mapedTotalIndex = mapedSourceIndex;
-            partition->sub[subIndex]->srcVertexStart =  edgeScoreMap[subPartitionSize * reOrderIndex];
-            partition->sub[subIndex]->srcVertexEnd   =  edgeScoreMap[subPartitionSize * (reOrderIndex + 1) - 1];
+            partition->sub[subIndex]->srcVertexStart =  edgesHeadArray[subPartitionSize * reOrderIndex];
+            partition->sub[subIndex]->srcVertexEnd   =  edgesHeadArray[subPartitionSize * (reOrderIndex + 1) - 1];
 
             DEBUG_PRINTF("[SIZE] %d cur_edge_num sub %d\n", partition->totalEdge, partition->sub[subIndex]->listEnd);
             partition_mem_init(acc->context, partId, partition->sub[subIndex]->listEnd, subIndex); // subIndex --> cuIndex
-            memcpy(partition->sub[subIndex]->edge.data     , &edgesTuples[subPartitionSize * reOrderIndex]  , partition->sub[subIndex]->listEnd * sizeof(int));
-            memcpy(partition->sub[subIndex]->edgeMap.data  , &edgeScoreMap[subPartitionSize * reOrderIndex] , partition->sub[subIndex]->listEnd * sizeof(int));
+            memcpy(partition->sub[subIndex]->edgeTail.data     , &edgesTailArray[subPartitionSize * reOrderIndex]  , partition->sub[subIndex]->listEnd * sizeof(int));
+            memcpy(partition->sub[subIndex]->edgeHead.data  , &edgesHeadArray[subPartitionSize * reOrderIndex] , partition->sub[subIndex]->listEnd * sizeof(int));
             memcpy(partition->sub[subIndex]->edgeProp.data , &edgeProp[subPartitionSize * reOrderIndex]     , partition->sub[subIndex]->listEnd * sizeof(int));
         }
     }
@@ -251,14 +251,14 @@ void partitionFunction(graphInfo *info)
     for (int i = 0; i < info->blkNum; i++)
     {
         subPartitionDescriptor * subPartition = getSubPartition(i);
-        int *edgeScoreMap = (int*)subPartition->edgeMap.data;
+        int *edgesHeadArray = (int*)subPartition->edgeHead.data;
 
         DEBUG_PRINTF("\n----------------------------------------------------------------------------------\n");
         DEBUG_PRINTF("[PART] subPartitions %d info :\n", i);
         DEBUG_PRINTF("[PART] \t edgelist from %d to %d\n"   , subPartition->listStart      , subPartition->listEnd     );
         DEBUG_PRINTF("[PART] \t dst. vertex from %d to %d\n", subPartition->dstVertexStart , subPartition->dstVertexEnd);
         DEBUG_PRINTF("[PART] \t src. vertex from %d to %d\n", subPartition->srcVertexStart , subPartition->srcVertexEnd);
-        DEBUG_PRINTF("[PART] \t dump: %d - %d\n", (edgeScoreMap[subPartition->listStart]), (edgeScoreMap[subPartition->listEnd - 1]));
+        DEBUG_PRINTF("[PART] \t dump: %d - %d\n", (edgesHeadArray[subPartition->listStart]), (edgesHeadArray[subPartition->listEnd - 1]));
         DEBUG_PRINTF("[PART] scatter cache ratio %lf \n", subPartition->scatterCacheRatio);
         DEBUG_PRINTF("[PART] v/e %lf \n", (subPartition->dstVertexEnd - subPartition->dstVertexStart)
                      / ((float)(subPartition->listEnd - subPartition->listStart)));
@@ -299,89 +299,3 @@ int acceleratorDataPreprocess(graphInfo *info)
     partitionFunction(info);
     return 0;
 }
-
-
-#if 0
-unsigned int *bitmapOri =  (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_BIT_ORI);
-//for (int delta_index = 1; delta_index < 16; delta_index ++)
-int delta_index = (BURSTBUFFERSIZE / 2);
-{
-#define  DELTA (16 * delta_index)
-    for (int u = 0; u < vertexNum; u++) {
-        bitmapOri[u / DELTA] = 0;
-    }
-    mapedSourceIndex = 0;
-
-    for (int u = 0; u < vertexNum; u++) {
-        int start = rpa[u];
-        int num = rpa[u + 1] - rpa[u];
-        for (int j = 0; j < num; j++) {
-            int cia_idx = start + j; //printf("cia_idx %d\n",cia_idx );
-            int vertex_idx = vertexMap[cia[cia_idx]];
-            if ((vertex_idx >= i * MAX_VERTICES_IN_ONE_PARTITION) && (vertex_idx < (i + 1) * MAX_VERTICES_IN_ONE_PARTITION)) {
-                bitmapOri[mapedSourceIndex / DELTA] = 1;
-            }
-        }
-        if (num != 0)
-        {
-            mapedSourceIndex ++;
-        }
-    }
-    int hit_counter = 0;
-    for (int u = 0; u < vertexNum / DELTA ; u++) {
-        if (bitmapOri[u] == 1)
-        {
-            hit_counter++;
-        }
-    }
-
-    subPartitions[i].scatterCacheRatio =  ((float)hit_counter) / ((mapedSourceIndex / DELTA + 1 ));
-    DEBUG_PRINTF("[TRS] scatter cache ratio: %lf in %d @blk %d \n",
-                 subPartitions[i].scatterCacheRatio,
-                 DELTA, i);
-    /* calculate scatter efficient */
-}
-#endif
-
-#if 0
-#if SRC_VERTEX_CHECK
-int lastMapIndex = edgeScoreMap[subPartitions[i].listStart];
-int inner_counter = 0;
-DEBUG_PRINTF("SRC_VERTEX_CHECK @%d\n", SRC_VERTEX_CHECK_UNIT);
-int max_diff  = 0;
-int diff_count[3] = {0};
-for (unsigned int j = subPartitions[i].listStart;  j < subPartitions[i].listEnd; j += SRC_VERTEX_CHECK_UNIT)
-{
-    inner_counter ++;
-    int diff = edgeScoreMap[j] - lastMapIndex;
-    if (diff > max_diff)
-    {
-        max_diff = diff;
-    }
-    if (diff > 2000)
-    {
-        DEBUG_PRINTF("hit: edge index over cache perfetch [%d] %d %d %d --- %d \n",
-                     inner_counter, j, lastMapIndex, edgeScoreMap[j], diff);
-        diff_count[0] ++;
-    } else if (diff > 1000)
-    {
-        diff_count[1] ++;
-    }
-    else if (diff > 100)
-    {
-        diff_count[2] ++;
-    }
-
-    //if ((diff) >  SRC_VERTEX_CHECK_UNIT )
-    //{
-    //DEBUG_PRINTF("warning: edge index over cache perfetch [%d] %d %d %d --- %d \n",
-    //             inner_counter, j, lastMapIndex, edgeScoreMap[j], diff);
-    //}
-    lastMapIndex = edgeScoreMap[j];
-}
-DEBUG_PRINTF(" MAX DIFF[%d] %d %d %d\n",
-             max_diff, diff_count[0], diff_count[1], diff_count[2]);
-
-#endif
-
-#endif

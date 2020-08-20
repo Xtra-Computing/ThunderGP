@@ -3,21 +3,19 @@
 
 
 
-#define VERTEX_ACTIVE_BIT_MASK 		(0x80000000)
-
+#include "l2.h"
 
 #if HAVE_VERTEX_ACTIVE_BIT
 
-#define IS_ACTIVE_VERTEX(a)			((((((a) & VERTEX_ACTIVE_BIT_MASK) == VERTEX_ACTIVE_BIT_MASK))) ? 1 : 0)
+#ifndef IS_ACTIVE_VERTEX
+#error "Please define the MACRO: IS_ACTIVE_VERTEX in l2.h, as your configuration: HAVE_VERTEX_ACTIVE_BIT is true!"
+#endif
 
 #else
 
 #define IS_ACTIVE_VERTEX(a)			(1)
 
 #endif
-
-
-#include "l2.h"
 
 /* source vertex property process */
 #define PROP_COMPUTE_STAGE0(srcProp)                preprocessProperty(srcProp)

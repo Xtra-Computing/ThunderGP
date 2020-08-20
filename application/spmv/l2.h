@@ -28,7 +28,7 @@ inline prop_t updateDestination(prop_t ori, prop_t update)
 inline prop_t applyCalculation( prop_t tProp,
                                 prop_t source,
                                 prop_t outDeg,
-                                unsigned int &extra,
+                                unsigned int (&extra)[APPLY_REF_ARRAY_SIZE],
                                 unsigned int arg
                               )
 {

@@ -5,6 +5,9 @@
 #define kDamp               (0.85f)
 #define kDampFixPoint       108//(0.85 << 7)  // * 128
 
+#define SCALE_DEGREE		(16)
+#define SCALE_DAMPING		(7)
+
 /* source vertex property process */
 inline prop_t preprocessProperty(prop_t srcProp)
 {
@@ -37,19 +40,18 @@ inline prop_t applyCalculation( prop_t tProp,
                               )
 {
 
-	prop_t old_score = source;
-	prop_t new_score = arg  + ((kDampFixPoint * tProp) >> 7);
-	prop_t tmp;
-	if (outDeg != 0)
-	{
-		tmp = (1 << 16 ) / outDeg;
-	}
-	else
-	{
-		tmp = 0;
-	}
+	prop_t new_score ;
+	prop_t old_score ;
+	unsigned int C_avg = arg;
 
-	prop_t update = (new_score * tmp) >> 16;
+	prop_t tmp;
+	prop_t C_Ta = outDeg;
+	tmp = (1 << SCALE_DEGREE ) / (C_Ta + C_avg);
+
+	old_score = source * tmp;
+	new_score = kDampFixPoint * tProp + (unsigned int) ((1<< (SCALE_DEGREE + SCALE_DAMPING)) * (1.0f - kDamp));
+
+	prop_t update = (new_score * tmp);
 
 	extra[0] = (new_score - old_score) > 0 ? (new_score - old_score) : (old_score - new_score) ;
 

@@ -86,9 +86,9 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
         //DEBUG_PRINTF("gs task in cu [%d] info:\n", i);
         //DEBUG_PRINTF("\tedge  %d %d \n", 0, edgeEnd);
         //DEBUG_PRINTF("\tsink  %d %d \n", sinkStart, sinkEnd);
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeMap.id));
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeHead.id));
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(gsHandler->prop[currentPropId].id));
-        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edge.id));
+        clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeTail.id));
 
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->tmpProp.id));
         he_set_dirty(partition->tmpProp.id);

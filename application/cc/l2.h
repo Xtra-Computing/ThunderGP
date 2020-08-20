@@ -2,31 +2,33 @@
 #define __L2_H__
 
 
-#define kDamp               (0.85f)
-#define kDampFixPoint       108//(0.85 << 7)  // * 128
+#define MAX_PROP                  (INT_MAX - 1)
+
+#define VERTEX_ACTIVE_BIT_MASK    (0x80000000)
+#define IS_ACTIVE_VERTEX(a)       (a != 0)
 
 /* source vertex property process */
 inline prop_t preprocessProperty(prop_t srcProp)
 {
-	return (srcProp);
+    return ((srcProp));
 }
 
 /* source vertex property & edge property */
 inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
 {
-	return (srcProp);
+    return (srcProp);
 }
 
 /* destination property update in RAW solver */
 inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
 {
-	return ((ori) + (update));
+    return (ori | update);
 }
 
 /* destination property update dst buffer update */
 inline prop_t updateDestination(prop_t ori, prop_t update)
 {
-	return ((ori) + (update));
+    return (ori | update);
 }
 
 inline prop_t applyCalculation( prop_t tProp,
@@ -37,22 +39,16 @@ inline prop_t applyCalculation( prop_t tProp,
                               )
 {
 
-	prop_t old_score = source;
-	prop_t new_score = arg  + ((kDampFixPoint * tProp) >> 7);
-	prop_t tmp;
-	if (outDeg != 0)
-	{
-		tmp = (1 << 16 ) / outDeg;
-	}
-	else
-	{
-		tmp = 0;
-	}
+    for (int i = 0; i < APPLY_REF_ARRAY_SIZE; i++)
+    {
+        const prop_t mask = (1<<i);
+        if ((source&mask) != (tProp & mask))
+        {
+            extra[i] = 1;
+        }
+    }
 
-	prop_t update = (new_score * tmp) >> 16;
-
-	extra[0] = (new_score - old_score) > 0 ? (new_score - old_score) : (old_score - new_score) ;
-
-	return update;
+    return tProp | source;
 }
+
 #endif /* __L2_H__ */

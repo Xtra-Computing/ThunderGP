@@ -2,8 +2,10 @@
 #define __L2_H__
 
 
-#define MAX_PROP            (INT_MAX - 1)
+#define MAX_PROP                  (INT_MAX - 1)
 
+#define VERTEX_ACTIVE_BIT_MASK    (0x80000000)
+#define IS_ACTIVE_VERTEX(a)       ((((((a) & VERTEX_ACTIVE_BIT_MASK) == VERTEX_ACTIVE_BIT_MASK))) ? 1 : 0)
 
 /* source vertex property process */
 inline prop_t preprocessProperty(prop_t srcProp)
@@ -40,7 +42,7 @@ inline prop_t updateDestination(prop_t ori, prop_t update)
 inline prop_t applyCalculation( prop_t tProp,
                                 prop_t source,
                                 prop_t outDeg,
-                                unsigned int &extra,
+                                unsigned int (&extra)[APPLY_REF_ARRAY_SIZE],
                                 unsigned int arg
                               )
 {
@@ -48,24 +50,20 @@ inline prop_t applyCalculation( prop_t tProp,
 
     prop_t uProp  = source;
     prop_t wProp;
-    if  (((tProp & 0x80000000) == 0x80000000) && ((uProp & 0x80000000) == 0x80000000))
+    if (((tProp & 0x80000000) == 0x80000000) && (uProp == MAX_PROP))
     {
-        extra = 0;
-        wProp = uProp & 0x7fffffff;  // last active vertex
-    }
-    else if ((tProp & 0x80000000) == 0x80000000)
-    {
-        extra = 1;
-        wProp = tProp; // current active vertex
+        extra[0] = 1;
+        wProp = tProp; // current active vertex, not travsered
     }
     else
     {
-        extra = 0;
-        wProp = MAX_PROP; // not travsered
+        extra[0] = 0;
+        wProp = uProp & 0x7fffffff; // not travsered
     }
     update = wProp;
 
     return update;
 }
+
 
 #endif /* __L2_H__ */

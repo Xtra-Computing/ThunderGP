@@ -1,5 +1,5 @@
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#ifndef __GLOBAL_CONFIG_H__
+#define __GLOBAL_CONFIG_H__
 
 #include <climits>
 #include <math.h>
@@ -36,4 +36,4 @@ typedef  int                prop_t;
 
 
 
-#endif /* __CONFIG_H__ */
+#endif /* __GLOBAL_CONFIG_H__ */

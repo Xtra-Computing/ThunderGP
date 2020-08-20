@@ -6,9 +6,9 @@
 he_mem_t local_mem[] =
 {
     {
-        MEM_ID_VERTEX_PROP,
-        "vertexProp",
-        ATTR_PL_DDR3,
+        MEM_ID_PROP_FOR_DATAPREPARE,
+        "data prepare",
+        ATTR_HOST_ONLY,
         sizeof(prop_t),
         SIZE_IN_VERTEX,
     },
@@ -29,29 +29,29 @@ he_mem_t local_mem[] =
     },
 
     {
-        MEM_ID_EDGE_TUPLES,
-        "edgesTuples",
+        MEM_ID_EDGE_TAIL,
+        "edgesTailArray",
         ATTR_HOST_ONLY,
         sizeof(prop_t),
         SIZE_IN_EDGE,
     },
     {
-        MEM_ID_EDGE_SCORE_MAP,
-        "edgeScoreMap",
+        MEM_ID_EDGE_HEAD,
+        "edgesHeadArray",
         ATTR_HOST_ONLY,
         sizeof(int),
         SIZE_IN_EDGE,
     },
     {
-        MEM_ID_VERTEX_SCORE,
-        "vertexScore",
+        MEM_ID_PUSHIN_PROP,
+        "vertexPushinProp",
         ATTR_HOST_ONLY,
         sizeof(int),
         SIZE_IN_VERTEX,
     },
     {
-        MEM_ID_VERTEX_SCORE_MAPPED,
-        "vertexScoreMapped",
+        MEM_ID_PUSHIN_PROP_MAPPED,
+        "vertexPushinPropMapped",
         ATTR_HOST_ONLY,
         sizeof(int),
         SIZE_IN_VERTEX,

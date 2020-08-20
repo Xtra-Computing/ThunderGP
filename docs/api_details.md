@@ -34,11 +34,11 @@ Example:
 
 /*simplified gather_scatter kernel*/
 {
-    burstRead(0, edge_end, edges, edgeBurstStream);
-    burstRead(0, edge_end, edgeScoreMap, mapStream);
+    burstRead(0, edge_end, edgesTailArray, edgeBurstStream);
+    burstRead(0, edge_end, edgesHeadArray, mapStream);
     burstRead(0, edge_end, edgeProp, edgePropStream);
 
-    srcPropertyProcess(vertexScore, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
+    srcPropertyProcess(vertexPushinProp, edgeBurstSliceStream, mapSliceStream, edgeTuplesBuffer);
     propProcess(edgePropSliceStream, edgeTuplesBuffer, edgeTuplesCoupled);
     for (int i = 0; i < PE_NUM ; i++)
     {
