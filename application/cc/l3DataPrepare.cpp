@@ -14,7 +14,7 @@ int dataPrepareProperty(graphInfo *info)
     int vertexNum = info->vertexNum;
 
     for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
-        vertexPushinProp[i]    = MAX_PROP;
+        vertexPushinProp[i]    = 0;
     }
     vertexPushinProp[getStartIndex()] = 0x00000001;
     activeVertexNum[0] = 1;

@@ -78,7 +78,7 @@ void applyFunction(
             DEBUG_PRINTF("infoArray %d %d \n", i, infoArray[i]);
             infoAggregate += infoArray[i][j];
         }
-        outReg[0] = infoAggregate;
+        outReg[j] = infoAggregate;
     }
 }
 

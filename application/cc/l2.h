@@ -46,6 +46,10 @@ inline prop_t applyCalculation( prop_t tProp,
         {
             extra[i] = 1;
         }
+        else
+        {
+            extra[i] = 0;
+        }
     }
 
     return tProp | source;
