@@ -1,5 +1,3 @@
-/* DEFAULT_ENTRY in build.mk */
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

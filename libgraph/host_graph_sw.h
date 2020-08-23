@@ -145,7 +145,7 @@ int acceleratorDataPreprocess(graphInfo *info);
 
 int acceleratorSuperStep(int superStep, graphInfo *info);
 
-int accelratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime);
+
 
 int acceleratorDeinit(void);
 
@@ -154,22 +154,12 @@ void* acceleratorQueryRegister(void);
 prop_t* acceleratorQueryProperty(int step);
 
 
+int accelratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime);
 
-void partitionGatherScatterCModel(
-    cl_context              &context,
-    cl_device_id            &device,
-    int                     superStep,
-    int                     cuIndex,
-    subPartitionDescriptor  *subPartitions
-);
+int acceleratorCModelDataPreprocess(graphInfo *info);
 
-void partitionApplyCModel(
-    cl_context              &context,
-    cl_device_id            &device,
-    int                     superStep,
-    int                     partId,
-    unsigned int            applyArg
-);
+int acceleratorCModelSuperStep(int superStep, graphInfo *info);
+
 
 unsigned int dataPrepareGetArg(graphInfo *info);
 

@@ -86,7 +86,7 @@ void partitionApplyCModel(
             if (error_count < 50)
             {
 
-                DEBUG_PRINTF("apply error tmp  %d 0x%08x 0x%08x  diff 0x%08x !!!!\n", i,
+                DEBUG_PRINTF("apply error %d 0x%08x hw: 0x%08x  diff 0x%08x !!!!\n", i,
                              updateVerify[i],
                              hwUpdate[i + offset],
                              updateVerify[i] - hwUpdate[i + offset]);

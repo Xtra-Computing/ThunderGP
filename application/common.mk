@@ -61,6 +61,8 @@ endif
 
 HOST_SRCS += ./libgraph/verification/host_graph_verification_gs.cpp
 
+HOST_SRCS += ./libgraph/verification/host_graph_cmodel.cpp
+
 # Host compiler global settings
 CXXFLAGS := $(opencl_CXXFLAGS) -Wall
 CXXFLAGS += -I/$(XILINX_SDX)/Vivado_HLS/include/ -O3 -g -fmessage-length=0 -std=c++14 -Wno-deprecated-declarations

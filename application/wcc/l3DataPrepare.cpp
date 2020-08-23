@@ -9,14 +9,13 @@ unsigned int dataPrepareGetArg(graphInfo *info)
 int dataPrepareProperty(graphInfo *info)
 {
     int *vertexPushinProp =      (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
-    unsigned int *activeVertexNum = (unsigned int *)get_host_mem_pointer(MEM_ID_ACTIVE_VERTEX_NUM);
 
-    int vertexNum = info->vertexNum;
+    int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size;
 
-    for (int i = 0; i < (vertexNum / (ALIGN_SIZE ) + 1) * (ALIGN_SIZE ); i++) {
+    for (int i = 0; i < alignedVertexNum; i++)
+    {
         vertexPushinProp[i]    = 0;
     }
     vertexPushinProp[getStartIndex()] = 1;
-    activeVertexNum[0] = 1;
     return 0;
 }

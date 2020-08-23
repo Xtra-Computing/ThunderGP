@@ -57,6 +57,20 @@ he_mem_t local_mem[] =
         SIZE_IN_VERTEX,
     },
     {
+        MEM_ID_HOST_PROP_PING,
+        "hostVerificationPropPing",
+        ATTR_HOST_ONLY,
+        sizeof(prop_t),
+        SIZE_IN_VERTEX,
+    },
+    {
+        MEM_ID_HOST_PROP_PONG,
+        "hostVerificationPropPong",
+        ATTR_HOST_ONLY,
+        sizeof(prop_t),
+        SIZE_IN_VERTEX,
+    },
+    {
         MEM_ID_TMP_VERTEX_VERIFY,
         "tmpVertexPropVerify",
         ATTR_HOST_ONLY,
@@ -101,6 +115,13 @@ he_mem_t local_mem[] =
     {
         MEM_ID_EDGE_PROP,
         "edgeProp",
+        ATTR_HOST_ONLY,
+        sizeof(int),
+        SIZE_IN_EDGE,
+    },
+    {
+        MEM_ID_PARTITON_EDGE_PROP,
+        "edgePartitionProp",
         ATTR_HOST_ONLY,
         sizeof(int),
         SIZE_IN_EDGE,
