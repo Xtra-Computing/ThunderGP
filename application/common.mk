@@ -1,21 +1,17 @@
-
 VAR_TRUE=true
 
 CP = cp -rf
-
 XCLBIN := ./xclbin_$(APP)
 DSA := $(call device2sandsa, $(DEVICE))
 
 CXX := $(XILINX_SDX)/bin/xcpp
 XOCC := $(XILINX_SDX)/bin/xocc
 
-
-
-GS_KERNEL_PATH    = ./libfpga/common
+GS_KERNEL_PATH    = ./tmp_fpga_top
 ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
 APPLY_KERNEL_PATH = $(APPCONFIG)
 else
-APPLY_KERNEL_PATH = ./libfpga/common
+APPLY_KERNEL_PATH = ./tmp_fpga_top
 endif
 
 
@@ -35,33 +31,24 @@ else
 	HOST_SRCS +=  $(APPCONFIG)/main.cpp
 endif
 
-
 HOST_SRCS += ./libgraph/memory/he_mem.cpp 
-
 HOST_SRCS += ./libgraph/host_graph_sw_mem.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_partition.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_kernel.cpp
-
 HOST_SRCS += ./libgraph/host_graph_sw_dataflow.cpp
-
 HOST_SRCS += ./libgraph/scheduler/host_graph_scheduler.cpp
 HOST_SRCS += ./libgraph/scheduler/$(SCHEDULER)/scheduler.cpp
-
 HOST_SRCS += $(APPCONFIG)/l3DataPrepare.cpp
-
+HOST_SRCS += ./libgraph/verification/host_graph_verification_gs.cpp
+HOST_SRCS += ./libgraph/verification/host_graph_cmodel.cpp
 
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
-
-ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
-HOST_SRCS += $(APPCONFIG)/host_vertex_apply.cpp
+    ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
+        HOST_SRCS += $(APPCONFIG)/host_vertex_apply.cpp
+    endif
+        HOST_SRCS += ./libgraph/verification/host_graph_verification_apply.cpp
 endif
 
-HOST_SRCS += ./libgraph/verification/host_graph_verification_apply.cpp
-endif
-
-HOST_SRCS += ./libgraph/verification/host_graph_verification_gs.cpp
-
-HOST_SRCS += ./libgraph/verification/host_graph_cmodel.cpp
 
 # Host compiler global settings
 CXXFLAGS := $(opencl_CXXFLAGS) -Wall
@@ -175,7 +162,6 @@ else
 CXXFLAGS += -DCUSTOMIZE_APPLY=0
 CLFLAGS  += -DCUSTOMIZE_APPLY=0
 endif
-
 
 #############################################################################
 #                                                                           #

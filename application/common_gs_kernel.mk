@@ -1,4 +1,4 @@
-$(XCLBIN)/readEdgesCU1.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu1.cpp
+$(XCLBIN)/readEdgesCU1.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/scatter_gather_top_0.cpp
 	mkdir -p $(XCLBIN)
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU1 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU1.$(TARGET).$(DSA).xo
@@ -15,7 +15,7 @@ BINARY_LINK_OBJS    += --slr readEdgesCU1_1:SLR2
 
 ifeq ($(strip $(HAVE_FULL_SLR)), $(strip $(VAR_TRUE))) 
 
-$(XCLBIN)/readEdgesCU2.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu2.cpp
+$(XCLBIN)/readEdgesCU2.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/scatter_gather_top_1.cpp
 	mkdir -p $(XCLBIN)
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU2 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU2.$(TARGET).$(DSA).xo
@@ -31,7 +31,7 @@ BINARY_LINK_OBJS    += --slr readEdgesCU2_1:SLR2
 
 
 
-$(XCLBIN)/readEdgesCU3.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu3.cpp
+$(XCLBIN)/readEdgesCU3.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/scatter_gather_top_2.cpp
 	mkdir -p $(XCLBIN)
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU3 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU3.$(TARGET).$(DSA).xo
@@ -47,7 +47,7 @@ BINARY_LINK_OBJS    += --slr readEdgesCU3_1:SLR0
 
 
 
-$(XCLBIN)/readEdgesCU4.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/graph_fpga_cu4.cpp
+$(XCLBIN)/readEdgesCU4.$(TARGET).$(DSA).xo: $(GS_KERNEL_PATH)/scatter_gather_top_3.cpp
 	mkdir -p $(XCLBIN)
 	$(XOCC) $(CLFLAGS) -c -k readEdgesCU4 -I'$(<D)' -o'$@' '$<'
 BINARY_CONTAINER_OBJS += $(XCLBIN)/readEdgesCU4.$(TARGET).$(DSA).xo

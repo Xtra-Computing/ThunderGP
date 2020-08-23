@@ -14,7 +14,8 @@
 
 
 extern "C" {
-    void  readEdgesCU3(
+#pragma THUNDERGP MSLR_FUNCTION
+    void  readEdgesCU#%d#(
         uint16          *edgesHeadArray,
         uint16          *vertexPushinProp,
         uint16          *edgesTailArray,

@@ -10,9 +10,6 @@
 #define LOG_WRITE_BURST_LEN         (6)
 
 
-#define CU_SIZE                     (4)
-
-
 
 template <typename T>
 void burstRead(
@@ -192,65 +189,6 @@ void writeBackLite(int totalSize, uint16 *addr, hls::stream<burst_raw>  &input)
 }
 
 
-template <typename T>
-void  cuDuplicate ( int               loopNum,
-                    hls::stream<T>    &input,
-                    hls::stream<T>    (&output)[CU_SIZE])
-{
-#pragma HLS function_instantiate variable=input
-    for (int i = 0; i < loopNum ; i++)
-    {
-#pragma HLS PIPELINE II=1
-        T  unit;
-        read_from_stream(input, unit);
-        for (int j = 0; j < CU_SIZE; j ++)
-        {
-#pragma HLS UNROLL
-            write_to_stream(output[j], unit);
-        }
-    }
-}
-
-
-template <typename T>
-void  cuMerge ( int               loopNum,
-                hls::stream<T>    (&input)[CU_SIZE],
-                hls::stream<T>    &output)
-{
-#pragma HLS function_instantiate variable=input
-    for (int i = 0; i < loopNum ; i++)
-    {
-#pragma HLS PIPELINE II=1
-        T  unit[CU_SIZE];
-#pragma HLS ARRAY_PARTITION variable=unit dim=0 complete
-
-        for (int j = 0; j < CU_SIZE; j ++)
-        {
-#pragma HLS UNROLL
-            read_from_stream(input[j], unit[j]);
-        }
-        T res;
-        for (int inner = 0; inner < 16 ; inner ++)
-        {
-#pragma HLS UNROLL
-            uint_raw tmp1 = PROP_COMPUTE_STAGE4(
-                                unit[0].range(31 + inner * 32, 0 + inner * 32),
-                                unit[1].range(31 + inner * 32, 0 + inner * 32)
-                            );
-            uint_raw tmp2 = PROP_COMPUTE_STAGE4(
-                                unit[2].range(31 + inner * 32, 0 + inner * 32),
-                                unit[3].range(31 + inner * 32, 0 + inner * 32)
-                            );
-            uint_raw rtmp = PROP_COMPUTE_STAGE4(
-                                tmp1,
-                                tmp2
-                            );
-            res.range(31 + inner * 32, 0 + inner * 32) = rtmp;
-        }
-
-        write_to_stream(output, res);
-    }
-}
 
 
 

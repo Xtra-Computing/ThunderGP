@@ -18,3 +18,5 @@ sdaccel.ini
 csr
 *.xclbin
 *.sh
+tmp_fpga_top
+code_gen
