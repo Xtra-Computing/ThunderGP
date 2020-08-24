@@ -33,7 +33,7 @@ void  cuMerge ( int               loopNum,
                 hls::stream<T>    &input_b,
                 hls::stream<T>    &output)
 {
-#pragma HLS function_instantiate variable=input
+#pragma HLS function_instantiate variable=input_a
     for (int i = 0; i < loopNum ; i++)
     {
 #pragma HLS PIPELINE II=1

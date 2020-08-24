@@ -77,6 +77,7 @@ endif
 CLFLAGS += --platform $(DEVICE) --save-temps  -O3
 CLFLAGS += -I ./
 CLFLAGS += -I ./libfpga
+CLFLAGS += -I ./libfpga/common
 CLFLAGS += -I $(APPCONFIG)
 CLFLAGS += -I ./application
 CLFLAGS += --xp prop:solution.kernel_compiler_margin=10%

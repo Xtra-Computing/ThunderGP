@@ -97,6 +97,7 @@ extern "C" {
 
         for (int i = 0; i < SUB_PARTITION_NUM; i++)
         {
+#pragma HLS UNROLL
             cuMerge(loopNum, tmpVertexPropArray[i], tmpVertexPropStream[i], tmpVertexPropStream[i + 1]);
         }
 
