@@ -45,8 +45,11 @@ int main(int argc, char **argv) {
 
     acceleratorDataPreprocess(&graphDataInfo);
 
-    for (int runCounter = 0 ; runCounter < 3 ; runCounter ++)
+    int runCounter = 0;
+    int totalActiveVertices = 1;
+    while(totalActiveVertices != 0)
     {
+        totalActiveVertices = 0;
         double startStamp, endStamp;
         startStamp = getCurrentTimestamp();
 
@@ -55,12 +58,16 @@ int main(int argc, char **argv) {
         endStamp = getCurrentTimestamp();
 
         int *reg = (int *)acceleratorQueryRegister();
-        int activeVertices = reg[0];
-        DEBUG_PRINTF("activeVertice : %d \n",activeVertices);
-
+        for (int i = 0; i < 32; i++)
+        {
+            int activeVertices = reg[i];
+            totalActiveVertices += activeVertices;
+            DEBUG_PRINTF("activeVertice@path_%d : %d \n",i, activeVertices);
+        }
 
         /* profile */
         accelratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
+        runCounter ++;
     }
     acceleratorDeinit();
 

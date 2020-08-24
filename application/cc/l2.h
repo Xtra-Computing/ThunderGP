@@ -41,8 +41,9 @@ inline prop_t applyCalculation( prop_t tProp,
 
     for (int i = 0; i < APPLY_REF_ARRAY_SIZE; i++)
     {
-        const prop_t mask = (1<<i);
-        if ((source&mask) != (tProp & mask))
+        const prop_t mask = (1 << i);
+
+        if (((source & mask) != mask ) && ((tProp & mask) == mask))
         {
             extra[i] = 1;
         }

@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 
     int runCounter = 0;
     int activeVertices = 1;
-    while(activeVertices != 0)
+    while (activeVertices != 0)
     {
 
         double startStamp, endStamp;
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
         int *reg = (int *)acceleratorQueryRegister();
         activeVertices = reg[0];
-        DEBUG_PRINTF("activeVertice : %d \n",activeVertices);
+        DEBUG_PRINTF("activeVertice : %d \n", activeVertices);
 
 
         /* profile */

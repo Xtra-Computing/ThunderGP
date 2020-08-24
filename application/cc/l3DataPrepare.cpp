@@ -17,6 +17,9 @@ int dataPrepareProperty(graphInfo *info)
     {
         vertexPushinProp[i]    = 0;
     }
-    vertexPushinProp[getStartIndex()] = 0x00000001;
+    for (int i = 0; i < 32; i++)
+    {
+        vertexPushinProp[getStartIndex() + i * 10] = 1 << i;
+    }
     return 0;
 }
