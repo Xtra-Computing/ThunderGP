@@ -8,7 +8,7 @@ include $(UTILS_PATH)/utils.mk
 
 TARGETS := hw
 TARGET  := $(TARGETS)
-DEVICES := xilinx_u200_xdma_201830_2
+DEVICES := xilinx_vcu1525_xdma_201830_1
 # device list:
 # xilinx_vcu1525_xdma_201830_1
 # xilinx_u200_xdma_201830_2
