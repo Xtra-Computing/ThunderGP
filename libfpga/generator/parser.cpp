@@ -140,7 +140,6 @@ int parser_init(void)
     register_output_method(mem_output_method);
     return 0;
 }
-#define GN  (4)
 
 std::vector<std::ofstream *> output_files;
 
@@ -155,7 +154,7 @@ int file_output(const std::string& input, const std::string& output)
         }
     }
     int total_file_num;
-    int group_num = GN;
+    int group_num = SUB_PARTITION_NUM;
 
     if (of_attr == OUTPUT_ATTR_SINGLE)
         total_file_num = 1;

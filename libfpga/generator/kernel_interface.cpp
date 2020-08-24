@@ -67,7 +67,7 @@ static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
             std::string object = kernel_arg_list[i].kernel_arg.object;
             while (true)
             {
-                bool ret = replace(object, "#%d#", to_string(fileid));
+                bool ret = replace(object, "#%d#", to_string(fileid + 1));
                 if (ret == false)
                 {
                     break;

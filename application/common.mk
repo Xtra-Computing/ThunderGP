@@ -100,6 +100,8 @@ LDFLAGS +=   $(xcl_CXXFLAGS)
 HOST_SRCS += $(xcl_SRCS)
 
 
+GENFLAGS :=  -I ./libgraph
+
 #############################################################################
 #                                                                           #
 #                     Specific Build Configuration                          #
@@ -108,8 +110,12 @@ HOST_SRCS += $(xcl_SRCS)
 
 ifeq ($(strip $(HAVE_FULL_SLR)), $(strip $(VAR_TRUE)))
 CXXFLAGS += -DSUB_PARTITION_NUM=4
+CLFLAGS  += -DSUB_PARTITION_NUM=4
+GENFLAGS += -DSUB_PARTITION_NUM=4
 else
 CXXFLAGS += -DSUB_PARTITION_NUM=1
+CLFLAGS  += -DSUB_PARTITION_NUM=1
+GENFLAGS += -DSUB_PARTITION_NUM=1
 endif
 
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
