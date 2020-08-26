@@ -10,19 +10,19 @@ int dataPrepareProperty(graphInfo *info)
 {
 	prop_t *vertexPushinProp =      (prop_t*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
 
-	int vertexNum = info->vertexNum;
-	int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size;
+	int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size/sizeof(int);
 
 	for (int i = 0; i < alignedVertexNum; i++) {
 		vertexPushinProp[i]    = i;
 	}
+	 prop_t *edgeProp    = (prop_t*)get_host_mem_pointer(MEM_ID_EDGE_PROP);
 
 	//int edgeNum = info->edgeNum;
-	int alignedEdgeNum = get_he_mem(MEM_ID_EDGE_PROP)->size;
+	int alignedEdgeNum = get_he_mem(MEM_ID_EDGE_PROP)->size/sizeof(int);
 
 	for (int i = 0; i < alignedEdgeNum; i++)
 	{
-		edgeProp = i;
+		edgeProp[i] = i;
 	}
 
 

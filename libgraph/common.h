@@ -17,7 +17,7 @@
 
 #if 1
 
-#define DEBUG_PRINTF(fmt,...)   printf(fmt,##__VA_ARGS__);
+#define DEBUG_PRINTF(fmt,...)   printf(fmt,##__VA_ARGS__); fflush(stdout);
 
 #else
 
@@ -31,7 +31,19 @@
 #endif
 
 
-#define SIZE_ALIGNMENT(in,align)     ((((((unsigned int)(in + 1))/(align)) + 1) * (align )) - 1) 
+inline unsigned int get_aligned_size(unsigned int in, unsigned int align)
+{
+	if (in == 0)
+	{
+		return align;
+	}
+	else
+	{
+		return (((((in - 1) / align) + 1) * align));
+	}
+}
+
+#define SIZE_ALIGNMENT(in,align)    get_aligned_size((unsigned int)in,(unsigned int)align)
 
 
 #endif /* __COMMON_H__ */

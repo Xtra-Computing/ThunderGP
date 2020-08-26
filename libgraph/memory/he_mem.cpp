@@ -86,7 +86,7 @@ int he_mem_init(cl_context &dev_context, he_mem_t * item)
     }
 
     item->size = item->unit_size * get_size_attribute(item->size_attr);
-    //item->size = SIZE_ALIGNMENT(item->size, 64 * 1024);
+    item->size = SIZE_ALIGNMENT(item->size, 64 * 1024);
 
     item->data = clSVMAlloc(dev_context, 0, item->size, 64 * 1024);
 

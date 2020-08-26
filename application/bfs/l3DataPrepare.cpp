@@ -10,8 +10,7 @@ int dataPrepareProperty(graphInfo *info)
 {
     int *vertexPushinProp =      (int*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
 
-    int vertexNum = info->vertexNum;
-    int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size;
+    int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size/sizeof(int);
 
     for (int i = 0; i < alignedVertexNum; i++)
     {

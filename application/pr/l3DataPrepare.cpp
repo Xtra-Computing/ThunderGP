@@ -23,7 +23,7 @@ int dataPrepareProperty(graphInfo *info)
     prop_t *vertexPushinProp = (prop_t*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
 
     int vertexNum = info->vertexNum;
-    int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size;
+    int alignedVertexNum = get_he_mem(MEM_ID_PUSHIN_PROP)->size/sizeof(int);
 
     float init_score_float = 1.0f / vertexNum;
     int init_score_int = float2int(init_score_float);
