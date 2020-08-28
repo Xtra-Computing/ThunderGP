@@ -154,7 +154,7 @@ void* acceleratorQueryRegister(void);
 prop_t* acceleratorQueryProperty(int step);
 
 
-int accelratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime);
+int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime);
 
 int acceleratorCModelDataPreprocess(graphInfo *info);
 
@@ -168,6 +168,10 @@ int dataPrepareProperty(graphInfo *info);
 int getStartIndex(void);
 
 
+inline int getCuIDbyInterface(int order)
+{
+    return he_get_interface_id(order);
+}
 
 
 double getCurrentTimestamp(void);

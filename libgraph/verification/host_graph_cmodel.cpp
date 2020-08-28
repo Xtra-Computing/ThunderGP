@@ -8,7 +8,7 @@
 
 
 
-int accelratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime)
+int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime)
 {
     graphAccelerator * acc = getAccelerator();
     int blkNum = info->blkNum;
@@ -99,6 +99,7 @@ int acceleratorCModelDataPreprocess(graphInfo *info)
 
 int acceleratorCModelSuperStep(int superStep, graphInfo *info)
 {
+#if HAVE_APPLY
     graphAccelerator * acc = getAccelerator();
 
     int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
@@ -178,7 +179,8 @@ int acceleratorCModelSuperStep(int superStep, graphInfo *info)
             }
         }
     }
-    DEBUG_PRINTF("total cmodel error: %d\n",error_count);
+    DEBUG_PRINTF("total cmodel error: %d\n", error_count);
     memcpy(propValue, updateVerify, (get_he_mem(MEM_ID_HOST_PROP_PONG)->size));
+#endif
     return 0;
 }

@@ -9,10 +9,20 @@
 
 #include "global_config.h"
 
+#define EXPAND(x)                   x
 
 
-#define FLAG_SET                (1u)
-#define FLAG_RESET              (0u)
+#define STRINGIFY_MACRO(x)          STR(x)
+#define STR(x)                      #x
+
+#define CONCAT4(n1, n2, n3, n4)     STRINGIFY_MACRO(EXPAND(n1)EXPAND(n2)EXPAND(n3)EXPAND(n4))
+
+#define CAT_SECOND_LEVLE(x, y)      x ## y
+#define VAR_CONCAT2(x, y)           CAT_SECOND_LEVLE(x, y)
+
+
+#define FLAG_SET                    (1u)
+#define FLAG_RESET                  (0u)
 
 
 #if 1

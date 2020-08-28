@@ -31,7 +31,8 @@ else
 	HOST_SRCS +=  $(APPCONFIG)/main.cpp
 endif
 
-HOST_SRCS += ./libgraph/memory/he_mem.cpp 
+HOST_SRCS += ./libgraph/memory/he_mem.cpp
+HOST_SRCS += ./libgraph/memory/he_mapping.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_mem.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_partition.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_kernel.cpp

@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     /* for verification */
     acceleratorCModelDataPreprocess(&graphDataInfo);
 
-    for (int runCounter = 0 ; runCounter < 2 ; runCounter ++)
+    for (int runCounter = 0 ; runCounter < 3 ; runCounter ++)
     {
         double startStamp, endStamp;
         startStamp = getCurrentTimestamp();
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
         acceleratorCModelSuperStep(runCounter, &graphDataInfo);
  
         /* for profile */
-        accelratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
+        acceleratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
     }
     acceleratorDeinit();
 

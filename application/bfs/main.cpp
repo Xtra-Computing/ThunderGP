@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 
 
         /* profile */
-        accelratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
+        acceleratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
         runCounter++;
     }
     acceleratorDeinit();

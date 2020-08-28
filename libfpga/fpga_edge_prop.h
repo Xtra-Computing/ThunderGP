@@ -55,6 +55,7 @@ void edgePropCouple (
             break;
         }
     }
+    clear_stream(input);
     clear_stream(edgeProp);
 }
 

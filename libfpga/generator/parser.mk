@@ -13,3 +13,9 @@ code_gen:
 	./code_gen libfpga/common/apply_top.cpp             tmp_fpga_top/apply_top
 	./code_gen libfpga/common/scatter_gather_top.cpp    tmp_fpga_top/scatter_gather_top
 
+.PHONY: para_gen
+para_gen:
+	rm -rf tmp_para
+	mkdir -p tmp_para
+	g++  -static-libstdc++ -I libfpga/generator/devices -DDEVICE_HEADER="$(DEVICES).h"  $(CODE_GEN_PATH)/para_gen.cpp -o para_gen
+

@@ -1,3 +1,3 @@
 # Verification
 
-As we have a cache in ThunderGP, the static verification method (emu-sw) can not be used for the verification and validation of our framework. ThunderGP provides an automatic verification scheme, by calling the function ```accelratorProfile``` after the calcuation, the verification will be automatically performed, and it will output the difference between the result from hardware unit and the golden. Currently it only supports the verification on the fisrt super step.
+As we have a cache in ThunderGP, the static verification method (emu-sw) can not be used for the verification and validation of our framework. ThunderGP provides an automatic verification scheme, by calling the function ```acceleratorProfile``` after the calcuation, the verification will be automatically performed, and it will output the difference between the result from hardware unit and the golden. Currently it only supports the verification on the fisrt super step.

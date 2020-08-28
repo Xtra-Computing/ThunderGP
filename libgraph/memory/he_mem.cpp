@@ -7,7 +7,6 @@
 
 #include "he_mem_attr.h"
 
-
 //#define HE_DEBUG(fmt,...)   printf(fmt,##__VA_ARGS__); fflush(stdout);
 #define HE_DEBUG(fmt,...) ;
 
@@ -16,7 +15,7 @@ int he_set_dirty(int id)
     he_mem_t * p_mem = get_he_mem(id);
     if (p_mem)
     {
-        HE_DEBUG("[HE_DEBUG] 0x%08x set dirty\n",id);
+        HE_DEBUG("[HE_DEBUG] 0x%08x set dirty\n", id);
         p_mem->dirty_flags = FLAG_SET;
         return 0;
     }
@@ -29,7 +28,7 @@ int he_set_clean(int id)
     he_mem_t * p_mem = get_he_mem(id);
     if (p_mem)
     {
-        HE_DEBUG("[HE_DEBUG] 0x%08x set clean\n",id);
+        HE_DEBUG("[HE_DEBUG] 0x%08x set clean\n", id);
         p_mem->dirty_flags = FLAG_RESET;
         return 0;
     }
@@ -75,6 +74,8 @@ unsigned int get_size_attribute(unsigned int attr_id)
     }
     return value;
 }
+
+
 
 int he_mem_init(cl_context &dev_context, he_mem_t * item)
 {
@@ -131,22 +132,8 @@ int he_mem_init(cl_context &dev_context, he_mem_t * item)
 #else
         item->ext_attr.obj =  item->data;
         item->ext_attr.param = 0;
+        item->ext_attr.flags = he_get_mem_attr(item->attr);
 
-        switch (item->attr)
-        {
-        case ATTR_PL_DDR0:
-            item->ext_attr.flags = XCL_MEM_DDR_BANK0;
-            break;
-        case ATTR_PL_DDR1:
-            item->ext_attr.flags = XCL_MEM_DDR_BANK1;
-            break;
-        case ATTR_PL_DDR2:
-            item->ext_attr.flags = XCL_MEM_DDR_BANK2;
-            break;
-        case ATTR_PL_DDR3:
-            item->ext_attr.flags = XCL_MEM_DDR_BANK3;
-            break;
-        }
         item->device = clCreateBuffer(dev_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR |  CL_MEM_EXT_PTR_XILINX,
                                       item->size  , &item->ext_attr, &status);
         item->dirty_flags = FLAG_RESET;

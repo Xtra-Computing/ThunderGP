@@ -12,8 +12,6 @@
 #define ATTR_PL_DDR3                (5)
 #define ATTR_ERROR                  (6)
 
-
-
 typedef struct
 {
     const unsigned int  size_attr;
@@ -21,10 +19,7 @@ typedef struct
 
 } size_attr_ctrl_t;
 
-
-
 #define clSVMAlloc(context,flag,size,alignment)  memalign(alignment,size)
-
 
 typedef struct
 {
@@ -74,5 +69,10 @@ int he_set_dirty(int id);
 int he_set_clean(int id);
 
 int he_get_dirty_flag(int id);
+
+/************* memory channel, interface mapping ***************/
+int he_get_interface_id(int cu_id);
+
+int he_get_mem_attr(int attr_id);
 
 #endif /* __HE_MEM_H__ */

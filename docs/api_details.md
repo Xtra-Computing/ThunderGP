@@ -182,6 +182,6 @@ inline prop_t applyCalculation( prop_t tProp,
 |acceleratorDataPrepare  | load the graph data |
 |acceleratorDataPreprocess  | graph partitioning |
 |acceleratorSuperStep  | process all of the partitions once |
-|accelratorProfile  | profile the execution time and verify the result |
+|acceleratorProfile  | profile the execution time and verify the result |
 |acceleratorDeinit  | release all the dynamic resources |
 

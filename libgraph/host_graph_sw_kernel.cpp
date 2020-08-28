@@ -83,9 +83,7 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
 #if HW_EMU_DEBUG
         edgeEnd         = HW_EMU_DEBUG_SIZE;
 #endif
-        //DEBUG_PRINTF("gs task in cu [%d] info:\n", i);
-        //DEBUG_PRINTF("\tedge  %d %d \n", 0, edgeEnd);
-        //DEBUG_PRINTF("\tsink  %d %d \n", sinkStart, sinkEnd);
+
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeHead.id));
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(gsHandler->prop[currentPropId].id));
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(partition->edgeTail.id));
@@ -105,10 +103,6 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
 
 #if  CUSTOMIZE_APPLY == 0
 
-const int applyGlobalMemoryIndex[] =
-{
-    2, 1, 0, 3
-};
 
 void setApplyKernel(int partId, int superStep, graphInfo *info)
 {
@@ -127,20 +121,20 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
     int offset = p_partition->dstVertexStart;
 
 
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(applyGlobalMemoryIndex[0])->prop[currentPropId].id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(getCuIDbyInterface(0))->prop[currentPropId].id));
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
         clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem),
-                       get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + applyGlobalMemoryIndex[i])->tmpProp.id)
+                       get_cl_mem_pointer(getSubPartition(partId * SUB_PARTITION_NUM + getCuIDbyInterface(i))->tmpProp.id)
                       );
     }
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
         clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem),
-                       get_cl_mem_pointer(getGatherScatter(applyGlobalMemoryIndex[i])->prop[updatePropId].id)
+                       get_cl_mem_pointer(getGatherScatter(getCuIDbyInterface(i))->prop[updatePropId].id)
                       );
-        he_set_dirty(getGatherScatter(applyGlobalMemoryIndex[i])->prop[updatePropId].id);
+        he_set_dirty(getGatherScatter(getCuIDbyInterface(i))->prop[updatePropId].id);
     }
 
 #if HAVE_APPLY_OUTDEG
