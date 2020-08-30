@@ -2,7 +2,7 @@ $(XCLBIN)/graph_fpga.$(TARGET).$(DSA).xclbin: $(BINARY_CONTAINER_OBJS)
 	$(XOCC) $(CLFLAGS) -l $(LDCLFLAGS)   $(BINARY_LINK_OBJS) -o'$@' $(+)
 
 # Building Host
-$(EXECUTABLE): $(HOST_SRCS)
+$(EXECUTABLE): $(HOST_SRCS) cleanexe
 	mkdir -p $(XCLBIN)
 	$(CXX) $(CXXFLAGS) $(HOST_SRCS) -o '$@' $(LDFLAGS)
 

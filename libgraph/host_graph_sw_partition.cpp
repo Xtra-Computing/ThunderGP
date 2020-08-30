@@ -73,7 +73,7 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
     info->vertexNum = vertexNum;
     info->compressedVertexNum = mapedSourceIndex;
     info->edgeNum   = edgeNum;
-    info->blkNum =  (mapedSourceIndex + BLK_SIZE - 1) / BLK_SIZE;
+    info->blkNum =  (mapedSourceIndex + PARTITION_SIZE - 1) / PARTITION_SIZE;
 
     return 0;
 }

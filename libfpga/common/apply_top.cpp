@@ -10,9 +10,9 @@
 extern "C" {
     void  vertexApply(
         uint16        *vertexProp,
-#pragma THUNDERGP INTERFACE_ARG tmpVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_ARG tmpVertexProp
         uint16        *tmpVertexProp#%d#,
-#pragma THUNDERGP INTERFACE_ARG newVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_ARG newVertexProp
         uint16        *newVertexProp#%d#,
 #if HAVE_APPLY_OUTDEG
         uint16        *outDegree,
@@ -25,20 +25,20 @@ extern "C" {
     {
 
 
-#pragma THUNDERGP INTERFACE_HLS_ATTR tmpVertexProp 
+#pragma THUNDERGP MSLR_INTERFACE_ATTR tmpVertexProp 
 
-#pragma THUNDERGP INTERFACE_HLS_ATTR newVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_ATTR newVertexProp
 
-#pragma THUNDERGP INTERFACE_HLS_INSTANCE tmpVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_INSTANCE tmpVertexProp
 #pragma HLS INTERFACE m_axi port=tmpVertexProp#%d# offset=slave bundle=gmem#%d# max_read_burst_length=64 num_write_outstanding=4
 
-#pragma THUNDERGP INTERFACE_HLS_INSTANCE tmpVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_INSTANCE tmpVertexProp
 #pragma HLS INTERFACE s_axilite port=tmpVertexProp#%d# bundle=control
 
-#pragma THUNDERGP INTERFACE_HLS_INSTANCE newVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_INSTANCE newVertexProp
 #pragma HLS INTERFACE m_axi port=newVertexProp#%d# offset=slave bundle=gmem#%d# max_read_burst_length=64 num_write_outstanding=4
 
-#pragma THUNDERGP INTERFACE_HLS_INSTANCE newVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_INSTANCE newVertexProp
 #pragma HLS INTERFACE s_axilite port=newVertexProp#%d# bundle=control
 
 
@@ -92,7 +92,7 @@ extern "C" {
         burstReadLite(addrOffset, vertexNum, vertexProp, vertexPropStream);
 
 
-#pragma THUNDERGP INTERFACE_HLS_INSTANCE tmpVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_INSTANCE tmpVertexProp
         burstReadLite(0, vertexNum, tmpVertexProp#%d#, tmpVertexPropArray[#%d#]);
 
         for (int i = 0; i < SUB_PARTITION_NUM; i++)
@@ -117,7 +117,7 @@ extern "C" {
                     newVertexPropArray);
 
 
-#pragma THUNDERGP INTERFACE_HLS_INSTANCE newVertexProp
+#pragma THUNDERGP MSLR_INTERFACE_INSTANCE newVertexProp
         writeBackLite(vertexNum, newVertexProp#%d# + (addrOffset >> 4), newVertexPropArray[#%d#]);
 
     }

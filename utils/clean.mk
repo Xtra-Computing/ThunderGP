@@ -14,3 +14,6 @@ clean:
 	-$(RMDIR) xclbin*
 	-$(RMDIR) .run
 	-$(RMDIR) tmp_fpga_top
+	-$(RMDIR) tmp_para
+	-$(RMDIR) para_gen
+	-$(RMDIR) code_gen

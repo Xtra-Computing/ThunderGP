@@ -1,9 +1,11 @@
 #ifndef __HOST_GRAPH_SW_H__
 #define __HOST_GRAPH_SW_H__
 
+#include "para_check.h"
 #include <stdint.h>
 
 #include "common.h"
+#include "global_config.h"
 
 #include "graph.h"
 

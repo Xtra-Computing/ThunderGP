@@ -10,11 +10,13 @@
 #include <stdarg.h>
 #include <vector>
 
+#include "para_check.h"
 
 #include "parser.h"
 #include "parser_debug.h"
 #include "mem_interface.h"
 #include "kernel_interface.h"
+
 
 using namespace std;
 
@@ -27,17 +29,17 @@ parser_item_t local_item[] =
     },
     {
         .id      = PRAGMA_ID_MEM_ARG,
-        .keyword = "INTERFACE_ARG",
+        .keyword = "MSLR_INTERFACE_ARG",
         .func    = register_mem_arg,
     },
     {
         .id      = PRAGMA_ID_MEM_ATTR,
-        .keyword = "INTERFACE_HLS_ATTR",
+        .keyword = "MSLR_INTERFACE_ATTR",
         .func    = register_mem_attr,
     },
     {
         .id      = PRAGMA_ID_MEM_INSTANCE,
-        .keyword = "INTERFACE_HLS_INSTANCE",
+        .keyword = "MSLR_INTERFACE_INSTANCE",
         .func    = register_mem_instance,
     }
 };
@@ -167,7 +169,7 @@ int file_output(const std::string& input, const std::string& output)
         std::ostringstream output_file_name;
         output_file_name << output;
         output_file_name << "_";
-        output_file_name << i;
+        output_file_name << (i + 1);
         output_file_name << ".cpp";
         std::ofstream * of = new std::ofstream(output_file_name.str().c_str());
         output_files.push_back(of);

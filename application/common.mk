@@ -52,7 +52,9 @@ endif
 
 
 # Host compiler global settings
-CXXFLAGS := $(opencl_CXXFLAGS) -Wall
+CXXFLAGS :=  $(AUTOGEN_CFLAG) 
+
+CXXFLAGS += $(opencl_CXXFLAGS) -Wall
 CXXFLAGS += -I/$(XILINX_SDX)/Vivado_HLS/include/ -O3 -g -fmessage-length=0 -std=c++14 -Wno-deprecated-declarations
 CXXFLAGS += -I ./
 CXXFLAGS += -I ./libfpga
@@ -62,16 +64,20 @@ CXXFLAGS += -I ./libgraph/scheduler
 CXXFLAGS += -I ./libgraph/verification
 CXXFLAGS += -I $(APPCONFIG)
 CXXFLAGS += -I ./application
+CXXFLAGS += -I tmp_para
 
 # Host linker flags
 LDFLAGS := $(opencl_LDFLAGS)
 LDFLAGS += -lrt -lstdc++  -lxilinxopencl
 
 
+
+CLFLAGS := $(AUTOGEN_CFLAG)
+
 ifeq ($(TARGET),$(filter $(TARGET), hw_emu))
-CLFLAGS = -g -t $(TARGET)
+CLFLAGS += -g -t $(TARGET)
 else
-CLFLAGS = -t $(TARGET)
+CLFLAGS += -t $(TARGET)
 endif
 
 # Kernel compiler global settings
@@ -102,23 +108,12 @@ LDFLAGS +=   $(xcl_CXXFLAGS)
 HOST_SRCS += $(xcl_SRCS)
 
 
-GENFLAGS :=  -I ./libgraph
-
 #############################################################################
 #                                                                           #
 #                     Specific Build Configuration                          #
 #                                                                           #
 #############################################################################
 
-ifeq ($(strip $(HAVE_FULL_SLR)), $(strip $(VAR_TRUE)))
-CXXFLAGS += -DSUB_PARTITION_NUM=4
-CLFLAGS  += -DSUB_PARTITION_NUM=4
-GENFLAGS += -DSUB_PARTITION_NUM=4
-else
-CXXFLAGS += -DSUB_PARTITION_NUM=1
-CLFLAGS  += -DSUB_PARTITION_NUM=1
-GENFLAGS += -DSUB_PARTITION_NUM=1
-endif
 
 ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))
 CXXFLAGS += -DHAVE_APPLY=1

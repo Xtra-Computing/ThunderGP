@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-#include "global_config.h"
 
 #define EXPAND(x)                   x
 

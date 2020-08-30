@@ -12,8 +12,7 @@ typedef  int                prop_t;
 #endif
 
 
-#define BLK_SIZE                                (512*1024)
-#define MAX_VERTICES_IN_ONE_PARTITION           (BLK_SIZE)
+#define MAX_VERTICES_IN_ONE_PARTITION           (PARTITION_SIZE)
 #define ENDFLAG                                 0xffffffff
 
 

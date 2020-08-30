@@ -9,6 +9,7 @@ typedef struct
 	int dsp;
 	int bram;
 	int uram;
+	int mem_chns;
 } slr_resource_info_t;
 
 

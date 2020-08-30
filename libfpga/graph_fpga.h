@@ -3,7 +3,7 @@
 
 #define AP_INT_MAX_W 4096
 #include <ap_int.h>
-
+#include "para_check.h"
 #include "global_config.h"
 
 #define PE_NUM              16

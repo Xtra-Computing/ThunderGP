@@ -175,7 +175,7 @@ static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
 {
     for (int i = 0; i < mem_list.size(); i ++)
     {
-        /* INTERFACE_ARG */
+        /* MSLR_INTERFACE_ARG */
         if (mem_list[i].input.ln == ln )
         {
             return 1;
@@ -197,7 +197,7 @@ static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
             }
             return 1;
         }
-        /* INTERFACE_HLS_ATTR */
+        /* MSLR_INTERFACE_ATTR */
         if (mem_list[i].attr.ln == ln )
         {
             return 1;
@@ -218,7 +218,7 @@ static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
 #endif
             return 1;
         }
-        /* INTERFACE_HLS_INSTANCE */
+        /* MSLR_INTERFACE_INSTANCE */
         for (int k = 0; k < mem_list[i].instance.size(); k++)
         {
             if (mem_list[i].instance[k].ln == ln )

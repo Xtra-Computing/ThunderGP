@@ -6,6 +6,19 @@
 
 
 
+#define URAM_DEPTH              (4096)
+#define URAM_PER_EDGE           (4)
+#define CACHE_SIZE              (URAM_DEPTH * URAM_PER_EDGE * 2)
+
+#define CACHE_ADDRESS_MASK      (URAM_DEPTH * 8 - 1)
+
+#define CACHE_UPDATE_BURST      (1<<LOG_CACHEUPDATEBURST)
+#define LOG_CACHEUPDATEBURST    (LOG_SCATTER_CACHE_BURST_SIZE)
+
+#define CA_WIDTH                (32)
+//(32 + 1 - LOG_CACHEUPDATEBURST - LOG2_SIZE_BY_INT)
+
+
 typedef  struct
 {
     burst_raw data;
@@ -20,18 +33,25 @@ typedef  struct
     ap_uint<1> flag;
 } cache_command;
 
-#define URAM_DEPTH              (4096)
-#define URAM_PER_EDGE           (4)
-#define CACHE_SIZE              (URAM_DEPTH * URAM_PER_EDGE * 2)
-
-#define CACHE_ADDRESS_MASK      (URAM_DEPTH * 8 - 1)
-
 typedef struct
 {
     burst_raw tuples;
     burst_raw score;
     ap_uint<1> flag;
 } edgeBlock;
+
+
+typedef struct {
+    ap_uint<CA_WIDTH*SIZE_BY_INT>   data;
+    ap_uint<5>                      num;
+    ap_uint<1>                      flag;
+} address_token;
+
+typedef struct {
+    ap_uint<CA_WIDTH*SIZE_BY_INT>   data;
+    ap_uint<1>                      flag;
+} filtered_token;
+
 
 
 template <typename T>
@@ -130,8 +150,275 @@ void  duplicateStreamForCache(hls::stream<T>       &input,
     }
 }
 
-#define CACHE_UPDATE_BURST  (1<<LOG_CACHEUPDATEBURST)
-#define LOG_CACHEUPDATEBURST (LOG_SCATTER_CACHE_BURST_SIZE)
+void streamFilter(hls::stream<burst_token>         &mapStream,
+                  hls::stream<filtered_token>      &filteredStream)
+{
+    uint_raw last_index =  ENDFLAG - 1;
+    ap_uint<1> update_flag = 0;
+    while (true)
+    {
+        burst_token map;
+        filtered_token output;
+        read_from_stream(mapStream, map);
+        for (int i = 0; i < SIZE_BY_INT - 1; i++)
+        {
+#pragma HLS UNROLL
+            output.data.range((CA_WIDTH - 1) + i * CA_WIDTH, 0 + i * CA_WIDTH)
+                = map.data.range(31 + i * 32, 0 + i * 32) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT);
+        }
+
+        uint_raw min_index = (output.data.range(31, 0) );
+        uint_raw max_index = ((map.data.range(511, 480) + 64) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
+
+        output.data.range((CA_WIDTH - 1) + (CA_WIDTH * (SIZE_BY_INT - 1)), 0 + (CA_WIDTH * (SIZE_BY_INT - 1)) )
+            = ((map.data.range(511, 480) + 64) >> (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
+
+
+        if ((last_index == (ENDFLAG - 1)) || (min_index > last_index) || (max_index > last_index))
+        {
+            update_flag = 1;
+        }
+        else
+        {
+            update_flag = 0;
+        }
+        if (map.flag == FLAG_SET)
+        {
+            break;
+        }
+        else if (update_flag)
+        {
+
+            if ((max_index != last_index) || (map.flag == FLAG_SET))
+            {
+                last_index = max_index;
+                output.flag = map.flag;
+                write_to_stream(filteredStream, output);
+            }
+        }
+    }
+    {
+        filtered_token token;
+        token.flag = FLAG_SET;
+        write_to_stream(filteredStream, token);
+        return;
+    }
+}
+
+#define INVALID_FLAG (0xffffffff)
+void streamRemoveBubble(hls::stream<filtered_token> &in,
+                       hls::stream<address_token>  &out)
+{
+    ap_uint < CA_WIDTH > ori[SIZE_BY_INT];
+#pragma HLS ARRAY_PARTITION variable=ori dim=0 complete
+
+    ap_uint < CA_WIDTH > tmp_array[SIZE_BY_INT][SIZE_BY_INT];
+#pragma HLS ARRAY_PARTITION variable=tmp_array dim=0 complete
+
+    ap_uint < CA_WIDTH > array[SIZE_BY_INT][SIZE_BY_INT];
+#pragma HLS ARRAY_PARTITION variable=array dim=0 complete
+
+    ap_uint<1> mask[SIZE_BY_INT];
+#pragma HLS ARRAY_PARTITION variable=mask dim=0 complete
+
+    ap_uint<2> level_1_sum[8];
+#pragma HLS ARRAY_PARTITION variable=level_1_sum dim=0 complete
+
+    ap_uint<3> level_2_sum[4];
+#pragma HLS ARRAY_PARTITION variable=level_2_sum dim=0 complete
+
+    ap_uint<4> level_3_sum[2];
+#pragma HLS ARRAY_PARTITION variable=level_3_sum dim=0 complete
+
+
+    while (true)
+    {
+        filtered_token in_data;
+        address_token out_data;
+        read_from_stream(in, in_data);
+        for (int j = 0; j < SIZE_BY_INT; j++)
+        {
+#pragma HLS UNROLL
+            ori[j] = in_data.data.range((CA_WIDTH - 1) + j * CA_WIDTH, 0 + j * CA_WIDTH);
+        }
+
+        array[0][0] = ori[0];
+        mask[0] = 1;
+        for (int j = 1; j < SIZE_BY_INT; j++)
+        {
+#pragma HLS UNROLL
+            if (ori[j - 1] != ori[j])
+            {
+                array[0][j] = ori[j];
+                mask[j] = 1;
+            }
+            else
+            {
+                array[0][j] = INVALID_FLAG;
+                mask[j] = 0;
+            }
+        }
+
+        for (int j = 0; j < 8; j++)
+        {
+#pragma HLS UNROLL
+            level_1_sum[j] = mask[2 * j] + mask[2 * j + 1];
+        }
+
+        for (int j = 0; j < 4; j++)
+        {
+#pragma HLS UNROLL
+            level_2_sum[j] = level_1_sum[2 * j] + level_1_sum[2 * j + 1];
+        }
+
+        for (int j = 0; j < 2; j++)
+        {
+#pragma HLS UNROLL
+            level_3_sum[j] = level_2_sum[2 * j] + level_2_sum[2 * j + 1];
+        }
+
+        ap_uint<5> result = level_3_sum[0] + level_3_sum[1];
+
+        for (int i = 1; i < 16; i++)
+        {
+#pragma HLS PIPELINE
+            {
+                for (int j = 0; j < SIZE_BY_INT - 1 ; j++)
+                {
+#pragma HLS UNROLL
+                    if (array[i - 1][j] == INVALID_FLAG)
+                    {
+                        tmp_array[i][j] = array[i - 1][j + 1];
+                    }
+                    else
+                    {
+                        tmp_array[i][j] = array[i - 1][j];
+                    }
+
+                }
+                if (array[i - 1][SIZE_BY_INT - 1] == INVALID_FLAG)
+                {
+                    tmp_array[i][SIZE_BY_INT - 1] = INVALID_FLAG;
+                }
+                else
+                {
+                    tmp_array[i][SIZE_BY_INT - 1] = array[i - 1][SIZE_BY_INT - 1];
+                }
+            }
+            {
+                array[i][0] = tmp_array[i][0];
+                for (int j = 1; j < SIZE_BY_INT; j++)
+                {
+
+#pragma HLS UNROLL
+                    if (tmp_array[i][j] == tmp_array[i][j - 1])
+                    {
+                        array[i][j] = INVALID_FLAG;
+                    }
+                    else
+                    {
+                        array[i][j] = tmp_array[i][j];
+                    }
+
+                }
+            }
+//            for (int k = 0; k < SIZE_BY_INT ; k++)
+//                printf("%d \n", array[i][k]);
+//            printf("----------------------\n");
+        }
+        for (int j = 0; j < SIZE_BY_INT; j++)
+        {
+#pragma HLS UNROLL
+            out_data.data.range((CA_WIDTH - 1) + j * CA_WIDTH, 0 + j * CA_WIDTH) = array[15][j];
+        }
+        out_data.num = result;
+        out_data.flag = in_data.flag;
+
+        write_to_stream(out, out_data);
+
+
+        if (in_data.flag == FLAG_SET)
+        {
+            break;
+        }
+    }
+}
+
+void updateVertexCacheNarrow(uint16                          * input,
+                             hls::stream<address_token>      &addressStream,
+                             hls::stream<cache_line>         &cacheStream)
+{
+
+    burst_raw read_buffer[CACHE_UPDATE_BURST];
+
+    ap_uint < CA_WIDTH > ori[SIZE_BY_INT];
+#pragma HLS ARRAY_PARTITION variable=ori dim=0 complete
+
+    unsigned int last_index  = INVALID_FLAG;
+
+    while (true)
+    {
+        address_token addr;
+        read_from_stream(addressStream, addr);
+        if (addr.flag == FLAG_SET)
+        {
+            break;
+        }
+
+        for (int j = 0; j < SIZE_BY_INT; j++)
+        {
+#pragma HLS UNROLL
+            ori[j] = addr.data.range((CA_WIDTH - 1) + j * CA_WIDTH, 0 + j * CA_WIDTH);
+        }
+
+        C_PRINTF("updating %d  %d  from %d \n", (int)min_index, (int)max_index, (int)last_index)
+
+        for (uint_raw i = 0; i < addr.num ; i ++)
+        {
+            if ((last_index == INVALID_FLAG) || (ori[i] > last_index))
+            {
+                uint_raw outer_idx = (ori[i]) & (((2 * 1024 * 1024 * 1024u) >> LOG_CACHEUPDATEBURST) - 1);
+                for (int inner_idx = 0 ; inner_idx < CACHE_UPDATE_BURST; inner_idx ++) {
+#pragma HLS PIPELINE II=1
+                    read_buffer[inner_idx] = input[((uint_raw)(outer_idx) << LOG_CACHEUPDATEBURST) + inner_idx];
+                }
+                uint_raw address = ((uint_raw)(outer_idx) << (LOG_CACHEUPDATEBURST + LOG2_SIZE_BY_INT));
+                for (int inner_idx = 0 ; inner_idx < CACHE_UPDATE_BURST; inner_idx ++)
+                {
+                    cache_line  cache_data;
+                    cache_data.addr = address + (inner_idx << 4);
+                    cache_data.data = read_buffer[inner_idx];
+                    write_to_stream(cacheStream, cache_data);
+#if 0
+                    for (int j = 0 ; j < 4 ; j ++)
+                    {
+                        for (int k = 0; k < EDGE_NUM; k++)
+                        {
+#pragma HLS UNROLL
+                            vertexPropCache[k][0][address + (inner_idx << 2) + j] = read_buffer[inner_idx].range(63 +  (j << 7), 0 + (j << 7));
+                            vertexPropCache[k][1][address + (inner_idx << 2) + j] = read_buffer[inner_idx].range(63 +  (j << 7) + 64, 0 + (j << 7) + 64);
+                        }
+                    }
+#endif
+                }
+            }
+            last_index = ori[i];
+        }
+
+    }
+    {
+        cache_line  end;
+        end.addr = (ENDFLAG - 15);
+        end.data = 0x0;
+        write_to_stream(cacheStream, end);
+    }
+    clear_stream(addressStream);
+}
+
+
+
+
+
 /* TODO: support narrow burst */
 void stream2Command(hls::stream<burst_token>        &mapStream,
                     hls::stream<cache_command>      &cmdStream)
@@ -293,7 +580,7 @@ void streamDelayScheme2(hls::stream<burst_token>  &in, hls::stream<burst_token> 
 }
 
 
-void updateVertexCache(uint16                          *input,
+void updateVertexCache(uint16                          * input,
                        hls::stream<cache_command>      &cmdStream,
                        hls::stream<cache_line>         &cacheStream)
 {
@@ -449,7 +736,7 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
     return;
 
 }
-void srcPropertyProcess( uint16                             *vertexPushinProp,
+void srcPropertyProcess( uint16                             * vertexPushinProp,
                          hls::stream<burst_token>           &edgeBurstStream,
                          hls::stream<burst_token>           &mapStream,
                          hls::stream<edge_tuples_t>         &edgeTuplesBuffer
@@ -467,8 +754,7 @@ void srcPropertyProcess( uint16                             *vertexPushinProp,
     hls::stream<cache_line>    cacheUpdateStream;
 #pragma HLS stream variable=cacheUpdateStream  depth=512
 
-    hls::stream<cache_command>    cmdStream;
-#pragma HLS stream variable=cmdStream  depth=512
+
 
     hls::stream<burst_token>      delayingMapStream;
 #pragma HLS stream variable=delayingMapStream depth=2
@@ -488,9 +774,31 @@ void srcPropertyProcess( uint16                             *vertexPushinProp,
 
     streamMerge(edgeBurstStream, delayedMapStream, edgeBlockStream);
 
+
+#if 1
+
+    hls::stream<cache_command>    cmdStream;
+#pragma HLS stream variable=cmdStream  depth=512
+
     stream2Command(map4CacheStream, cmdStream);
 
     updateVertexCache(vertexPushinProp , cmdStream, cacheUpdateStream);
+#else
+
+    hls::stream<filtered_token>      filteredStream;
+#pragma HLS stream variable=filteredStream depth=2
+
+    hls::stream<address_token>    addressStream;
+#pragma HLS stream variable=addressStream depth=512
+
+    streamFilter(map4CacheStream, filteredStream);
+
+    streamRemoveBubble(filteredStream, addressStream);
+
+    updateVertexCacheNarrow(vertexPushinProp , addressStream, cacheUpdateStream);
+
+
+#endif
 
     readEdgesStage(edgeTuplesBuffer, edgeBlockStream, cacheUpdateStream, vertexPropCache);
 }

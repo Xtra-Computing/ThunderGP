@@ -169,16 +169,16 @@ CSR_BLOCK::CSR_BLOCK(
     CSR* csr
 ) : cordx(_cordx), cordy(_cordy)
 {
-    vertexNum = BLK_SIZE;
-    srcStart = cordx * BLK_SIZE;
-    srcEnd = (cordx + 1) * BLK_SIZE;
+    vertexNum = PARTITION_SIZE;
+    srcStart = cordx * PARTITION_SIZE;
+    srcEnd = (cordx + 1) * PARTITION_SIZE;
     if (srcEnd > csr->vertexNum) {
         srcEnd = csr->vertexNum;
     }
     vertexNum = srcEnd - srcStart;
 
-    sinkStart = cordy * BLK_SIZE;
-    sinkEnd = (cordy + 1) * BLK_SIZE;
+    sinkStart = cordy * PARTITION_SIZE;
+    sinkEnd = (cordy + 1) * PARTITION_SIZE;
     if (sinkEnd > csr->vertexNum) {
         sinkEnd = csr->vertexNum;
     }

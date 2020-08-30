@@ -11,6 +11,7 @@ const slr_resource_info_t slrs[] =
         .dsp     = 2265,
         .bram    = 638,
         .uram    = 320,
+        .mem_chns= 1,
     },
     {
         .slr_id  = 1,
@@ -19,6 +20,7 @@ const slr_resource_info_t slrs[] =
         .dsp     = 1317,
         .bram    = 326,
         .uram    = 160,
+        .mem_chns= 2,
     },
     {
         .slr_id  = 2,
@@ -27,6 +29,7 @@ const slr_resource_info_t slrs[] =
         .dsp     = 2265,
         .bram    = 638,
         .uram    = 320,
+        .mem_chns= 1,
     },
 };
 
@@ -34,3 +37,6 @@ const int mem_cu_map[] =
 {
     0, 1, 1, 2
 };
+
+const int platform_max_memory_bandwidth = 77;
+const int platform_memory_bandwidth_per_channel = 19;
