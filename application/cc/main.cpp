@@ -74,7 +74,6 @@ int main(int argc, char **argv) {
                 totalActiveVertices += activeVertices;
                 DEBUG_PRINTF("activeVertice@path_%d : %d \n", i, activeVertices);
             }
-            runCounter ++;
             for (int i = 0; i < 32; i++)
             {
                 closenessCentrality[i] += reg[i] * runCounter;

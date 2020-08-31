@@ -23,7 +23,7 @@ int dataPrepareProperty(graphInfo *info)
 
     for (int i = 0; i < alignedEdgeNum; i++)
     {
-        edgeProp[i] = i;
+        edgeProp[i] = i % 16;
     }
     int select_index  = ((double)std::rand()) / ((RAND_MAX + 1u) / info->vertexNum);
     vertexPushinProp[select_index] = 0x80000001;

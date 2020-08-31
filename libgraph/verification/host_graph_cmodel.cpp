@@ -33,7 +33,7 @@ int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double e
     }
 
     /* verification */
-    //if (runCounter == 0)
+    if (0)
     {
         for (int i = 0; i < blkNum; i ++)
         {
