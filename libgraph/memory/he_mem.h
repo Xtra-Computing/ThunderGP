@@ -75,4 +75,6 @@ int he_get_interface_id(int cu_id);
 
 int he_get_mem_attr(int attr_id);
 
+int he_get_attr_by_cu(int cu_id);
+
 #endif /* __HE_MEM_H__ */

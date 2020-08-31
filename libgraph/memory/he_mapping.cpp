@@ -74,3 +74,16 @@ int he_get_interface_id(int cu_id)
     }
     return (mapping_item[SUB_PARTITION_NUM - 1].interface_id);
 }
+
+
+int he_get_attr_by_cu(int cu_id)
+{
+    for (int i = 0; i < SUB_PARTITION_NUM; i++)
+    {
+        if (mapping_item[i].cu_id == cu_id)
+        {
+            return mapping_item[i].he_attr_id;
+        }
+    }
+    return (mapping_item[SUB_PARTITION_NUM - 1].he_attr_id);
+}

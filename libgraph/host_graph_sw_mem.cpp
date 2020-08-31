@@ -8,8 +8,8 @@ const int sizeAttrLut[] = {ATTR_PL_DDR3, ATTR_PL_DDR2, ATTR_PL_DDR1, ATTR_PL_DDR
 const int cuAttrLut[] = {ATTR_PL_DDR3, ATTR_PL_DDR2, ATTR_PL_DDR1, ATTR_PL_DDR0};
 
 
-#define PARTITION_DDR       (sizeAttrLut[cuIndex])
-#define CU_DDR              (cuAttrLut[cuIndex])
+#define PARTITION_DDR       (he_get_attr_by_cu(cuIndex))
+#define CU_DDR              (he_get_attr_by_cu(cuIndex))
 
 void base_mem_init(cl_context &context)
 {
