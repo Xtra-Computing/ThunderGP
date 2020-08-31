@@ -11,7 +11,7 @@ then
 prj_file=" _x/link/vivado/vpl/prj/prj.xpr"
 fi
 
-
+./utils/tool_timing.sh > timing.report
 
 if [ -z ${prj_file} ]; then
     echo "no prj file"
