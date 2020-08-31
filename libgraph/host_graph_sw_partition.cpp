@@ -21,6 +21,7 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
     Graph* gptr = createGraph(gName, mode);
     CSR* csr    = new CSR(*gptr);
     acc->csr    = csr;
+    info->isUgraph = gptr->isUgraph;
     free(gptr);
 
     int vertexNum = csr ->vertexNum;
@@ -74,6 +75,7 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
     info->compressedVertexNum = mapedSourceIndex;
     info->edgeNum   = edgeNum;
     info->blkNum =  (mapedSourceIndex + BLK_SIZE - 1) / BLK_SIZE;
+
 
     return 0;
 }
@@ -188,7 +190,6 @@ void partitionFunction(graphInfo *info)
             partition->sub[k] = getSubPartition(i * SUB_PARTITION_NUM + k);
         }
     }
-
     for (int i = 0; i < info->blkNum; i ++) {
         partitionDescriptor * partition = getPartition(i);
 
@@ -202,6 +203,9 @@ void partitionFunction(graphInfo *info)
         prop_t *edgeProp               = (prop_t*)get_host_mem_pointer(MEM_ID_EDGE_PROP);
         mapedSourceIndex = 0;
 
+        int edgeAlignmentStart = 0;
+        int alignInitFlag = 0;
+        int alignedCount = 0;
         for (int u = 0; u < vertexNum; u++) {
             int start = rpa[u];
             int num = rpa[u + 1] - rpa[u];
@@ -210,9 +214,31 @@ void partitionFunction(graphInfo *info)
                 int cia_idx = start + j; //printf("cia_idx %d\n",cia_idx );
                 int vertex_idx = vertexMap[cia[cia_idx]];
                 if ((vertex_idx >= i * MAX_VERTICES_IN_ONE_PARTITION) && (vertex_idx < (i + 1) * MAX_VERTICES_IN_ONE_PARTITION)) {
+
+#if 0
+                    if ((cur_edge_num & 0xF) == 0)
+                    {
+                        edgeAlignmentStart = mapedSourceIndex;
+                        alignInitFlag = 1;
+                    }
+                    if (((mapedSourceIndex - edgeAlignmentStart) >= 4096 * 4 * 2) && (alignInitFlag == 1))
+                    {
+                        alignedCount ++;
+                        for (int k = cur_edge_num & 0xF; k < 16 ; k++)
+                        {
+                            edgePartitionTailArray[cur_edge_num] = edgePartitionTailArray[cur_edge_num - 1];
+                            edgePartitionHeadArray[cur_edge_num] = edgePartitionHeadArray[cur_edge_num - 1];
+                            edgePartitionPropArray[cur_edge_num] = edgePartitionPropArray[cur_edge_num - 1];
+
+                            cur_edge_num ++;
+                        }
+                    }
+#endif
                     edgePartitionTailArray[cur_edge_num] = vertex_idx;
                     edgePartitionHeadArray[cur_edge_num] = mapedSourceIndex;
                     edgePartitionPropArray[cur_edge_num] = edgeProp[cia_idx];
+
+
                     cur_edge_num ++;
                 }
             }
@@ -221,6 +247,7 @@ void partitionFunction(graphInfo *info)
                 mapedSourceIndex ++;
             }
         }
+        DEBUG_PRINTF("alignedCount %d\n", alignedCount);
 
 
         DEBUG_PRINTF("\nunpad edge_tuple_range %d\n", cur_edge_num);

@@ -33,6 +33,7 @@ typedef struct
     int compressedVertexNum;
     int edgeNum;
     int blkNum;
+    bool isUgraph;
 } graphInfo;
 
 typedef struct

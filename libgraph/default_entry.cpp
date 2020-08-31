@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 
         endStamp = getCurrentTimestamp();
         /* for verification */
-        acceleratorCModelSuperStep(runCounter, &graphDataInfo);
+        //acceleratorCModelSuperStep(runCounter, &graphDataInfo);
 
         /* for profile */
         acceleratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);

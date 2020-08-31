@@ -67,6 +67,7 @@ Graph::Graph(const std::string& gName) {
     edgeNum = (int)data.size();
     std::cout << "vertex num: " << vertexNum << std::endl;
     std::cout << "edge num: " << edgeNum << std::endl;
+    std::cout << "is ugraph: " << isUgraph << std::endl;
 
     for (int i = 0; i < vertexNum; i++) {
         Vertex* v = new Vertex(i);

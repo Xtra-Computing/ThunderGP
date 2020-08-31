@@ -88,14 +88,28 @@ int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double e
                      fpga_runtime_total)
     }
     DEBUG_PRINTF("[INFO] ave_e2e%d time %lf\n", runCounter, exec_time / exec_cnt);
-    DEBUG_PRINTF("[INFO] ave_throughput%lf \n", info->edgeNum / (exec_time / exec_cnt));
+    if (info->isUgraph)
+    {
+        DEBUG_PRINTF("[INFO] isUgraph ave_throughput %lf \n", info->edgeNum * 2.0/ (exec_time / exec_cnt) );
+    }
+    else
+    {
+        DEBUG_PRINTF("[INFO] ave_throughput %lf \n", info->edgeNum / (exec_time / exec_cnt));
+    }
     return 0;
 }
 
 int dumpResult( graphInfo *info)
 {
     DEBUG_PRINTF("[INFO_RES] ave_e2e time %lf\n", exec_time / exec_cnt);
-    DEBUG_PRINTF("[INFO_RES] ave_throughput%lf \n", info->edgeNum / (exec_time / exec_cnt));
+    if (info->isUgraph)
+    {
+        DEBUG_PRINTF("[INFO_RES] isUgraph ave_throughput %lf \n", info->edgeNum  * 2.0 / 1000.0 / (exec_time / exec_cnt));
+    }
+    else
+    {
+        DEBUG_PRINTF("[INFO_RES] ave_throughput %lf \n", info->edgeNum / 1000.0 / (exec_time / exec_cnt));
+    }
     return 0;
 }
 
