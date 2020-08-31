@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 
     acceleratorDataPreprocess(&graphDataInfo);
 
-    for (int runCounter = 0 ; runCounter < 5 ; runCounter ++)
+    for (int runCounter = 0 ; runCounter < 10 ; runCounter ++)
     {
         double startStamp, endStamp;
         startStamp = getCurrentTimestamp();
@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
         /* profile */
         acceleratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
     }
+    dumpResult(&graphDataInfo);
     acceleratorDeinit();
 
     return 0;

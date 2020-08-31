@@ -8,6 +8,8 @@
 
 
 
+static double exec_time = 0;
+static double exec_cnt = 0;
 int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime)
 {
     graphAccelerator * acc = getAccelerator();
@@ -79,10 +81,21 @@ int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double e
 #endif
 
         }
+        exec_time += exeTime * 1000;
+        exec_cnt += 1;
         DEBUG_PRINTF("[INFO] summary e2e %lf ms, fpga %lf ms\n",
                      end2end_runtime_total,
                      fpga_runtime_total)
     }
+    DEBUG_PRINTF("[INFO] ave_e2e%d time %lf\n", runCounter, exec_time / exec_cnt);
+    DEBUG_PRINTF("[INFO] ave_throughput%lf \n", info->edgeNum / (exec_time / exec_cnt));
+    return 0;
+}
+
+int dumpResult( graphInfo *info)
+{
+    DEBUG_PRINTF("[INFO_RES] ave_e2e time %lf\n", exec_time / exec_cnt);
+    DEBUG_PRINTF("[INFO_RES] ave_throughput%lf \n", info->edgeNum / (exec_time / exec_cnt));
     return 0;
 }
 

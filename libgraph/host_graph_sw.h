@@ -167,6 +167,8 @@ int dataPrepareProperty(graphInfo *info);
 
 int getStartIndex(void);
 
+int dumpResult( graphInfo *info);
+
 
 inline int getCuIDbyInterface(int order)
 {
@@ -175,6 +177,8 @@ inline int getCuIDbyInterface(int order)
 
 
 double getCurrentTimestamp(void);
+
+void reTransferProp(graphInfo *info);
 
 
 Graph* createGraph(const std::string &gName, const std::string &mode);

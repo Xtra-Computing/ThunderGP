@@ -117,6 +117,37 @@ static void partitionTransfer(graphInfo *info)
 }
 
 
+void reTransferProp(graphInfo *info)
+{
+    dataPrepareProperty(info);
+    graphAccelerator * acc = getAccelerator();
+
+    int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
+    int *cia = (int*)get_host_mem_pointer(MEM_ID_CIA);
+    prop_t *vertexPushinPropMapped = (prop_t*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP_MAPPED);
+    prop_t *vertexPushinProp       = (prop_t*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
+    unsigned int *vertexMap        = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
+    unsigned int *vertexRemap      = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
+    unsigned int mapedSourceIndex  = 0;
+    int vertexNum = info->vertexNum;
+
+    for (int u = 0; u < vertexNum; u++) {
+        int num = rpa[u + 1] - rpa[u];
+        vertexMap[u] = mapedSourceIndex;
+        if (num != 0)
+        {
+#if CAHCE_FETCH_DEBUG
+            vertexPushinPropMapped[mapedSourceIndex] =  mapedSourceIndex;
+#else
+            vertexPushinPropMapped[mapedSourceIndex] =  vertexPushinProp[u];
+#endif
+            vertexRemap[mapedSourceIndex] = u;
+            mapedSourceIndex ++;
+        }
+    }
+    process_mem_init(acc->context);
+}
+
 void partitionFunction(graphInfo *info)
 {
     graphAccelerator * acc = getAccelerator();
@@ -236,12 +267,12 @@ void partitionFunction(graphInfo *info)
 
             DEBUG_PRINTF("[SIZE] %d cur_edge_num sub %d\n", partition->totalEdge, partition->sub[subIndex]->listEnd);
             partition_mem_init(acc->context, partId, partition->sub[subIndex]->listEnd, subIndex); // subIndex --> cuIndex
-            memcpy(partition->sub[subIndex]->edgeTail.data , &edgePartitionTailArray[subPartitionSize * reOrderIndex], 
-                partition->sub[subIndex]->listEnd * sizeof(int));
-            memcpy(partition->sub[subIndex]->edgeHead.data , &edgePartitionHeadArray[subPartitionSize * reOrderIndex], 
-                partition->sub[subIndex]->listEnd * sizeof(int));
+            memcpy(partition->sub[subIndex]->edgeTail.data , &edgePartitionTailArray[subPartitionSize * reOrderIndex],
+                   partition->sub[subIndex]->listEnd * sizeof(int));
+            memcpy(partition->sub[subIndex]->edgeHead.data , &edgePartitionHeadArray[subPartitionSize * reOrderIndex],
+                   partition->sub[subIndex]->listEnd * sizeof(int));
             memcpy(partition->sub[subIndex]->edgeProp.data , &edgePartitionPropArray[subPartitionSize * reOrderIndex],
-                partition->sub[subIndex]->listEnd * sizeof(int));
+                   partition->sub[subIndex]->listEnd * sizeof(int));
         }
     }
 
