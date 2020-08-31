@@ -1,0 +1,48 @@
+diff --git a/Makefile b/Makefile
+index ec6f9ec..09d96e8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -8,7 +8,7 @@ include $(UTILS_PATH)/utils.mk
+ 
+ TARGETS := hw
+ TARGET  := $(TARGETS)
+-DEVICES := xilinx_vcu1525_xdma_201830_1
++DEVICES := xilinx_u250_xdma_201830_2
+ # device list:
+ # xilinx_vcu1525_xdma_201830_1
+ # xilinx_u200_xdma_201830_2
+diff --git a/application/common_gs_kernel.mk b/application/common_gs_kernel.mk
+index a64442b..477477e 100644
+--- a/application/common_gs_kernel.mk
++++ b/application/common_gs_kernel.mk
+@@ -10,7 +10,7 @@ BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.tmpVertexProp:DDR[3]
+ ifeq ($(strip $(HAVE_EDGE_PROP)), $(strip $(VAR_TRUE)))
+ BINARY_LINK_OBJS    += --sp  readEdgesCU1_1.edgeProp:DDR[3]
+ endif
+-BINARY_LINK_OBJS    += --slr readEdgesCU1_1:SLR2
++BINARY_LINK_OBJS    += --slr readEdgesCU1_1:SLR3
+ 
+ 
+ ifeq ($(strip $(HAVE_FULL_SLR)), $(strip $(VAR_TRUE))) 
+@@ -43,7 +43,7 @@ BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.tmpVertexProp:DDR[1]
+ ifeq ($(strip $(HAVE_EDGE_PROP)), $(strip $(VAR_TRUE)))
+ BINARY_LINK_OBJS    += --sp  readEdgesCU3_1.edgeProp:DDR[1]
+ endif
+-BINARY_LINK_OBJS    += --slr readEdgesCU3_1:SLR0
++BINARY_LINK_OBJS    += --slr readEdgesCU3_1:SLR1
+ 
+ 
+ 
+diff --git a/application/global_config.h b/application/global_config.h
+index 98dd578..a6aaa65 100644
+--- a/application/global_config.h
++++ b/application/global_config.h
+@@ -12,7 +12,7 @@ typedef  int                prop_t;
+ #endif
+ 
+ 
+-#define BLK_SIZE                                (512*1024)
++#define BLK_SIZE                                (1024*1024)
+ #define MAX_VERTICES_IN_ONE_PARTITION           (BLK_SIZE)
+ #define ENDFLAG                                 0xffffffff
+ 
