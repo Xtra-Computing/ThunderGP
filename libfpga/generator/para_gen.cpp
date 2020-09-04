@@ -178,6 +178,11 @@ int main(int argc, char **argv) {
     {
         DEBUG_PRINTF("\t\t gather scatter%d --> slr%d\n", i, kernel_mapping[i]);
     }
+    for (int i = 0; i < slr_ordered.size(); i++)
+    {
+        DEBUG_PRINTF("\t\t lefted uram %d@%d --> slr%d\n",
+                   slr_ordered[i].id, i, slr_ordered[i].uram);
+    }
 
 
     int min_id = 0;
@@ -207,6 +212,8 @@ int main(int argc, char **argv) {
     }
 
     /* if all the slrs cost the same urams, we choose the one with max clbs(luts & ffs)*/
+    DEBUG_PRINTF("\t\t apply  diff is %d\n", diff);
+
     if (diff == 0)
     {
         apply_mapping = slr_ordered[lut_max_id].id;

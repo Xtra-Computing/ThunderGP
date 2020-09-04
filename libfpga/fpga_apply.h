@@ -59,7 +59,7 @@ void  cuMerge ( int               loopNum,
     }
 }
 
-
+#if (CUSTOMIZE_APPLY==0)
 
 void applyFunction(
     int                             loopNum,
@@ -136,3 +136,4 @@ void applyFunction(
         outReg[j] = infoAggregate;
     }
 }
+#endif

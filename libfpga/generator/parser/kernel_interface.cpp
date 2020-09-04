@@ -17,6 +17,8 @@ typedef struct
     arg_instance_t kernel_arg;
 } kernel_arg_instance_t;
 
+
+
 static std::vector<kernel_arg_instance_t> kernel_arg_list;
 
 static kernel_arg_instance_t * get_kernel_arg(std::string arg)
@@ -84,4 +86,20 @@ output_method_t kernel_output_method =
 {
     .of_number = get_of_number,
     .output    = output_to_file,
+};
+
+
+static parser_item_t local_parser[] =
+{
+    {
+        .id      = PRAGMA_ID_CU_DUPLICATE,
+        .keyword = "MSLR_FUNCTION",
+        .func    = register_kernel_arg,
+    },
+};
+
+reg_parser_item_t kernel_interface_parser =
+{
+    .pointer = local_parser,
+    .size  = ARRAY_SIZE(local_parser),
 };

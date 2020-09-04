@@ -1,4 +1,4 @@
 #!/bin/bash
-make -f ./libfpga/generator/auto_gen_parameters.mk auto_para
-make -f ./libfpga/generator/auto_gen_code.mk code_gen
-make -f ./libfpga/generator/auto_gen_makefile.mk  makefile_gen 
+make -f ./libfpga/generator/auto_gen_parameters.mk app=$1 auto_para
+make -f ./libfpga/generator/auto_gen_code.mk  app=$1 code_gen
+make -f ./libfpga/generator/auto_gen_makefile.mk app=$1 makefile_gen

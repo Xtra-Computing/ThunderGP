@@ -35,33 +35,5 @@ int main(int argc, char **argv) {
     file.flush();
     file.close();
 
-    file.open("./tmp_fpga_top/apply_kernel.mk");
-
-    file << "ifeq ($(strip $(HAVE_APPLY)), $(strip $(VAR_TRUE)))" << std::endl;
-    file << "$(XCLBIN)/vertexApply.$(TARGET).$(DSA).xo: $(APPLY_KERNEL_PATH)/apply_top_1.cpp" << std::endl;
-    file << "\tmkdir -p $(XCLBIN)" << std::endl;
-    file << "\t$(XOCC) $(CLFLAGS) -c -k vertexApply -I'$(<D)' -o'$@' '$<'" << std::endl;
-    file << "BINARY_CONTAINER_OBJS += $(XCLBIN)/vertexApply.$(TARGET).$(DSA).xo" << std::endl;
-    file << "BINARY_LINK_OBJS    += --nk  vertexApply:1" << std::endl;
-    file << "BINARY_LINK_OBJS    += --sp  vertexApply_1.vertexProp:DDR[1]" << std::endl;
-    for (int i = 0; i < SUB_PARTITION_NUM; i ++)
-    {
-        file << "BINARY_LINK_OBJS    += --sp  vertexApply_1.newVertexProp"
-             << (i) << ":DDR[$(INTERFACE_" << (i) << "_ID)]" << std::endl;
-        file << "BINARY_LINK_OBJS    += --sp  vertexApply_1.tmpVertexProp"
-             << (i) << ":DDR[$(INTERFACE_" << (i) << "_ID)]" << std::endl;
-    }
-    file << "ifeq ($(strip $(HAVE_APPLY_OUTDEG)), $(strip $(VAR_TRUE)))" << std::endl;
-    file << "BINARY_LINK_OBJS    += --sp  vertexApply_1.outDegree:DDR[2]" << std::endl;
-    file << "endif" << std::endl;
-    file << "BINARY_LINK_OBJS    += --sp  vertexApply_1.outReg:DDR[2]" << std::endl;
-    file << "BINARY_LINK_OBJS    += --slr vertexApply_1:SLR$(APPLY_SLR)" << std::endl;
-    file << "include $(APPCONFIG)/apply_kernel.mk" << std::endl;
-    file << "endif" << std::endl;
-
-    file.flush();
-    file.close();
-
-
     return 0;
 }

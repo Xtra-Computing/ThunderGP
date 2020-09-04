@@ -1,4 +1,4 @@
-$(shell ./utils/automation.sh > generator.log)
+$(shell ./utils/automation.sh $(app) > generator.log)
 
 SHELL          := /bin/bash
 TARGET         := $(TARGETS)
@@ -34,7 +34,7 @@ include $(APPCONFIG)/build.mk
 include ./application/common.mk
 
 include tmp_fpga_top/gs_kernel.mk
-include tmp_fpga_top/apply_kernel.mk
+include tmp_fpga_top/apply_kernel_1.mk
 
 include $(UTILS_PATH)/bitstream.mk
 include $(UTILS_PATH)/clean.mk

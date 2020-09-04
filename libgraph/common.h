@@ -20,8 +20,13 @@
 #define VAR_CONCAT2(x, y)           CAT_SECOND_LEVLE(x, y)
 
 
-#define FLAG_SET                    (1u)
-#define FLAG_RESET                  (0u)
+#ifndef FLAG_SET
+#define FLAG_SET                (1u)
+#endif
+
+#ifndef FLAG_RESET
+#define FLAG_RESET              (0u)
+#endif
 
 
 #if 1

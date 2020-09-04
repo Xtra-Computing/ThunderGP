@@ -100,6 +100,7 @@ int acceleratorCModelDataPreprocess(graphInfo *info)
 int acceleratorCModelSuperStep(int superStep, graphInfo *info)
 {
 #if HAVE_APPLY
+#if (CUSTOMIZE_APPLY == 0)
     graphAccelerator * acc = getAccelerator();
 
     int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
@@ -181,6 +182,7 @@ int acceleratorCModelSuperStep(int superStep, graphInfo *info)
     }
     DEBUG_PRINTF("total cmodel error: %d\n", error_count);
     memcpy(propValue, updateVerify, (get_he_mem(MEM_ID_HOST_PROP_PONG)->size));
+#endif
 #endif
     return 0;
 }

@@ -3,6 +3,6 @@
 
 extern output_method_t kernel_output_method;
 
-int register_kernel_arg(arg_instance_t item);
+extern reg_parser_item_t kernel_interface_parser;
 
 #endif /* __KERNEL_INTERFACE_H__ */

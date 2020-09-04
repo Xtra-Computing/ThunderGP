@@ -8,11 +8,8 @@ CXX := $(XILINX_SDX)/bin/xcpp
 XOCC := $(XILINX_SDX)/bin/xocc
 
 GS_KERNEL_PATH    = ./tmp_fpga_top
-ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
-APPLY_KERNEL_PATH = $(APPCONFIG)
-else
 APPLY_KERNEL_PATH = ./tmp_fpga_top
-endif
+
 
 
 include $(ABS_COMMON_REPO)/utils/opencl.mk

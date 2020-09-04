@@ -253,3 +253,30 @@ output_method_t mem_output_method =
     .output    = output_to_file,
 };
 
+
+static parser_item_t local_parser[] =
+{
+    {
+        .id      = PRAGMA_ID_MEM_ARG,
+        .keyword = "MSLR_INTERFACE_ARG",
+        .func    = register_mem_arg,
+    },
+    {
+        .id      = PRAGMA_ID_MEM_ATTR,
+        .keyword = "MSLR_INTERFACE_ATTR",
+        .func    = register_mem_attr,
+    },
+    {
+        .id      = PRAGMA_ID_MEM_INSTANCE,
+        .keyword = "MSLR_INTERFACE_INSTANCE",
+        .func    = register_mem_instance,
+    }
+};
+
+
+
+reg_parser_item_t mem_interface_parser =
+{
+    .pointer = local_parser,
+    .size  = ARRAY_SIZE(local_parser),
+};

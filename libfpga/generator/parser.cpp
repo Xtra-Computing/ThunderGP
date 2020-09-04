@@ -16,33 +16,39 @@
 #include "parser_debug.h"
 #include "mem_interface.h"
 #include "kernel_interface.h"
-
+#include "customize.h"
+#include "makefile.h"
 
 using namespace std;
 
-parser_item_t local_item[] =
+#define REG_PARSER(N)       for (int i = 0; i < (N##_interface_parser).size;i++){       \
+                                local_item.push_back(N##_interface_parser.pointer[i]);  \
+                            }                                                           \
+                            register_output_method(N##_output_method);
+
+int register_output_method(output_method_t method);
+
+
+std::vector<parser_item_t> local_item;
+int parser_init(void)
 {
+    const char * prefix = PRAGMA_PERFIX;
+
+    REG_PARSER(kernel);
+    REG_PARSER(mem);
+    REG_PARSER(customize);
+    REG_PARSER(makefile);
+    for (int i = 0; i < local_item.size(); i++)
     {
-        .id      = PRAGMA_ID_CU_DUPLICATE,
-        .keyword = "MSLR_FUNCTION",
-        .func    = register_kernel_arg,
-    },
-    {
-        .id      = PRAGMA_ID_MEM_ARG,
-        .keyword = "MSLR_INTERFACE_ARG",
-        .func    = register_mem_arg,
-    },
-    {
-        .id      = PRAGMA_ID_MEM_ATTR,
-        .keyword = "MSLR_INTERFACE_ATTR",
-        .func    = register_mem_attr,
-    },
-    {
-        .id      = PRAGMA_ID_MEM_INSTANCE,
-        .keyword = "MSLR_INTERFACE_INSTANCE",
-        .func    = register_mem_instance,
+        int ret = snprintf(local_item[i].pragma_string, MAX_CHAR_LENGTH, "%s %s", prefix, local_item[i].keyword);
+        if (ret <= 0)
+        {
+            DEBUG_PRINTF("bug: pragma string overflow\n");
+            exit(EXIT_FAILURE);
+        }
     }
-};
+    return 0;
+}
 
 std::string find_arg(void * context, std::string &line, int ln)
 {
@@ -59,9 +65,7 @@ std::string find_arg(void * context, std::string &line, int ln)
     return arg;
 }
 
-
-
-int identify_pragmas(std::string &current_line, std::string &next_line, int line_number)
+int identify_pragmas(std::string file_name, std::string &current_line, std::string &next_line, int line_number)
 {
     std::string stripped_line = current_line;
     stripped_line.erase(
@@ -69,7 +73,7 @@ int identify_pragmas(std::string &current_line, std::string &next_line, int line
         stripped_line.end()
     );
     arg_instance_t arg_ins;
-    for (int i = 0; i < ARRAY_SIZE(local_item); i++)
+    for (int i = 0; i < local_item.size(); i++)
     {
         std::string target(local_item[i].pragma_string);
         target.erase(std::remove_if(target.begin(), target.end(), ::isspace), target.end());
@@ -79,6 +83,7 @@ int identify_pragmas(std::string &current_line, std::string &next_line, int line
             arg_ins.ln      = line_number;
             arg_ins.id      = local_item[i].id;
             arg_ins.object  = next_line;
+            arg_ins.file_name = file_name;
 
             if (local_item[i].func != NULL)
             {
@@ -108,7 +113,7 @@ int file_input(const std::string& input)
     while (std::getline(fhandle, line)) {
         if (line_number > 0)
         {
-            identify_pragmas(last_line, line, (line_number));
+            identify_pragmas(input, last_line, line, (line_number));
         }
         line_number ++;
         last_line  = line;
@@ -123,23 +128,6 @@ std::vector<output_method_t> output_methods;
 int register_output_method(output_method_t method)
 {
     output_methods.push_back(method);
-    return 0;
-}
-
-int parser_init(void)
-{
-    const char * prefix = "#pragma THUNDERGP";
-    for (int i = 0; i < ARRAY_SIZE(local_item); i++)
-    {
-        size_t n = sprintf(local_item[i].pragma_string, "%s %s", prefix, local_item[i].keyword);
-        if (n > MAX_CHAR_LENGTH)
-        {
-            DEBUG_PRINTF("bug: pragma string overflow\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    register_output_method(kernel_output_method);
-    register_output_method(mem_output_method);
     return 0;
 }
 
@@ -170,10 +158,28 @@ int file_output(const std::string& input, const std::string& output)
         output_file_name << output;
         output_file_name << "_";
         output_file_name << (i + 1);
-        output_file_name << ".cpp";
-        std::ofstream * of = new std::ofstream(output_file_name.str().c_str());
-        output_files.push_back(of);
+        size_t pos = input.find(".cpp");
+        if (pos != std::string::npos)
+        {
+            output_file_name << ".cpp";
+        }
+        else
+        {
+            size_t pos = input.find(".mk");
+            if (pos != std::string::npos)
+            {
+                output_file_name << ".mk";
+            }
+            else
+            {
+                output_file_name << ".tmp";
+            }
+        }
+        DEBUG_PRINTF("output file: %s\n",output_file_name.str().c_str());
 
+        std::ofstream * of = new std::ofstream(output_file_name.str().c_str());
+        //(*of) << "autogen"<<std::endl;
+        output_files.push_back(of);
     }
 
     std::ifstream fhandle(input.c_str());
@@ -209,6 +215,10 @@ int file_output(const std::string& input, const std::string& output)
                 (*output_files[i]) << line << std::endl;
             }
         }
+        else
+        {
+            std::cout << "[" << line_number << "] " << line << std::endl;
+        }
         line_number ++;
     }
     fhandle.close();
@@ -221,29 +231,21 @@ int file_output(const std::string& input, const std::string& output)
     return 0;
 }
 
-bool replace(std::string& str, const std::string& from, const std::string& to) {
-    size_t start_pos = str.find(from);
-    if (start_pos == std::string::npos)
-        return false;
-    str.replace(start_pos, from.length(), to);
-    return true;
-}
-
 int main(int argc, char **argv) {
     std::string input_code;
     parser_init();
-    if (argc > 1)
-    {
-        input_code = argv[1];
-    }
-    else
+    if (argc < 2)
     {
         DEBUG_PRINTF("error: no input \n");
+        DEBUG_PRINTF("./code_gen  base_input input2 ... output \n");
     }
-    file_input(input_code);
-    if (argc > 2)
+    for (int i = 1; i < argc - 1; i++)
     {
-        file_output(input_code, argv[2]);
+        DEBUG_PRINTF("read in %d@%d\n", i, argc - 2);
+        file_input(argv[i]);
     }
+    DEBUG_PRINTF("output\n")
+    file_output(argv[1], argv[argc - 1]);
+
     return 0;
 }
