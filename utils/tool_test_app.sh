@@ -20,6 +20,7 @@ fi
 # $2 app
 
 DATASET=(   'rmat-19-32.txt' \
+            'graph500-scale25-ef16_adj.edges'\
 )
 
 make app=$2 exe 
