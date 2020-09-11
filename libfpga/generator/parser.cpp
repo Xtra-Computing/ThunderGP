@@ -158,24 +158,30 @@ int file_output(const std::string& input, const std::string& output)
         output_file_name << output;
         output_file_name << "_";
         output_file_name << (i + 1);
-        size_t pos = input.find(".cpp");
-        if (pos != std::string::npos)
+        // TODO: hardcode
         {
-            output_file_name << ".cpp";
+            size_t pos = input.find(".cpp");
+            if (pos != std::string::npos)
+            {
+                output_file_name << ".cpp";
+            }
         }
-        else
         {
             size_t pos = input.find(".mk");
             if (pos != std::string::npos)
             {
                 output_file_name << ".mk";
             }
-            else
+        }
+        {
+            size_t pos = input.find(".h");
+            if (pos != std::string::npos)
             {
-                output_file_name << ".tmp";
+                output_file_name << ".h";
             }
         }
-        DEBUG_PRINTF("output file: %s\n",output_file_name.str().c_str());
+
+        DEBUG_PRINTF("output file: %s\n", output_file_name.str().c_str());
 
         std::ofstream * of = new std::ofstream(output_file_name.str().c_str());
         //(*of) << "autogen"<<std::endl;

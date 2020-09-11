@@ -36,7 +36,7 @@ HOST_SRCS += ./libgraph/host_graph_sw_kernel.cpp
 HOST_SRCS += ./libgraph/host_graph_sw_dataflow.cpp
 HOST_SRCS += ./libgraph/scheduler/host_graph_scheduler.cpp
 HOST_SRCS += ./libgraph/scheduler/$(SCHEDULER)/scheduler.cpp
-HOST_SRCS += $(APPCONFIG)/l3DataPrepare.cpp
+HOST_SRCS += $(APPCONFIG)/dataPrepare.cpp
 HOST_SRCS += ./libgraph/verification/host_graph_verification_gs.cpp
 HOST_SRCS += ./libgraph/verification/host_graph_cmodel.cpp
 
@@ -62,6 +62,7 @@ CXXFLAGS += -I ./libgraph/verification
 CXXFLAGS += -I $(APPCONFIG)
 CXXFLAGS += -I ./application
 CXXFLAGS += -I tmp_para
+CXXFLAGS += -I tmp_fpga_top
 
 # Host linker flags
 LDFLAGS := $(opencl_LDFLAGS)
@@ -163,6 +164,7 @@ CXXFLAGS += -DCUSTOMIZE_APPLY=0
 CLFLAGS  += -DCUSTOMIZE_APPLY=0
 endif
 
+
 #############################################################################
 #                                                                           #
 #                     Specific Configuration                                #
@@ -173,8 +175,14 @@ endif
 CLFLAGS  += -DQUEUE_SIZE_FILTER=$(QUEUE_SIZE_FILTER)
 CLFLAGS  += -DQUEUE_SIZE_MEMORY=$(QUEUE_SIZE_MEMORY)
 CLFLAGS  += -DLOG_SCATTER_CACHE_BURST_SIZE=$(LOG_SCATTER_CACHE_BURST_SIZE)
-CLFLAGS  += -DAPPLY_REF_ARRAY_SIZE=$(APPLY_REF_ARRAY_SIZE)
 
-#for software
+
+CLFLAGS  += -DAPPLY_REF_ARRAY_SIZE=$(APPLY_REF_ARRAY_SIZE)
 CXXFLAGS  += -DAPPLY_REF_ARRAY_SIZE=$(APPLY_REF_ARRAY_SIZE)
 
+
+ifdef TARGET_PARTITION_SIZE
+CLFLAGS  += -DTARGET_PARTITION_SIZE=$(TARGET_PARTITION_SIZE)
+CXXFLAGS  += -DTARGET_PARTITION_SIZE=$(TARGET_PARTITION_SIZE)
+
+endif

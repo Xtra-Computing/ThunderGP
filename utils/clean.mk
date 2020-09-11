@@ -17,3 +17,4 @@ clean:
 	-$(RMDIR) tmp_para
 	-$(RMDIR) para_gen
 	-$(RMDIR) code_gen
+	-$(RMDIR) makefile_gen

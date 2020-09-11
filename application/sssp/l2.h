@@ -14,19 +14,13 @@ inline prop_t preprocessProperty(prop_t srcProp)
 }
 
 /* source vertex property & edge property */
-inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
+inline prop_t scatterFunc(prop_t srcProp, prop_t edgeProp)
 {
     return ((srcProp) + (edgeProp));
 }
 
-/* destination property update in RAW solver */
-inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
-{
-    return ((((ori)& (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK)))?(update):(ori));
-}
-
 /* destination property update dst buffer update */
-inline prop_t updateDestination(prop_t ori, prop_t update)
+inline prop_t gatherFunc(prop_t ori, prop_t update)
 {
     return (
                (
@@ -39,7 +33,7 @@ inline prop_t updateDestination(prop_t ori, prop_t update)
            );
 }
 
-inline prop_t applyCalculation( prop_t tProp,
+inline prop_t applyFunc( prop_t tProp,
                                 prop_t source,
                                 prop_t outDeg,
                                 unsigned int (&extra)[APPLY_REF_ARRAY_SIZE],

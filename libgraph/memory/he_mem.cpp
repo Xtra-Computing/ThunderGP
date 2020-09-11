@@ -1,4 +1,7 @@
-
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
 
 #include "common.h"
@@ -93,7 +96,7 @@ int he_mem_init(cl_context &dev_context, he_mem_t * item)
 
     memset(item->data, 0 , item->size);
 
-    DEBUG_PRINTF("[INIT] alignment allocate for %s in %p with size %d\n",
+    HE_DEBUG("[INIT] alignment allocate for %s in %p with size %d\n",
                  item->name,
                  item->data,
                  item->size)
@@ -156,7 +159,7 @@ he_mem_t* get_he_mem(unsigned int id)
             return lut_item.p_mem;
         }
     }
-    DEBUG_PRINTF("[ERROR] get he mem error %d \n", id);
+    HE_DEBUG("[ERROR] get he mem error %d \n", id);
     return NULL;
 }
 
@@ -219,13 +222,13 @@ int transfer_data_to_pl(cl_context &dev_context, cl_device_id device_id, int* id
         {
             continue;
         }
-        DEBUG_PRINTF("[HEME] %s enqueue size %d @ %p\n", p_mem->name, p_mem->size, p_mem->data );
+        HE_DEBUG("[HEME] %s enqueue size %d @ %p\n", p_mem->name, p_mem->size, p_mem->data );
         status = clEnqueueMigrateMemObjects(ops, 1, &p_mem->device, 0, 0, NULL, NULL);
         if (status != CL_SUCCESS) {
             DEBUG_PRINTF("%s enqueue failed %d\n", p_mem->name, status);
             exit(1);
         }
-        DEBUG_PRINTF("[HEME] %s enqueue success\n", p_mem->name);
+        HE_DEBUG("[HEME] %s enqueue success\n", p_mem->name);
     }
     clFinish(ops);
     return 0;
@@ -256,3 +259,13 @@ int transfer_data_from_pl(cl_context &dev_context, cl_device_id device_id, int m
 
     return 0;
 }
+
+std::vector<he_mem_t *> allocate_he_mem;
+
+
+
+int he_mem_from_bin(std::string file_name, int he_id, int mem_id)
+{
+    return 0;
+}
+

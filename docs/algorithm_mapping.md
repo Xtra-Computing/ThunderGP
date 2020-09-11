@@ -37,9 +37,9 @@ In our implementation, the gather and scatter stages are combined together by th
 | Hooks    | ID | Description  |
 |-----------|--|--------------|
 | preprocessProperty | 1 | Per-process the source vertex property. |
-| updateCalculation | 2 | Calculate the update value by using the edge property and source vertex property.  |
+| scatterFunc | 2 | Calculate the update value by using the edge property and source vertex property.  |
 | updateMergeInRAWSolver| 3 | Destination property update in RAW solver. | 
-| updateDestination | 4 | Destination property update. | 
+| gatherFunc | 4 | Destination property update. | 
 
 
 In SpMV, these hooks in Scatter-Gather can be easily instanced as follows:
@@ -52,7 +52,7 @@ inline prop_t preprocessProperty(prop_t srcProp)
 }
 
 /*  calculate the  A.val[i] * x[A.col[i]]; */
-inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
+inline prop_t scatterFunc(prop_t srcProp, prop_t edgeProp)
 {
     return ((srcProp) * (edgeProp));
 }
@@ -64,7 +64,7 @@ inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
 }
 
 /* accumulate y[r] in on-chip memory */
-inline prop_t updateDestination(prop_t ori, prop_t update)
+inline prop_t gatherFunc(prop_t ori, prop_t update)
 {
     return ((ori) + (update));
 }
@@ -72,8 +72,8 @@ inline prop_t updateDestination(prop_t ori, prop_t update)
 ```
 
 Notes: 
-* The operation in ```updateDestination``` and ```updateMergeInRAWSolver``` can be very similar, the __difference__ is that  for ```updateDestination```, the data in on-chip memory is not initialized,  which means the accumulations are start from zero, but for ```updateMergeInRAWSolver```,  as the read-after-write hazard only happened in two very closed update tuples, we add a temporary buffer in RAWSolver to sift out the closed update and perform the update in the temporary buffer. Therefore if the update happened, the data in the temporary buffer is initialized. It should be considered when mapping an algorithm with bit-masked property(e.g. BFS).
-* If the accelerator configuration ```HAVE_EDGE_PROP``` is set to false the hook ```updateCalculation``` will not be called because there is no property of edges.
+* The operation in ```gatherFunc``` and ```updateMergeInRAWSolver``` can be very similar, the __difference__ is that  for ```gatherFunc```, the data in on-chip memory is not initialized,  which means the accumulations are start from zero, but for ```updateMergeInRAWSolver```,  as the read-after-write hazard only happened in two very closed update tuples, we add a temporary buffer in RAWSolver to sift out the closed update and perform the update in the temporary buffer. Therefore if the update happened, the data in the temporary buffer is initialized. It should be considered when mapping an algorithm with bit-masked property(e.g. BFS).
+* If the accelerator configuration ```HAVE_EDGE_PROP``` is set to false the hook ```scatterFunc``` will not be called because there is no property of edges.
 
 
 ## Mapping the Apply Kernel
@@ -94,7 +94,7 @@ Following table shows the hook functions for apply stage. Note:  ```applyMerge``
 | Hooks    | ID | Description  |
 |-----------|--|--------------|
 | applyMerge | 5 | Destination property merge from all of the scatter-gather CUs. | 
-| applyCalculation | 6 | Calculate the new property of vertices. | 
+| applyFunc | 6 | Calculate the new property of vertices. | 
 
 In SpMV, these hooks in Apply can be easily instanced as follows:
 
@@ -105,7 +105,7 @@ inline prop_t applyMerge(prop_t ori, prop_t update)
     return ((ori) + (update));
 }
 /* no other calculation in apply phase */
-inline prop_t applyCalculation( prop_t tProp,
+inline prop_t applyFunc( prop_t tProp,
                                 prop_t source,
                                 prop_t outDeg,
                                 unsigned int &extra,

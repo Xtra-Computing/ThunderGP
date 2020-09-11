@@ -157,7 +157,7 @@ int acceleratorCModelSuperStep(int superStep, graphInfo *info)
     }
     for (int u = 0; u < vertexNum; u++)
     {
-        updateVerify[u] = applyCalculation(tmpVertexPropVerify[u],
+        updateVerify[u] = applyFunc(tmpVertexPropVerify[u],
                                            propValue[u], outDeg[u], infoArrayVerify, *(unsigned int *)&applyArgReg);
     }
 

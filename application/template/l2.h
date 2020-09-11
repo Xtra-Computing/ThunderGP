@@ -8,7 +8,7 @@ inline prop_t preprocessProperty(prop_t srcProp)
 }
 
 /* source vertex property & edge property */
-inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
+inline prop_t scatterFunc(prop_t srcProp, prop_t edgeProp)
 {
     return 0;
 }
@@ -20,7 +20,7 @@ inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
 }
 
 /* destination property update dst buffer update */
-inline prop_t updateDestination(prop_t ori, prop_t update)
+inline prop_t gatherFunc(prop_t ori, prop_t update)
 {
     return 0;
 }

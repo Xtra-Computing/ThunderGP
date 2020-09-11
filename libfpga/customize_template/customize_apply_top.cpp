@@ -117,7 +117,7 @@ core_loop: for (int i = 0; i < BURST_ALL_BITS / INT_WIDTH; i++)
                 //mark for auto generation
 
                 /*
-                prop_t  wProp    = applyCalculation( tProp, uProp, out_deg, tmpInfoArray[i],  argReg);
+                prop_t  wProp    = applyFunc( tProp, uProp, out_deg, tmpInfoArray[i],  argReg);
                 */
 
 #pragma THUNDERGP USER_APPLY_COV_FOR_WRITE

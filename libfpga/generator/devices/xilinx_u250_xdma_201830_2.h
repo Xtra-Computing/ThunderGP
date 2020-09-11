@@ -47,5 +47,4 @@ const int mem_cu_map[] =
     0, 1, 2, 3
 };
 
-const int platform_max_memory_bandwidth = 77;
 const int platform_memory_bandwidth_per_channel = 19;

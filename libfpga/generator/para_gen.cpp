@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
     std::vector<slr_info_t> slr_ordered;
     DEBUG_PRINTF("board: %s \n", board_name);
     int max_bw_required = 0;
+    int platform_max_memory_bandwidth = platform_memory_bandwidth_per_channel * ARRAY_SIZE(mem_cu_map);
     if (TARGET_BANDWIDTH > platform_max_memory_bandwidth)
     {
         max_bw_required = platform_max_memory_bandwidth;

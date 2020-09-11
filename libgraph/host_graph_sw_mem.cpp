@@ -3,11 +3,6 @@
 #include "he_mem_config.h"
 
 
-const int sizeAttrLut[] = {ATTR_PL_DDR3, ATTR_PL_DDR2, ATTR_PL_DDR1, ATTR_PL_DDR0};
-
-const int cuAttrLut[] = {ATTR_PL_DDR3, ATTR_PL_DDR2, ATTR_PL_DDR1, ATTR_PL_DDR0};
-
-
 #define PARTITION_DDR       (he_get_attr_by_cu(cuIndex))
 #define CU_DDR              (he_get_attr_by_cu(cuIndex))
 

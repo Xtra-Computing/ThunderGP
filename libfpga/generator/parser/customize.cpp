@@ -3,48 +3,13 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 #include "parser.h"
 #include "parser_debug.h"
 
-#define  STREAM_ATTR_STR ("\n\
-#pragma HLS INTERFACE m_axi port=%s offset=slave bundle=gmem%d \n\
-#pragma HLS INTERFACE s_axilite port=%s bundle=control\n\
-        hls::stream<burst_raw>      %sStream;\n\
-#pragma HLS stream variable=%sStream depth=16\n\
-        burstReadLite(addrOffset, vertexNum, %s, %sStream);\n\
-        ")
-#define STREAM_DUPLEX_OUTPUT_ATTR_STR ("\n\
-#pragma HLS INTERFACE m_axi port=%s offset=slave bundle=gmem%d \n\
-#pragma HLS INTERFACE s_axilite port=%s bundle=control \n\
-        hls::stream<burst_raw>      %sStream;\n\
-#pragma HLS stream variable=%sStream depth=16\n\
-")
+#include "customize_str.h"
 
-
-#define SCALAR_ATTR_STR ("\n\
-#pragma HLS INTERFACE s_axilite port=%s      bundle=control \n\
-")
-
-#define WRITE_STR ("\n        \
-writeBackLite(vertexNum, %s + (addrOffset >> 4), %sStream);\n\
-")
-#define READ_STR ("\n\
-burst_raw %s_u512;\n\
-read_from_stream(%sStream, %s_u512);\n\
-")
-
-#define COV_STR ("type_cov %s_tmp; \n\
-%s_tmp.ui=%s_u512.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH );\n\
-float %s=%s_tmp.f;")
-
-
-#define COV_STR_WRITE ("type_cov new%s_tmp;\n\
-new%s_tmp.f =new%s;\n\
-new%s_u512.range((i + 1) * INT_WIDTH - 1, i * INT_WIDTH ) = new%s_tmp.ui;")
-
-#define MAKFILE_STR ("\n\
-BINARY_LINK_OBJS    += --sp  vertexApply_1.%s:DDR[%d]")
 
 #define ARG_ITEM(N)   {                 \
         .id      = N,                   \
@@ -107,11 +72,16 @@ typedef struct
     MARKER_DEFINE(write_to_stream)
     MARKER_DEFINE(cal)
     MARKER_DEFINE(makefile)
+    MARKER_DEFINE(dump)
+    MARKER_DEFINE(dump_scalar)
+    MARKER_DEFINE(cl)
 
 } arg_mark_t;
 
 typedef struct
 {
+    std::string type;
+
     int code_start_ln;
     arg_instance_t start;
     int code_start_flag;
@@ -136,31 +106,16 @@ MARKER_FUNCTION(USER_APPLY_WRITE_TO_STREAM, write_to_stream)
 MARKER_FUNCTION(USER_APPLY_CAL, cal)
 MARKER_FUNCTION(MAKEFILE_USER_APPLY, makefile)
 
-static int gmem_counter = 6;
+MARKER_FUNCTION(DUMP_MEM_ATTR, dump);
+MARKER_FUNCTION(DUMP_MEM_SCALAR, dump_scalar)
 
+MARKER_FUNCTION(USER_APPLY_CL_KERNEL, cl);
+
+
+static int gmem_counter = 6;
+static int mem_id_offset = 0;
 static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
 {
-    MARKER_OUTPUT(makefile,
-    {
-        if ((args.var_type == VAR_DUPLEX_ARRAY)
-        || ((args.var_type == VAR_INPUT_ARRAY)))
-        {
-            std::string name = args.input.name;
-            std::string object(MAKFILE_STR);
-            replace_all(object, "%s", name);
-            replace_all(object, "%d", to_string(args.mem_chn));
-
-            ( *of) << object << std::endl;
-        }
-        if (args.var_type == VAR_DUPLEX_ARRAY)
-        {
-            std::string name = args.input.name;
-            std::string object(MAKFILE_STR);
-            replace_all(object, "%s", "new" + name);
-            replace_all(object, "%d", to_string(args.mem_chn));
-            ( *of) << object << std::endl;
-        }
-    })
     if (marker.cal_flag == FLAG_SET)
     {
         if ((ln + 1) == marker.cal_ln )
@@ -266,7 +221,7 @@ static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
         }
         if (args.var_type == VAR_SCALAR)
         {
-            ( *of) << "float     " << name << "," << std::endl;
+            ( *of) << region.type << "     " << name << "," << std::endl;
         }
     })
     MARKER_OUTPUT(stream_attr,
@@ -313,15 +268,132 @@ static int output_to_file(std::ofstream * of, int ln, int fileid, int gn)
             ( *of) << object << std::endl;
         }
     })
-
-#if 0
-    if (marker.scalar_attr_flag == FLAG_SET)
+    MARKER_OUTPUT(dump_scalar,
     {
-        if ((ln + 1) == marker.scalar_attr_ln)
+        if (args.var_type == VAR_SCALAR)
         {
+            ( *of) << region.type  << " " << args.input.name << ";" << std::endl;
         }
-    }
-#endif
+    })
+    MARKER_OUTPUT(dump,
+    {
+        if ((args.var_type == VAR_DUPLEX_ARRAY)
+        || ((args.var_type == VAR_INPUT_ARRAY)))
+        {
+            mem_id_offset ++;
+            std::ostringstream ss1;
+            ss1  << " MEM_ID_"
+            << args.input.name
+            << " "
+            << "(MEM_ID_CUSTOM_BASE +"
+            << to_string(mem_id_offset)
+            << ")"
+            << std::endl;
+            std::string def_mem_id = ss1.str();
+            std::transform(def_mem_id.begin(), def_mem_id.end(), def_mem_id.begin(), ::toupper);
+
+            std::ostringstream ss2;
+            ss2  << " MEM_ATTR_"
+            << args.input.name
+            << " "
+            << "("
+            << "ATTR_PL_DDR"
+            << to_string(args.mem_chn)
+            << ")"
+            << std::endl;
+            std::string def_mem_attr = ss2.str();
+            std::transform(def_mem_attr.begin(), def_mem_attr.end(), def_mem_attr.begin(), ::toupper);
+
+            ( *of) << "#define " << def_mem_id << std::endl;
+            ( *of) << "#define " << def_mem_attr << std::endl;
+        }
+        if (args.var_type == VAR_DUPLEX_ARRAY)
+        {
+            mem_id_offset ++;
+            std::ostringstream ss1;
+            ss1  << " MEM_ID_"
+            << "new"
+            << args.input.name
+            << " "
+            << "(MEM_ID_CUSTOM_BASE +"
+            << to_string(mem_id_offset)
+            << ")"
+            << std::endl;
+            std::string def_mem_id = ss1.str();
+            std::transform(def_mem_id.begin(), def_mem_id.end(), def_mem_id.begin(), ::toupper);
+
+            std::ostringstream ss2;
+            ss2  << " MEM_ATTR_"
+            << "new"
+            << args.input.name
+            << " "
+            << "("
+            << "ATTR_PL_DDR"
+            << to_string(args.mem_chn)
+            << ")"
+            << std::endl;
+            std::string def_mem_attr = ss2.str();
+            std::transform(def_mem_attr.begin(), def_mem_attr.end(), def_mem_attr.begin(), ::toupper);
+
+            ( *of) << "#define " << def_mem_id << std::endl;
+            ( *of) << "#define " << def_mem_attr << std::endl;
+        }
+
+
+    })
+    MARKER_OUTPUT(cl,
+    {
+        if ((args.var_type == VAR_DUPLEX_ARRAY)
+        || ((args.var_type == VAR_INPUT_ARRAY)))
+        {
+            std::ostringstream ss;
+            ss  << " MEM_ID_" << args.input.name;
+            std::string mem_id_macro = ss.str();
+            std::transform(mem_id_macro.begin(), mem_id_macro.end(), mem_id_macro.begin(), ::toupper);
+            ( *of) << "clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer("
+            << mem_id_macro
+            << "));" << std::endl;
+            //he_set_dirty(MEM_ID_RESULT_REG);
+        }
+        if (args.var_type == VAR_DUPLEX_ARRAY)
+        {
+            std::ostringstream ss;
+            ss  << " MEM_ID_" << "new" << args.input.name;
+            std::string mem_id_macro = ss.str();
+            std::transform(mem_id_macro.begin(), mem_id_macro.end(), mem_id_macro.begin(), ::toupper);
+            ( *of) << "clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer("
+            << mem_id_macro
+            << "));" << std::endl;
+            ( *of) << "he_set_dirty("
+            << mem_id_macro
+            << ");" << std::endl;
+        }
+        if (args.var_type == VAR_SCALAR)
+        {
+            ( *of) << "clSetKernelArg(applyHandler->kernel, argvi++, 4,    &(global." <<  args.input.name << "));" << std::endl;
+        }
+    })
+    MARKER_OUTPUT(makefile,
+    {
+        if ((args.var_type == VAR_DUPLEX_ARRAY)
+        || ((args.var_type == VAR_INPUT_ARRAY)))
+        {
+            std::string name = args.input.name;
+            std::string object(MAKFILE_STR);
+            replace_all(object, "%s", name);
+            replace_all(object, "%d", to_string(args.mem_chn));
+
+            ( *of) << object << std::endl;
+        }
+        if (args.var_type == VAR_DUPLEX_ARRAY)
+        {
+            std::string name = args.input.name;
+            std::string object(MAKFILE_STR);
+            replace_all(object, "%s", "new" + name);
+            replace_all(object, "%d", to_string(args.mem_chn));
+            ( *of) << object << std::endl;
+        }
+    })
     return 0;
 }
 
@@ -337,6 +409,12 @@ static def_arg_instance_t * get_def_arg(std::string arg)
     return NULL;
 }
 
+int register_base_type(arg_instance_t item)
+{
+    region.type = item.name;
+    DEBUG_PRINTF("    [BASE] %s\n", region.type.c_str());
+    return 0;
+}
 
 int register_USER_APPLY_CODE_START(arg_instance_t item)
 {
@@ -440,19 +518,24 @@ output_method_t customize_output_method =
 static parser_item_t local_parser[] =
 {
     {
-        .id      = USER_APPLY_DEF_SCALAR,
-        .keyword = "USER_APPLY_DEF_SCALAR",
+        .id      = DEF_SCALAR,
+        .keyword = "DEF_SCALAR",
         .func    = register_def_scalar,
     },
     {
-        .id      = USER_APPLY_DEF_ARRAY,
-        .keyword = "USER_APPLY_DEF_ARRAY",
+        .id      = DEF_ARRAY,
+        .keyword = "DEF_ARRAY",
         .func    = register_def_dou_array,
     },
     {
-        .id      = USER_APPLY_DEF_INPUT_ARRAY,
-        .keyword = "USER_APPLY_DEF_INPUT_ARRAY",
+        .id      = DEF_INPUT_ONLY_ARRAY,
+        .keyword = "DEF_INPUT_ONLY_ARRAY",
         .func    = register_def_input_only_array,
+    },
+    {
+        .id      = APPLY_BASE_TYPE,
+        .keyword = "APPLY_BASE_TYPE",
+        .func    = register_base_type,
     },
 
     ARG_ITEM(USER_APPLY_ARG)
@@ -467,6 +550,9 @@ static parser_item_t local_parser[] =
     ARG_ITEM(USER_APPLY_CODE_START)
     ARG_ITEM(USER_APPLY_CODE_END)
     ARG_ITEM(MAKEFILE_USER_APPLY)
+    ARG_ITEM(DUMP_MEM_ATTR)
+    ARG_ITEM(DUMP_MEM_SCALAR)
+    ARG_ITEM(USER_APPLY_CL_KERNEL)
 };
 
 

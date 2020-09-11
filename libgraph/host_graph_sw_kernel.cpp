@@ -40,14 +40,12 @@ applyDescriptor * getApply(void)
 void kernelInit(graphAccelerator * acc)
 {
     cl_int status;
-#if HAVE_GS
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
         getGatherScatter(i)->kernel = clCreateKernel(acc->program, getGatherScatter(i)->name, &status);
         checkStatus("Failed clCreateKernel gs.");
         acc->gsKernel[i] =  getGatherScatter(i);
     }
-#endif
 
 #if HAVE_APPLY
 
@@ -70,7 +68,6 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
 {
     int currentPropId = superStep % 2;
 
-#if HAVE_GS
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {
         gatherScatterDescriptor * gsHandler = getGatherScatter(i);
@@ -98,7 +95,6 @@ void setGsKernel(int partId, int superStep, graphInfo *info)
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &sinkStart);
         clSetKernelArg(gsHandler->kernel, argvi++, sizeof(int),    &sinkEnd);
     }
-#endif
 }
 
 #if  CUSTOMIZE_APPLY == 0
@@ -121,7 +117,7 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
     int offset = p_partition->dstVertexStart;
 
 
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(getCuIDbyInterface(1))->prop[currentPropId].id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(getCuIDbyInterface(0))->prop[currentPropId].id));
 
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {

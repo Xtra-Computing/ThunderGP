@@ -9,6 +9,7 @@ APP :=
 TARGET_BANDWIDTH := 77
 # target memory bandwidth in GB/s
 # max: 77GB/s
+# this value can be overridden by $(app)/build.mk
 
 DEVICES := xilinx_vcu1525_xdma_201830_1
 # device list:

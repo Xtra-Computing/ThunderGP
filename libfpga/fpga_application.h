@@ -21,16 +21,16 @@
 #define PROP_COMPUTE_STAGE0(srcProp)                preprocessProperty(srcProp)
 
 /* source vertex property & edge property */
-#define PROP_COMPUTE_STAGE1(srcProp, edgeProp)      updateCalculation(srcProp,edgeProp)
+#define PROP_COMPUTE_STAGE1(srcProp, edgeProp)      scatterFunc(srcProp,edgeProp)
 
 /* destination property update in RAW solver */
-#define PROP_COMPUTE_STAGE2(ori, update)            updateMergeInRAWSolver(ori ,update)
+#define PROP_COMPUTE_STAGE2(ori, update)            gatherFunc(ori ,update)
 
 /* destination property update dst buffer update */
-#define PROP_COMPUTE_STAGE3(ori,update)             updateDestination(ori, update)
+#define PROP_COMPUTE_STAGE3(ori,update)             gatherFunc(ori, update)
 
 /* destination property merge */
-#define PROP_COMPUTE_STAGE4(ori,update)             updateDestination(ori, update)
+#define PROP_COMPUTE_STAGE4(ori,update)             gatherFunc(ori, update)
 
 
 #endif /* __FPGA_APPLICATION_H__ */

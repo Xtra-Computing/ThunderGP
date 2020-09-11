@@ -10,59 +10,53 @@
 /* source vertex property process */
 inline prop_t preprocessProperty(prop_t srcProp)
 {
-    return ((srcProp) + 1);
+  return ((srcProp) + 1);
 }
 
 /* source vertex property & edge property */
-inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
+inline prop_t scatterFunc(prop_t srcProp, prop_t edgeProp)
 {
-    return (srcProp);
-}
-
-/* destination property update in RAW solver */
-inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
-{
-    return ((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) ? (update) : (ori));
+  return (srcProp);
 }
 
 /* destination property update dst buffer update */
-inline prop_t updateDestination(prop_t ori, prop_t update)
+inline prop_t gatherFunc(prop_t ori, prop_t update)
 {
-    return (
-               (
-                   (
-                       (((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK)))
-                       && (update != 0)
-                   )
-                   || (ori == 0x0)
-               ) ? (update) : (ori)
-           );
+  return (
+           (
+             (
+               (((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK)))
+               && (update != 0)
+             )
+             || (ori == 0x0)
+           ) ? (update) : (ori)
+         );
 }
 
-inline prop_t applyCalculation( prop_t tProp,
-                                prop_t source,
-                                prop_t outDeg,
-                                unsigned int (&extra)[APPLY_REF_ARRAY_SIZE],
-                                unsigned int arg
-                              )
+inline prop_t applyFunc( prop_t tProp,
+                         prop_t source,
+                         prop_t outDeg,
+                         unsigned int (&extra)[APPLY_REF_ARRAY_SIZE],
+                         unsigned int arg
+                       )
 {
-    prop_t update = 0;
+  prop_t update = 0;
 
-    prop_t uProp  = source;
-    prop_t wProp;
-    if (((tProp & 0x80000000) == 0x80000000) && (uProp == MAX_PROP))
-    {
-        extra[0] = 1;
-        wProp = tProp; // current active vertex, not travsered
-    }
-    else
-    {
-        extra[0] = 0;
-        wProp = uProp & 0x7fffffff; // not travsered
-    }
-    update = wProp;
+  prop_t uProp  = source;
+  prop_t wProp;
+  if (((tProp & 0x80000000) == 0x80000000) && (uProp == MAX_PROP))
+  {
+    extra[0] = 1;
+    wProp = tProp; // current active vertex, not travsered
+  }
+  else
+  {
+    extra[0] = 0;
+    wProp = uProp & 0x7fffffff; // not travsered
+  }
+  update = wProp;
 
-    return update;
+  return update;
 }
 
 #endif /* __L2_H__ */

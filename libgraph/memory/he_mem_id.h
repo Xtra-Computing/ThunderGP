@@ -45,5 +45,11 @@
 #define MEM_ID_GS_BASE              (8192)
 #define MEM_ID_GS_OFFSET            (128)
 
+#define MEM_ID_CUSTOM_BASE          (16384)
+
+
+
+#define MEM_ID_USER_DEFINE_BASE     (16384 * 2)
+
 
 #endif /* __HE_MEM_ID_H__ */

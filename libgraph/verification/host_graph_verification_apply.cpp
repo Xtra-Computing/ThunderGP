@@ -72,7 +72,7 @@ void partitionApplyCModel(
         }
 
         prop_t tProp = mergeData;
-        updateVerify[i] = applyCalculation(tProp, propValue[i + offset], outDeg[i + offset], infoArrayVerify, *(unsigned int *)&applyArgReg);
+        updateVerify[i] = applyFunc(tProp, propValue[i + offset], outDeg[i + offset], infoArrayVerify, *(unsigned int *)&applyArgReg);
 #if 0
         int dump_flag = 0;
         for (int k = 0 ; k < APPLY_REF_ARRAY_SIZE; k++)

@@ -113,7 +113,7 @@ void applyFunction(
 #pragma HLS ARRAY_PARTITION variable=tmpInfoArray dim=0 complete
 //#pragma HLS DEPENDENCE variable=tmpInfoArray inter false
 
-            prop_t  wProp    = applyCalculation( tProp, uProp, out_deg, tmpInfoArray[i],  argReg);
+            prop_t  wProp    = applyFunc( tProp, uProp, out_deg, tmpInfoArray[i],  argReg);
             for (int j = 0; j < APPLY_REF_ARRAY_SIZE; j++)
             {
                 infoArray[i][j] += tmpInfoArray[i][j];

@@ -579,7 +579,6 @@ void streamDelayScheme2(hls::stream<burst_token>  &in, hls::stream<burst_token> 
 
 }
 
-
 void updateVertexCache(uint16                          * input,
                        hls::stream<cache_command>      &cmdStream,
                        hls::stream<cache_line>         &cacheStream)

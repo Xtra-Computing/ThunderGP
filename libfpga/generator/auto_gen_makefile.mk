@@ -23,8 +23,8 @@ ifndef app
 	$(error app is undefined)
 else
 ifeq ($(strip $(CUSTOMIZE_APPLY)), $(strip $(VAR_TRUE)))
-	./code_gen libfpga/common/customize_apply_kernel.mk application/$(app)/customized_apply.cpp tmp_fpga_top/apply_kernel
+	./code_gen libfpga/customize_template/customize_apply_kernel.mk   application/$(app)/customized_apply.cpp tmp_fpga_top/apply_kernel
 else
-	./code_gen libfpga/common/apply_kernel.mk     tmp_fpga_top/apply_kernel
+	./code_gen libfpga/common_template/apply_kernel.mk                tmp_fpga_top/apply_kernel
 endif
 endif

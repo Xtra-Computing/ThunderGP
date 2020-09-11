@@ -74,11 +74,11 @@ Example:
 | Hooks    | Description  |
 |-----------|--------------|
 | preprocessProperty | per-process the source vertex property. |
-| updateCalculation | calculate the update value by using the edge property and source vertex property.  |
+| scatterFunc | calculate the update value by using the edge property and source vertex property.  |
 | updateMergeInRAWSolver | destination property update in RAW solver. | 
-| updateDestination | destination property update. | 
+| gatherFunc | destination property update. | 
 | applyMerge | destination property merge from all of the scatter-gather CUs. | 
-| applyCalculation | calculate the new property value |
+| applyFunc | calculate the new property value |
 
 
 
@@ -93,7 +93,7 @@ inline prop_t preprocessProperty(prop_t srcProp)
 }
 
 /* source vertex property & edge property */
-inline prop_t updateCalculation(prop_t srcProp, prop_t edgeProp)
+inline prop_t scatterFunc(prop_t srcProp, prop_t edgeProp)
 {
     return (srcProp);
 }
@@ -105,7 +105,7 @@ inline prop_t updateMergeInRAWSolver(prop_t ori, prop_t update)
 }
 
 /* destination property update dst buffer update */
-inline prop_t updateDestination(prop_t ori, prop_t update)
+inline prop_t gatherFunc(prop_t ori, prop_t update)
 {
     return (((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) || (ori == 0x0)) ? (update) : (ori));
 }
@@ -116,7 +116,7 @@ inline prop_t applyMerge(prop_t ori, prop_t update)
     return ((((((ori) & (~VERTEX_ACTIVE_BIT_MASK)) > ((update) & (~VERTEX_ACTIVE_BIT_MASK))) && (update != 0)) || (ori == 0x0)) ? (update) : (ori));
 }
 
-inline prop_t applyCalculation( prop_t tProp,
+inline prop_t applyFunc( prop_t tProp,
                                 prop_t source,
                                 prop_t outDeg,
                                 unsigned int &extra,

@@ -25,14 +25,18 @@
 #define USER_APPLY_WRITE_TO_STREAM    (14)
 #define USER_APPLY_CAL                (15)
 
-#define USER_APPLY_DEF_SCALAR         (7)
-#define USER_APPLY_DEF_INPUT_ARRAY    (8)
-#define USER_APPLY_DEF_ARRAY          (9)
+#define DEF_SCALAR                    (7)
+#define DEF_INPUT_ONLY_ARRAY          (8)
+#define DEF_ARRAY                     (9)
 #define USER_APPLY_CODE_START         (16)
 #define USER_APPLY_CODE_END           (17)
 
 #define MAKEFILE_MEM_INSTANCE         (18)
 #define MAKEFILE_USER_APPLY           (19)
+#define DUMP_MEM_ATTR                 (20)
+#define DUMP_MEM_SCALAR               (21)
+#define USER_APPLY_CL_KERNEL          (22)
+#define APPLY_BASE_TYPE               (23)
 
 
 #define OUTPUT_ATTR_SINGLE      (1)
@@ -71,7 +75,7 @@ typedef struct
 } reg_parser_item_t;
 
 typedef int (*get_of_attr)(void);
-typedef int (*output_line)(std::ofstream * of, int ln,int fileid, int gn);
+typedef int (*output_line)(std::ofstream * of, int ln, int fileid, int gn);
 
 typedef struct
 {
