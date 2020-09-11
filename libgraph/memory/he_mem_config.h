@@ -12,6 +12,14 @@ he_mem_t local_mem[] =
         sizeof(prop_t),
         SIZE_IN_VERTEX,
     },
+    {
+        MEM_ID_TEST,
+        "test",
+        ATTR_PL_DDR1,
+        sizeof(prop_t),
+        SIZE_IN_VERTEX,
+    },
+
     // tmp property
     {
         MEM_ID_TMP_VERTEX_PROP,

@@ -5,16 +5,9 @@
 
 #include "l2.h"
 
-#if HAVE_VERTEX_ACTIVE_BIT
 
 #ifndef IS_ACTIVE_VERTEX
-#error "Please define the MACRO: IS_ACTIVE_VERTEX in l2.h, as your configuration: HAVE_VERTEX_ACTIVE_BIT is true!"
-#endif
-
-#else
-
 #define IS_ACTIVE_VERTEX(a)			(1)
-
 #endif
 
 /* source vertex property process */

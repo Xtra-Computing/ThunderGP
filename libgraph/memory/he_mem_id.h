@@ -37,6 +37,8 @@
 #define MEM_ID_HOST_PROP_PONG		(24)
 #define MEM_ID_PARTITON_EDGE_PROP   (25)
 
+#define MEM_ID_TEST   	            (26)
+
 #define MEM_ID_PARTITION_BASE       (100)
 
 #define MEM_ID_PARTITION_OFFSET     (128)

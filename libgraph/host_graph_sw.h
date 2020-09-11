@@ -271,7 +271,6 @@ int output_init(int he_id, int mem_id, int ref_he_id)
 template <typename T>
 int write_back_csv(std::string file_name, int he_id)
 {
-    T data;
     std::vector<T> load_buffer;
     std::ofstream fhandle(file_name.c_str());
     if (!fhandle.is_open()) {
@@ -283,7 +282,7 @@ int write_back_csv(std::string file_name, int he_id)
     const he_mem_t *p_mem = get_he_mem(he_id);
     const  T * p_data = (T *)(p_mem->data);
 
-    for (int i = 0; i < p_mem->size / sizeof(T); i++)
+    for (unsigned int i = 0; i < p_mem->size / sizeof(T); i++)
     {
         fhandle << p_data[i] << std::endl;
     }

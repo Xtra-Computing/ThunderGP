@@ -16,7 +16,10 @@ inline prop_t preprocessProperty(prop_t srcProp)
 /* source vertex property & edge property */
 inline prop_t scatterFunc(prop_t srcProp, prop_t edgeProp)
 {
-    return ((srcProp) + (edgeProp));
+    if((srcProp & VERTEX_ACTIVE_BIT_MASK) == VERTEX_ACTIVE_BIT_MASK)
+      return ((srcProp) + (edgeProp));
+    else
+      return (srcProp);
 }
 
 /* destination property update dst buffer update */
@@ -44,7 +47,7 @@ inline prop_t applyFunc( prop_t tProp,
 
     prop_t uProp  = source;
     prop_t wProp;
-    if (((tProp & 0x80000000) == 0x80000000) && (uProp == MAX_PROP))
+    if (((tProp & VERTEX_ACTIVE_BIT_MASK) == VERTEX_ACTIVE_BIT_MASK) && (uProp == MAX_PROP))
     {
         extra[0] = 1;
         wProp = tProp; // current active vertex, not travsered

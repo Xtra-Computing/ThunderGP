@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "host_graph_sw.h"
+#include "customize_mem_1.h"
 
 using namespace std;
 
@@ -35,25 +36,23 @@ int main(int argc, char **argv) {
     return 0;
 #endif
 
-
-
     DEBUG_PRINTF("start main\n");
 
     acceleratorInit("graph_fpga", xcl_file);
-
     acceleratorDataPrepare(gName, mode, &graphDataInfo);
-
     acceleratorDataPreprocess(&graphDataInfo);
 
     {
         double startStamp, endStamp;
         startStamp = getCurrentTimestamp();
-
         acceleratorSuperStep(0, &graphDataInfo);
-
         endStamp = getCurrentTimestamp();
         DEBUG_PRINTF("exe time : %lf \n", endStamp - startStamp);
     }
+
+    write_back_csv<float>("out_s1.csv", MEM_ID_NEWTHETA_S);
+    write_back_csv<float>("out_a1.csv", MEM_ID_NEWTHETA_A);
+    write_back_csv<float>("out_r1.csv", MEM_ID_NEWTHETA_R);
 
     acceleratorDeinit();
 

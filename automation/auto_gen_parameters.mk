@@ -1,6 +1,7 @@
 include ThunderGP.mk
 
-PARA_GEN_CFLAGS := -I libfpga/generator/devices
+CODE_GEN_PATH  =./automation
+PARA_GEN_CFLAGS := -I $(CODE_GEN_PATH)/devices
 PARA_GEN_CFLAGS += -DDEVICE_HEADER="$(DEVICES).h"
 PARA_GEN_CFLAGS += -I libgraph/
 
