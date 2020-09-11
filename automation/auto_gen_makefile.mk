@@ -1,6 +1,6 @@
 include ThunderGP.mk
 
-CODE_GEN_PATH  =./libfpga/generator
+CODE_GEN_PATH  =./automation
 CODE_GEN_FILE  =  $(CODE_GEN_PATH)/makefile_gen.cpp
 CODE_GEN_FILE += -I libgraph/
 # AUTOGEN_CFLAG in here:

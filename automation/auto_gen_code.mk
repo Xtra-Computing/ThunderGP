@@ -1,6 +1,6 @@
 include ThunderGP.mk
 
-CODE_GEN_PATH   =./libfpga/generator
+CODE_GEN_PATH   =./automation
 CODE_GEN_PARSER_PATH  = $(CODE_GEN_PATH)/parser
 CODE_GEN_FILE =  $(CODE_GEN_PATH)/parser.cpp
 CODE_GEN_FILE += $(CODE_GEN_PATH)/parser_debug.cpp

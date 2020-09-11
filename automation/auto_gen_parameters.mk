@@ -20,7 +20,7 @@ para_gen:
 	rm -rf para_gen
 	rm -rf tmp_para
 	mkdir -p tmp_para
-	g++  -g -static-libstdc++  $(PARA_GEN_CFLAGS)   ./libfpga/generator/para_gen.cpp -o para_gen
+	g++  -g -static-libstdc++  $(PARA_GEN_CFLAGS)   ./automation/para_gen.cpp -o para_gen
 
 tmp_para/para.mk: para_gen
 	./para_gen
