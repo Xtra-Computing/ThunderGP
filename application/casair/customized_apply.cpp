@@ -31,7 +31,7 @@ float gamma;
 //start
 
 float n = 1 / N;
-float theta_i = uProp * n;
+float theta_i = uProp * n / FIXED_SCALE;
 float weightSum = tProp / FIXED_SCALE;
 float updated_i =  beta * pi * theta_s * (theta_i +  weightSum * n);
 float theta_i_update = (1 - gamma) * theta_i + updated_i;

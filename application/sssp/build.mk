@@ -1,7 +1,5 @@
-HAVE_FULL_SLR=true
 
 #scatter-gather kernel
-HAVE_VERTEX_ACTIVE_BIT=true
 HAVE_EDGE_PROP=true
 HAVE_UNSIGNED_PROP=true
 

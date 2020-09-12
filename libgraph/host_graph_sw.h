@@ -186,7 +186,7 @@ template <typename T>
 T * load_from_csv(std::string file_name, int he_id, int mem_id)
 {
     T data;
-    DEBUG_PRINTF("id: %d\n", he_id);
+    //DEBUG_PRINTF("id: %d\n", he_id);
     std::vector<T> load_buffer;
     std::ifstream fhandle(file_name.c_str());
     if (!fhandle.is_open()) {
@@ -229,7 +229,7 @@ T * load_from_csv(std::string file_name, int he_id, int mem_id)
         (((T*)p_mem->data)[i]) = load_buffer[i];
     }
     int id = he_id;
-    DEBUG_PRINTF("size %d \n", p_mem->size);
+    //DEBUG_PRINTF("size %d \n", p_mem->size);
     transfer_data_to_pl(getAccelerator()->context, getAccelerator()->device, &id, 1);
     return (T*)p_mem->data;
 }

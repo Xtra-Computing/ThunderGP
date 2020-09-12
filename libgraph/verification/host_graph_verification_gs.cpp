@@ -83,8 +83,8 @@ void partitionGatherScatterCModel(
             {
                 DEBUG_PRINTF("gs error %d 0x%08x hw: 0x%08x  diff 0x%08x !!!!\n", i,
                              tmpVertexPropVerify[i],
-                             tmpVertexProp[i],
-                             tmpVertexPropVerify[i] - tmpVertexProp[i]);
+                             tmpVertexProp[i - subPartitions->dstVertexStart],
+                             tmpVertexPropVerify[i] - tmpVertexProp[i - subPartitions->dstVertexStart]);
             }
 
         }
@@ -92,7 +92,7 @@ void partitionGatherScatterCModel(
         {
             if (DATA_DUMP)
             {
-                DEBUG_PRINTF("[DUMP] gs %d 0x%08x hw: 0x%08x\n", i,  tmpVertexPropVerify[i],tmpVertexProp[i]);
+                DEBUG_PRINTF("[DUMP] gs %d 0x%08x hw: 0x%08x\n", i,  tmpVertexPropVerify[i], tmpVertexProp[i - subPartitions->dstVertexStart]);
             }
         }
     }
