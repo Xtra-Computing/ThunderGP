@@ -1,4 +1,4 @@
-#include "host_graph_sw.h"
+#include "host_graph_api.h"
 
 
 unsigned int dataPrepareGetArg(graphInfo *info)

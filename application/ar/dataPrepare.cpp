@@ -1,4 +1,4 @@
-#include "host_graph_sw.h"
+#include "host_graph_api.h"
 #include "fpga_application.h"
 
 

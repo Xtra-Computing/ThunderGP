@@ -1,10 +1,9 @@
 
-#include "host_graph_sw.h"
+#include "host_graph_verification_inner.h"
 
 #include "global_config.h"
 #include "fpga_application.h"
 
-#include "host_graph_verification.h"
 
 #if  CUSTOMIZE_APPLY == 0
 

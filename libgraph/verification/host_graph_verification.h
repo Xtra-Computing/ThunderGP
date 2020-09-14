@@ -1,34 +1,12 @@
 #ifndef __HOST_GRAPH_SW_VERIFICATION_H__
 #define __HOST_GRAPH_SW_VERIFICATION_H__
 
-#include "host_graph_sw.h"
 
+int acceleratorProfile (int superStep, int runCounter, graphInfo *info, double exeTime);
 
-//#define SW_DEBUG
+int acceleratorCModelDataPreprocess(graphInfo *info);
 
-#define DEBUG_DUMP_VERTEX_SIZE          (1024)
-
-#define DATA_DUMP                       0//(i < 50)
-
-//#define PROBE_VERTEX                    (14562)
-
-
-void partitionGatherScatterCModel(
-    cl_context              &context,
-    cl_device_id            &device,
-    int                     superStep,
-    int                     cuIndex,
-    subPartitionDescriptor  *subPartitions
-);
-
-void partitionApplyCModel(
-    cl_context              &context,
-    cl_device_id            &device,
-    int                     superStep,
-    int                     partId,
-    unsigned int            applyArg
-);
-
+int acceleratorCModelSuperStep(int superStep, graphInfo *info);
 
 
 #endif /* __HOST_GRAPH_SW_VERIFICATION_H__ */

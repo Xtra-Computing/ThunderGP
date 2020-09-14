@@ -179,7 +179,7 @@ inline prop_t applyFunc( prop_t tProp,
 | Function  | Description  |
 |-----------|--------------|
 |acceleratorInit  | initialize the the bitstream and hardware|
-|acceleratorDataPrepare  | load the graph data |
+|acceleratorDataLoad  | load the graph data |
 |acceleratorDataPreprocess  | graph partitioning |
 |acceleratorSuperStep  | process all of the partitions once |
 |acceleratorProfile  | profile the execution time and verify the result |

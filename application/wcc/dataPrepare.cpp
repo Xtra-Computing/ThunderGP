@@ -1,5 +1,9 @@
-#include "host_graph_sw.h"
+#include "host_graph_api.h"
 #include "fpga_application.h"
+
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
 
 unsigned int dataPrepareGetArg(graphInfo *info)
 {
@@ -16,6 +20,7 @@ int dataPrepareProperty(graphInfo *info)
     {
         vertexPushinProp[i]    = 0;
     }
-    vertexPushinProp[getStartIndex()] = 1;
+    int select_index  = ((double)std::rand()) / ((RAND_MAX + 1u) / info->vertexNum);
+    vertexPushinProp[select_index] = 1;
     return 0;
 }

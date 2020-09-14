@@ -1,6 +1,7 @@
 
 #include "host_graph_sw.h"
 
+#include "host_graph_mem.h"
 
 #include "host_graph_scheduler.h"
 
@@ -8,13 +9,8 @@
 #define EDEG_MEMORY_SIZE        ((edgeNum + (ALIGN_SIZE * 4) * 128) * 1)
 #define VERTEX_MEMORY_SIZE      (((vertexNum - 1)/MAX_VERTICES_IN_ONE_PARTITION + 1) * MAX_VERTICES_IN_ONE_PARTITION)
 
-extern void base_mem_init(cl_context &context);
-extern void process_mem_init(cl_context &context);
-extern void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex);
 
-extern int schedulerRegister(void);
-
-int acceleratorDataPrepare(const std::string &gName, const std::string &mode, graphInfo *info)
+int acceleratorDataLoad(const std::string &gName, const std::string &mode, graphInfo *info)
 {
     graphAccelerator * acc = getAccelerator();
 
@@ -114,6 +110,37 @@ static void partitionTransfer(graphInfo *info)
 
     double end =  getCurrentTimestamp();
     DEBUG_PRINTF("data transfer %lf \n", (end - begin) * 1000);
+}
+
+void reTransferProp(graphInfo *info)
+{
+    dataPrepareProperty(info);
+    graphAccelerator * acc = getAccelerator();
+
+    int *rpa = (int*)get_host_mem_pointer(MEM_ID_RPA);
+    prop_t *vertexPushinPropMapped = (prop_t*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP_MAPPED);
+    prop_t *vertexPushinProp       = (prop_t*)get_host_mem_pointer(MEM_ID_PUSHIN_PROP);
+    unsigned int *vertexMap        = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_MAP);
+    unsigned int *vertexRemap      = (unsigned int *)get_host_mem_pointer(MEM_ID_VERTEX_INDEX_REMAP);
+    unsigned int mapedSourceIndex  = 0;
+    int vertexNum = info->vertexNum;
+
+    for (int u = 0; u < vertexNum; u++) {
+        int num = rpa[u + 1] - rpa[u];
+        vertexMap[u] = mapedSourceIndex;
+        if (num != 0)
+        {
+#if CAHCE_FETCH_DEBUG
+            vertexPushinPropMapped[mapedSourceIndex] =  mapedSourceIndex;
+#else
+            vertexPushinPropMapped[mapedSourceIndex] =  vertexPushinProp[u];
+#endif
+            vertexRemap[mapedSourceIndex] = u;
+            mapedSourceIndex ++;
+        }
+    }
+    process_mem_init(acc->context);
+    partitionTransfer(info);
 }
 
 

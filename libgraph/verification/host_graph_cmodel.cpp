@@ -1,6 +1,6 @@
-#include "host_graph_sw.h"
+#include "host_graph_verification_inner.h"
 #include "host_graph_scheduler.h"
-#include "host_graph_verification.h"
+
 
 #include "global_config.h"
 #include "fpga_application.h"

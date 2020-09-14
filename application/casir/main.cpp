@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <fstream>
 
-#include "host_graph_sw.h"
 #include "customize_mem_1.h"
-
+#include "host_graph_api.h"
 using namespace std;
 
 graphInfo graphDataInfo;
@@ -28,18 +27,11 @@ int main(int argc, char **argv) {
         gName = "wiki-talk";
     }
     std::string mode = "normal";
-#if 0
-    Graph* gptr = createGraph(gName, mode);
-    CSR* csr    = new CSR(*gptr);
-    csr->save2File(gName);
-    free(gptr);
-    return 0;
-#endif
 
     DEBUG_PRINTF("start main\n");
 
     acceleratorInit("graph_fpga", xcl_file);
-    acceleratorDataPrepare(gName, mode, &graphDataInfo);
+    acceleratorDataLoad(gName, mode, &graphDataInfo);
     acceleratorDataPreprocess(&graphDataInfo);
 
     {

@@ -24,7 +24,7 @@ ThunderGP can run on both Xilinx and Intel platforms:
 
 * [Check the implementation on Intel platform out.](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/)
 
-* On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***5300 MTEPS (million traversed edges per second)***, or a ***2 times speedup*** over the state-of-the-art.
+* On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art.
 
 
 ## Prerequisites
@@ -48,6 +48,9 @@ The below table is for quick reference of this argument.
 | ```app=spmv``` | Sparse Matrix-vector Multiplication (SpMV) |
 | ```app=bfs``` | Breadth First Search (BFS)|
 | ```app=sssp``` | Single Source Shortest Path (SSSP)|
+| ```app=cc``` | Closeness Centrality (CC)|
+| ```app=ar``` | ArticleRank  (AR)|
+| ```app=wcc``` | Weakly Connected Component  (WCC)|
 
 Here is an example of implementing PR algorithm. 
 ```sh
@@ -62,28 +65,44 @@ $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.
 
 Throughput (MTEPS) of different graph processing algorithms over datasets on VCU1525 platform.
 
-| Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
-|-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
-| PR     | 4,274  | 3,797  | 2,502  | 3,138  | 3,790  | 2,860  | 2,438  |
-| SpMV   | 4,759  | 4,396  | 2,018  | 3,043  | 3,871  | 3,133  | 2,561  |
-| BFS    | 5,395  | 4,619  | 2,431  | 3,775  | 4,072  | 3,490  | 3,004  |
-| SSSP   | 3,895  | 3,446  | 1,817  | 2,954  | 3,090  | 2,700  | 2,273  |
+|App.|PR|SPMV|BFS|SSSP|CC|AR|WCC |
+|----|--|----|---|----|--|--|----|
+|R21| 5,015|4,190|5,417|3,901|4,623|4,848|4,584 |
+|R24| 4,599|3,781|3,437|3,430|4,339|4,486|4,328 |
+|G24| 5,039|4,037|5,216|3,725|4,752|4,927|4,704 |
+|G25| 4,464|3,615|4,660|3,343|4,344|4,389|4,356 |
+|WT|  2,884|2,874|2,717|2,427|2,776|2,833|2,776 |
+|MG|  4,454|3,883|4,939|3,699|4,077|4,285|4,088 |
+|PK|  4,001|3,729|4,251|3,169|3,833|3,909|3,716 |
+|WP|  3,030|2,994|3,112|2,491|2,993|2,931|2,894 |
+|LJ|  3,186|3,003|3,408|2,623|3,113|3,081|3,099 |
+|TW|  2,938|2,801|2,120|2,425|2,962|2,853|2,894 |
 
 
-Throughput (MTEPS) of different graph processing algorithms over datasets on U200 platform. 
+Throughput (MTEPS) of different graph processing algorithms over datasets on U250 platform. 
 
-| Algo. 	| rmat-21-32 | rmat-24-16  | web-google | wiki-talk| pokec | live-journal| soc-twitter|
-|-------	|-------	|-------	|-------	|-------	|-------	|-------	|-------	|
-| PR     | 4,151 | 3,689 | 3,019 |2,352 |3,670 | 2,734 | 2,319 |
-| SpMV   | 4,548 | 4,159 | 2,826 |1,820 |3,650 | 2,931 | 2,375 |
-| BFS    | 5,226 | 4,437 | 3,614 |2,247 |3,883 | 3,336 | 2,849 |
-| SSSP   | 3,630 | 3,218 | 2,706 |1,620 |2,837 | 2,476 | 2,054 |
+
+|App.|PR|SPMV|BFS|SSSP|CC|AR|WCC |
+|----|--|----|---|----|--|--|----|
+|R21  |4,669|5,056|6,028|4,879|4,783|4,667|4,901 |
+|R24  |4,732|4,946|5,897|4,285|4,939|4,732|4,988 |
+|G24  |5,040|5,305|5,772|4,428|3,705|5,040|5,303 |
+|G25  |4,978|4,072|4,974|3,864|3,661|4,984|5,254 |
+|WT   |2,251|2,938|2,630|2,583|2,369|2,253|2,405 |
+|MG   |3,756|4,195|4,949|4,378|3,914|3,737|3,891 |
+|PK   |3,630|4,372|4,629|3,927|3,865|3,662|3,841 |
+|WP   |3,255|3,652|4,058|3,417|3,341|3,259|3,432 |
+|LJ   |3,342|3,693|4,329|3,614|3,557|3,328|3,708 |
+|TW   |3,538|3,959|3,671|3,585|3,759|3,533|3,806 |
 
 
 
 * [More Results](docs/results.md)
 
 ## APIs (programmability) 
+![auto](docs/images/automation.png)
+
+
 Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
 APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host program. Details are as below:
@@ -91,15 +110,15 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 * L1 is used to construct the basic modules to build the compute kernels and the dataflow. 
 
 * L2 provides hooks for mapping graph processing algorithms. 
-   * [Mapping new graph analytic algorithms](docs/algorithm_mapping.md)  
+    * [Mapping new graph analytic algorithms](docs/algorithm_mapping.md)  
 
 * L3 provides the high-level APIs on host side to deploy or control graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
 
-   * [Memory Management](docs/memory.md) 
+    * [Memory Management](docs/memory.md) 
 
-   * [Scheduling across Multi SLRs](docs/scheduling.md) 
+    * [Scheduling across Multi SLRs](docs/scheduling.md) 
 
-   * [Verification](docs/verification.md)
+    * [Verification](docs/verification.md)
 
 * More details: [ThunderGP APIs ](docs/api_details.md)
 
@@ -152,5 +171,5 @@ As shown in the above diagram, The edges in one partition are streamed into **Sc
 ## Acknowledgement
 * [Xilinx Adaptive Compute Clusters (XACC) program](https://www.xilinx.com/support/university/XUP-XACC.html)
 * Singapore MoE Tier 2 grant (MOE2017-T2-1-122).
-
+ 
 

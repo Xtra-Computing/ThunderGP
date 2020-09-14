@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <fstream>
 
-#include "host_graph_sw.h"
+#include "host_graph_api.h"
+#include "host_graph_verification.h"
 
 using namespace std;
 
@@ -27,25 +28,17 @@ int main(int argc, char **argv) {
         gName = "wiki-talk";
     }
     std::string mode = "normal";
-#if 0
-    Graph* gptr = createGraph(gName, mode);
-    CSR* csr    = new CSR(*gptr);
-    csr->save2File(gName);
-    free(gptr);
-    return 0;
-#endif
-
 
 
     DEBUG_PRINTF("start main\n");
 
     acceleratorInit("graph_fpga", xcl_file);
 
-    acceleratorDataPrepare(gName, mode, &graphDataInfo);
+    acceleratorDataLoad(gName, mode, &graphDataInfo);
 
     acceleratorDataPreprocess(&graphDataInfo);
 
-    for (int runCounter = 0 ; runCounter < 5 ; runCounter ++)
+    for (int runCounter = 0 ; runCounter < 10 ; runCounter ++)
     {
         double startStamp, endStamp;
         startStamp = getCurrentTimestamp();
@@ -61,3 +54,4 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+

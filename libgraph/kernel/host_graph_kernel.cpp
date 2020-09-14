@@ -117,7 +117,8 @@ void setApplyKernel(int partId, int superStep, graphInfo *info)
     int offset = p_partition->dstVertexStart;
 
 
-    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem), get_cl_mem_pointer(getGatherScatter(getCuIDbyInterface(0))->prop[currentPropId].id));
+    clSetKernelArg(applyHandler->kernel, argvi++, sizeof(cl_mem),
+                   get_cl_mem_pointer(getGatherScatter(getCuIDbyInterface(DEFAULT_KERNEL_ID))->prop[currentPropId].id));
 
     for (int i = 0; i < SUB_PARTITION_NUM; i++)
     {

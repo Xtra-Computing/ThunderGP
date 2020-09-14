@@ -20,7 +20,7 @@ include $(ABS_COMMON_REPO)/utils/opencl.mk
 #--xp prop:solution.kernel_compiler_margin=<Frequency Percentage>
 #--xp param:compiler.enableAutoFrequencyScaling=0
 
-HOST_SRCS = ./libgraph/graph.cpp ./libgraph/data_helper.cpp
+HOST_SRCS = ./libgraph/misc/graph.cpp ./libgraph/misc/data_helper.cpp
 
 ifeq ($(strip $(DEFAULT_ENTRY)), $(strip $(VAR_TRUE)))
 	HOST_SRCS +=  ./libgraph/default_entry.cpp
@@ -30,10 +30,10 @@ endif
 
 HOST_SRCS += ./libgraph/memory/he_mem.cpp
 HOST_SRCS += ./libgraph/memory/he_mapping.cpp
-HOST_SRCS += ./libgraph/host_graph_sw_mem.cpp
-HOST_SRCS += ./libgraph/host_graph_sw_partition.cpp
-HOST_SRCS += ./libgraph/host_graph_sw_kernel.cpp
-HOST_SRCS += ./libgraph/host_graph_sw_dataflow.cpp
+HOST_SRCS += ./libgraph/misc/host_graph_mem.cpp
+HOST_SRCS += ./libgraph/host_graph_partition.cpp
+HOST_SRCS += ./libgraph/kernel/host_graph_kernel.cpp
+HOST_SRCS += ./libgraph/host_graph_dataflow.cpp
 HOST_SRCS += ./libgraph/scheduler/host_graph_scheduler.cpp
 HOST_SRCS += ./libgraph/scheduler/$(SCHEDULER)/scheduler.cpp
 HOST_SRCS += $(APPCONFIG)/dataPrepare.cpp
@@ -59,6 +59,8 @@ CXXFLAGS += -I ./libgraph
 CXXFLAGS += -I ./libgraph/memory
 CXXFLAGS += -I ./libgraph/scheduler
 CXXFLAGS += -I ./libgraph/verification
+CXXFLAGS += -I ./libgraph/misc
+CXXFLAGS += -I ./libgraph/kernel
 CXXFLAGS += -I $(APPCONFIG)
 CXXFLAGS += -I ./application
 CXXFLAGS += -I tmp_para

@@ -16,9 +16,9 @@ typedef struct{
     partitionArrangementHandler       partitionScheduler;
 } graphStaticScheduler;
 
+int schedulerRegister(void);
 
 int registerScheduler(graphStaticScheduler * pItem);
-
 
 
 /* internal phase */

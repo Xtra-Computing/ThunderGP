@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <fstream>
 
-#include "host_graph_sw.h"
+#include "host_graph_api.h"
+#include "host_graph_verification.h"
 
 using namespace std;
 
@@ -27,48 +28,54 @@ int main(int argc, char **argv) {
         gName = "wiki-talk";
     }
     std::string mode = "normal";
-#if 0
-    Graph* gptr = createGraph(gName, mode);
-    CSR* csr    = new CSR(*gptr);
-    csr->save2File(gName);
-    free(gptr);
-    return 0;
-#endif
-
-
 
     DEBUG_PRINTF("start main\n");
 
     acceleratorInit("graph_fpga", xcl_file);
 
-    acceleratorDataPrepare(gName, mode, &graphDataInfo);
+    acceleratorDataLoad(gName, mode, &graphDataInfo);
 
     acceleratorDataPreprocess(&graphDataInfo);
-
-    int runCounter = 0;
-    int totalActiveVertices = 1;
-    while(totalActiveVertices != 0)
+    // 10 times for averaging result;
+    for (int j = 0; j < 10 ; j ++)
     {
-        totalActiveVertices = 0;
-        double startStamp, endStamp;
-        startStamp = getCurrentTimestamp();
+        int runCounter = 0;
+        int totalActiveVertices = 1;
+        int closenessCentrality[32];
 
-        acceleratorSuperStep(runCounter, &graphDataInfo);
-
-        endStamp = getCurrentTimestamp();
-
-        int *reg = (int *)acceleratorQueryRegister();
+        //random set 32 nodes to calculated their closeness centrality
+        reTransferProp(&graphDataInfo);
         for (int i = 0; i < 32; i++)
         {
-            int activeVertices = reg[i];
-            totalActiveVertices += activeVertices;
-            DEBUG_PRINTF("activeVertice@path_%d : %d \n",i, activeVertices);
+            closenessCentrality[i] = 0;
         }
+        while (totalActiveVertices != 0)
+        {
+            totalActiveVertices = 0;
+            double startStamp, endStamp;
+            startStamp = getCurrentTimestamp();
 
-        /* profile */
-        acceleratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
-        runCounter ++;
+            acceleratorSuperStep(runCounter, &graphDataInfo);
+
+            endStamp = getCurrentTimestamp();
+
+            int *reg = (int *)acceleratorQueryRegister();
+            for (int i = 0; i < 32; i++)
+            {
+                int activeVertices = reg[i];
+                totalActiveVertices += activeVertices;
+                DEBUG_PRINTF("activeVertice@path_%d : %d \n", i, activeVertices);
+            }
+            for (int i = 0; i < 32; i++)
+            {
+                closenessCentrality[i] += reg[i] * runCounter;
+            }
+            /* profile */
+            acceleratorProfile(runCounter, runCounter, &graphDataInfo, endStamp - startStamp);
+            runCounter ++;
+        }
     }
+    //dumpResult(&graphDataInfo);
     acceleratorDeinit();
 
     return 0;
