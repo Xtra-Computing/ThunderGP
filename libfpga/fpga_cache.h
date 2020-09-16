@@ -207,7 +207,7 @@ void streamFilter(hls::stream<burst_token>         &mapStream,
 
 #define INVALID_FLAG (0xffffffff)
 void streamRemoveBubble(hls::stream<filtered_token> &in,
-                       hls::stream<address_token>  &out)
+                        hls::stream<address_token>  &out)
 {
     ap_uint < CA_WIDTH > ori[SIZE_BY_INT];
 #pragma HLS ARRAY_PARTITION variable=ori dim=0 complete
@@ -632,6 +632,14 @@ void updateVertexCache(uint16                          * input,
     clear_stream(cmdStream);
 }
 
+#ifndef MAX
+#define MAX(a,b) (((a) > (b))?(a):(b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b) (((a) < (b))?(a):(b))
+#endif
+
 
 void  readEdgesStage(
     hls::stream<edge_tuples_t>      &edgeTuplesBuffer,
@@ -646,12 +654,44 @@ void  readEdgesStage(
     C_PRINTF("%s \n", "start readedges");
     ap_uint<1>  break_flag = 0;
     uint_raw caching_value = 0;
-    uint_raw processing_value = 0;
+    uint_raw cached_value = 0;
     uint_raw min_processing_value = 0;
+    uint_raw next_processing_value = 0;
     cache_line  cache_data[2];
     uint_raw    caching_counter = 0;
     edgeBlock   tmpBlock[2];
     uint_raw    processing_counter = 0;
+    ap_uint<1>  wait_cache_flag = 0;
+    ap_uint<1>  wait_cache_mask[EDGE_NUM][2];
+#pragma HLS ARRAY_PARTITION variable=wait_cache_mask dim=0 complete
+    unsigned int vertex_index[EDGE_NUM][2];
+#pragma HLS ARRAY_PARTITION variable=vertex_index dim=0 complete
+
+    ap_uint<1>  wait_mask_and_l1[EDGE_NUM];
+#pragma HLS ARRAY_PARTITION variable=wait_mask_and_l1 dim=0 complete
+
+    ap_uint<1>  wait_mask_and_l2[EDGE_NUM / 2];
+#pragma HLS ARRAY_PARTITION variable=wait_mask_and_l2 dim=0 complete
+
+    ap_uint<1>  wait_mask_and_l3[EDGE_NUM / 4];
+#pragma HLS ARRAY_PARTITION variable=wait_mask_and_l3 dim=0 complete
+
+
+    ap_uint<32>  max_passed[EDGE_NUM][2];
+#pragma HLS ARRAY_PARTITION variable=max_passed dim=0 complete
+
+    ap_uint<32>  max_passed_l1[EDGE_NUM];
+#pragma HLS ARRAY_PARTITION variable=max_passed_l1 dim=0 complete
+
+    ap_uint<32>  max_passed_l2[EDGE_NUM / 2];
+#pragma HLS ARRAY_PARTITION variable=max_passed_l2 dim=0 complete
+
+    ap_uint<32>  max_passed_l3[EDGE_NUM / 4];
+#pragma HLS ARRAY_PARTITION variable=max_passed_l3 dim=0 complete
+
+
+    ap_uint<32>  curr_caching_value[EDGE_NUM][2];
+#pragma HLS ARRAY_PARTITION variable=curr_caching_value dim=0 complete
 
     while (true)
     {
@@ -668,34 +708,112 @@ void  readEdgesStage(
             {
                 cacheUpdateByAddr(cache_data[1], vertexPropCache);
             }
+            cached_value = cache_data[1].addr;
             cache_data[1] = cache_data[0];
             caching_counter ++;
         }
         //else
-        if ((!edgeBlockStream.empty() && ((processing_value) < caching_value  ) ) || (processing_value == ENDFLAG))
+        edge_tuples_t tuples[2];
+        if (!edgeBlockStream.empty() && ((next_processing_value) < cached_value) && (wait_cache_flag == 0))
         {
-            read_from_stream(edgeBlockStream, tmpBlock[0]);
-            processing_value = tmpBlock[0].score.range(511, 511 - 31);
-            min_processing_value = tmpBlock[0].score.range(31, 0);
-            if (processing_counter > 0)
-            {
-#pragma HLS latency min=4 max=10
-                edge_tuples_t tuples[2];
-readCache: for (int unit_cycle = 0; unit_cycle < 2; unit_cycle ++)
-                {
+            for (int unit_cycle = 0; unit_cycle < 2; unit_cycle ++) {
 #pragma HLS UNROLL
-readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
+                for (int k = 0; k < EDGE_NUM; k ++) {
+#pragma HLS UNROLL
+                    curr_caching_value[k][unit_cycle] =  cached_value;
+                }
+            }
+            read_from_stream(edgeBlockStream, tmpBlock[0]);
+            next_processing_value = tmpBlock[0].score.range(31, 0);
+
+            if (processing_counter == 0)
+            {
+                min_processing_value = next_processing_value;
+                processing_counter = 1;
+                tmpBlock[1] = tmpBlock[0];
+                continue;
+            }
+
+
+
+readCache1: for (int unit_cycle = 0; unit_cycle < 2; unit_cycle ++) {
+#pragma HLS UNROLL
+readCacheInner1: for (int k = 0; k < EDGE_NUM; k ++) {
 #pragma HLS UNROLL
 #define  range_start  (( k ) << INT_WIDTH_SHIFT)
 
-                        tuples[unit_cycle].data[k].x =
-                            tmpBlock[1].tuples.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
-                        unsigned int vertex_index =
-                            tmpBlock[1].score.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
-                        //tuples[0].data[k].y = get_cached_value(vertex_index, vertexPropCache);
+                    tuples[unit_cycle].data[k].x =
+                        tmpBlock[1].tuples.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
+                    vertex_index[k][unit_cycle] =
+                        tmpBlock[1].score.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
+                    //tuples[0].data[k].y = get_cached_value(vertex_index, vertexPropCache);
+                    if (curr_caching_value[k][unit_cycle] <=  vertex_index[k][unit_cycle])
+                    {
+                        wait_cache_mask[k][unit_cycle] = 1;
+                    }
+                    else
+                    {
+                        wait_cache_mask[k][unit_cycle] = 0;
+                    }
+                }
+            }
+#include "fpga_col_wait.h"
 
-                        unsigned int address = (vertex_index & CACHE_ADDRESS_MASK) >> 3;
-                        unsigned int bit =  ((vertex_index & CACHE_ADDRESS_MASK) >> 1) & (URAM_PER_EDGE - 1);
+
+readCache2: for (int unit_cycle = 0; unit_cycle < 2; unit_cycle ++) {
+#pragma HLS UNROLL
+readCacheInner2: for (int k = 0; k < EDGE_NUM; k ++) {
+#pragma HLS UNROLL
+                    unsigned int address = (vertex_index[k][unit_cycle] & CACHE_ADDRESS_MASK) >> 3;
+                    unsigned int bit =  ((vertex_index[k][unit_cycle] & CACHE_ADDRESS_MASK) >> 1) & (URAM_PER_EDGE - 1);
+
+                    uint_uram tmp;
+                    {
+#pragma HLS latency min=1 max=3
+                        tmp = vertexPropCache[k][bit][address];
+                    }
+
+                    if (vertex_index[k][unit_cycle] & 0x01)
+                        tuples[unit_cycle].data[k].y = tmp.range(63, 32);
+                    else
+                        tuples[unit_cycle].data[k].y = tmp.range(31,  0);
+                }
+                tuples[unit_cycle].flag = (tmpBlock[1].flag);
+            }
+            break_flag = tmpBlock[1].flag;
+            if (wait_cache_flag == 0)
+            {
+                writeTuples(edgeTuplesBuffer, tuples);
+                tmpBlock[1] = tmpBlock[0];
+            }
+
+        }
+        else if (wait_cache_flag == 1)
+        {
+            for (int unit_cycle = 0; unit_cycle < 2; unit_cycle ++) {
+#pragma HLS UNROLL
+                for (int k = 0; k < EDGE_NUM; k ++) {
+#pragma HLS UNROLL
+                    curr_caching_value[k][unit_cycle] =  cached_value;
+                }
+            }
+readCache3: for (int unit_cycle = 0; unit_cycle < 2; unit_cycle ++) {
+#pragma HLS UNROLL
+readCacheInner3: for (int k = 0; k < EDGE_NUM; k ++) {
+#pragma HLS UNROLL
+#define  range_start  (( k ) << INT_WIDTH_SHIFT)
+
+                    tuples[unit_cycle].data[k].x =
+                        tmpBlock[1].tuples.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
+                    vertex_index[k][unit_cycle] =
+                        tmpBlock[1].score.range((range_start) + 31 + unit_cycle * 256, range_start + unit_cycle * 256);
+                    //tuples[0].data[k].y = get_cached_value(vertex_index, vertexPropCache);
+
+                    if (( curr_caching_value[k][unit_cycle] >=  vertex_index[k][unit_cycle]) && (wait_cache_mask[k][unit_cycle] == 1))
+                    {
+                        wait_cache_mask[k][unit_cycle] = 0;
+                        unsigned int address = (vertex_index[k][unit_cycle] & CACHE_ADDRESS_MASK) >> 3;
+                        unsigned int bit =  ((vertex_index[k][unit_cycle] & CACHE_ADDRESS_MASK) >> 1) & (URAM_PER_EDGE - 1);
 
                         uint_uram tmp;
                         {
@@ -703,28 +821,21 @@ readCacheInner: for (int k = 0; k < EDGE_NUM; k ++) {
                             tmp = vertexPropCache[k][bit][address];
                         }
 
-                        if (vertex_index & 0x01)
+                        if (vertex_index[k][unit_cycle] & 0x01)
                             tuples[unit_cycle].data[k].y = tmp.range(63, 32);
                         else
                             tuples[unit_cycle].data[k].y = tmp.range(31,  0);
-#if CAHCE_FETCH_DEBUG
-                        if (tuples[unit_cycle].data[k].y != vertex_index)
-                        {
-                            C_PRINTF("[FETCH] error %d %d\n", tuples[unit_cycle].data[k].y, vertex_index);
-                        }
-                        else
-                        {
-                            C_PRINTF("[FETCH] dump %d %d\n", tuples[unit_cycle].data[k].y, vertex_index);
-                        }
-#endif
                     }
-                    tuples[unit_cycle].flag = (tmpBlock[1].flag);
                 }
-                writeTuples(edgeTuplesBuffer, tuples);
-                break_flag = tmpBlock[1].flag;
             }
-            tmpBlock[1] = tmpBlock[0];
-            processing_counter ++;
+#include "fpga_col_wait.h"
+
+            if (wait_cache_flag == 0)
+            {
+                writeTuples(edgeTuplesBuffer, tuples);
+                tmpBlock[1] = tmpBlock[0];
+            }
+
         }
     }
 
@@ -774,7 +885,7 @@ void srcPropertyProcess( uint16                             * vertexPushinProp,
     streamMerge(edgeBurstStream, delayedMapStream, edgeBlockStream);
 
 
-#if 1
+#if 0
 
     hls::stream<cache_command>    cmdStream;
 #pragma HLS stream variable=cmdStream  depth=512

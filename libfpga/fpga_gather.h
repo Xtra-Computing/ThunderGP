@@ -30,15 +30,6 @@ void shuffleEntry (
 {
 #pragma HLS function_instantiate variable=i
 
-
-
-    unsigned char unitFinishFlag[EDGE_NUM];
-#pragma HLS ARRAY_PARTITION variable=unitFinishFlag dim=0 complete
-
-    for (int j = 0; j < EDGE_NUM; j++) {
-#pragma HLS UNROLL
-        unitFinishFlag[j] = 0;
-    }
     unsigned char end_flag_shift;
 
 

@@ -1,4 +1,4 @@
-TARGETS := hw
+TARGETS := hw_emu
 # emu or acc:
 #   hw
 #   hw_emu
@@ -6,7 +6,7 @@ TARGETS := hw
 APP := 
 # pass in by app=
 
-TARGET_BANDWIDTH := 77
+TARGET_BANDWIDTH := 17
 # target memory bandwidth in GB/s
 # max: 77GB/s
 # this value can be overridden by $(app)/build.mk

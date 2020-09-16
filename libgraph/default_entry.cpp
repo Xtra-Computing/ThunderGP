@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     /* for verification */
     acceleratorCModelDataPreprocess(&graphDataInfo);
 
-    for (int runCounter = 0 ; runCounter < 3 ; runCounter ++)
+    for (int runCounter = 0 ; runCounter < 1 ; runCounter ++)
     {
         double startStamp, endStamp;
         startStamp = getCurrentTimestamp();

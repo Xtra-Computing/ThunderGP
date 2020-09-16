@@ -62,7 +62,7 @@ int acceleratorDataPrepare(const std::string &gName, const std::string &mode, gr
     for (int u = 0; u < vertexNum; u++) {
         int num = rpa[u + 1] - rpa[u];
         vertexMap[u] = mapedSourceIndex;
-        if (num != 0)
+        //if (num != 0)
         {
             vertexRemap[mapedSourceIndex] = u;
             outDeg[mapedSourceIndex] = num;
@@ -136,7 +136,7 @@ void partitionFunction(graphInfo *info)
     for (int u = 0; u < vertexNum; u++) {
         int num = rpa[u + 1] - rpa[u];
         vertexMap[u] = mapedSourceIndex;
-        if (num != 0)
+        //if (num != 0)
         {
 #if CAHCE_FETCH_DEBUG
             vertexPushinPropMapped[mapedSourceIndex] =  mapedSourceIndex;
@@ -185,7 +185,7 @@ void partitionFunction(graphInfo *info)
                     cur_edge_num ++;
                 }
             }
-            if (num != 0)
+            //if (num != 0)
             {
                 mapedSourceIndex ++;
             }

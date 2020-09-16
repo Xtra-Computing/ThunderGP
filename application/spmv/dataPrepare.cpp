@@ -22,7 +22,7 @@ int dataPrepareProperty(graphInfo *info)
 
 	for (int i = 0; i < alignedEdgeNum; i++)
 	{
-		edgeProp[i] = i;
+		edgeProp[i] = 1;
 	}
 
 
