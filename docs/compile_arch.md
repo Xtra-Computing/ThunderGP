@@ -27,7 +27,7 @@ Other arguments the developers may use.
 For example, if you want to implement the PageRank, the command is:
 
 ```sh
-$ make app=pr all -j
+$ make app=pr all
 ```
 
 ## Makefile Tree
