@@ -56,7 +56,7 @@ Here is an example of implementing PR algorithm.
 ```sh
 $ cd ./
 $ make cleanall
-$ make app=pr all -j # make the host execution program and FPGA execution program for pagerank application. It takes time.
+$ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
 $ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
