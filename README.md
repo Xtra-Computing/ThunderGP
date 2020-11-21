@@ -7,6 +7,8 @@
 
 ## What's new?
 
+ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/)
+
 ThunderGP is featured at [Xilinx Apps and Libraries](https://www.xilinx.com/products/apps-and-libraries.html)
 
 
