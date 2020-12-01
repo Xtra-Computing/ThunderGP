@@ -3,7 +3,7 @@
 [![GitHub license](https://img.shields.io/badge/license-apache2-yellowgreen)](./LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs.svg)](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/issues)
 
-# ThunderGP: Fast Graph Processing for HLS-based FPGAs
+# ThunderGP: HLS-based Graph Processing Framework on FPGAs
 
 ## What's new?
 
@@ -22,11 +22,7 @@ ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based g
 Two aspacts make the ThunderGP deliver superior performance.
 On the one hand, ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platforms. 
 
-ThunderGP can run on both Xilinx and Intel platforms:
-
-* [Check the implementation on Intel platform out.](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/)
-
-* On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art.
+On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art.
 
 
 ## Prerequisites
@@ -59,7 +55,7 @@ Here is an example of implementing PR algorithm.
 $ cd ./
 $ make app=pr clean
 $ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
-$ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
+$ ./host_graph_fpga_pr ./xclbin_pr/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
 
