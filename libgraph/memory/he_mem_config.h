@@ -15,7 +15,7 @@ he_mem_t local_mem[] =
     {
         MEM_ID_TEST,
         "test",
-        ATTR_PL_DDR1,
+        ATTR_HOST_ONLY,
         sizeof(prop_t),
         SIZE_IN_VERTEX,
     },
@@ -88,7 +88,7 @@ he_mem_t local_mem[] =
     {
         MEM_ID_OUT_DEG,
         "outDeg",
-        ATTR_PL_DDR2,
+        ATTR_HOST_ONLY,
         sizeof(int),
         SIZE_IN_VERTEX,
     },
@@ -102,7 +102,7 @@ he_mem_t local_mem[] =
     {
         MEM_ID_RESULT_REG,
         "error",
-        ATTR_PL_DDR2,
+        ATTR_HOST_ONLY,
         sizeof(int) * 64,
         SIZE_USER_DEFINE,
     },

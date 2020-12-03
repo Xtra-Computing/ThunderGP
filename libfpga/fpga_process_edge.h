@@ -171,8 +171,11 @@ void dstPropertyProcess(
 #pragma HLS PIPELINE II=1
         uint_uram tmp = tmpVPropBuffer[i];
         write_to_stream(writeArray, tmp);
-        tmpVPropBuffer[i] = 0;
+        if (i > 0)
+            tmpVPropBuffer[i - 1] = 0;
     }
+    tmpVPropBuffer[((MAX_VERTICES_IN_ONE_PARTITION ) >> (LOG2_PE_NUM + 1)) - 1] = 0;
+
 }
 
 

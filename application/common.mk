@@ -4,8 +4,28 @@ CP = cp -rf
 XCLBIN := ./xclbin_$(APP)
 DSA := $(call device2sandsa, $(DEVICE))
 
-CXX := $(XILINX_SDX)/bin/xcpp
-XOCC := $(XILINX_SDX)/bin/xocc
+
+HOST_ARCH := x86
+
+#Checks for g++
+ifeq ($(HOST_ARCH), x86)
+ifneq ($(shell expr $(shell g++ -dumpversion) \>= 5), 1)
+ifndef XILINX_VIVADO
+$(error [ERROR]: g++ version older. Please use 5.0 or above.)
+else
+CXX := $(XILINX_VIVADO)/tps/lnx64/gcc-6.2.0/bin/g++
+$(warning [WARNING]: g++ version older. Using g++ provided by the tool : $(CXX))
+endif
+endif
+else ifeq ($(HOST_ARCH), aarch64)
+CXX := $(XILINX_VITIS)/gnu/aarch64/lin/aarch64-linux/bin/aarch64-linux-gnu-g++
+else ifeq ($(HOST_ARCH), aarch32)
+CXX := $(XILINX_VITIS)/gnu/aarch32/lin/gcc-arm-linux-gnueabi/bin/arm-linux-gnueabihf-g++
+endif
+
+XOCC := v++
+#CXX := $(XILINX_SDX)/bin/xcpp
+#XOCC := $(XILINX_SDX)/bin/xocc
 
 GS_KERNEL_PATH    = ./tmp_fpga_top
 APPLY_KERNEL_PATH = ./tmp_fpga_top
@@ -13,8 +33,6 @@ APPLY_KERNEL_PATH = ./tmp_fpga_top
 
 
 include $(ABS_COMMON_REPO)/utils/opencl.mk
-
-
 
 #--kernel_frequency <frequency>
 #--xp prop:solution.kernel_compiler_margin=<Frequency Percentage>
@@ -69,7 +87,6 @@ CXXFLAGS += -I tmp_fpga_top
 # Host linker flags
 LDFLAGS := $(opencl_LDFLAGS)
 LDFLAGS += -lrt -lstdc++  -lxilinxopencl
-
 
 
 CLFLAGS := $(AUTOGEN_CFLAG)

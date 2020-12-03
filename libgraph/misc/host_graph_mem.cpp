@@ -3,6 +3,19 @@
 #include "he_mem_config.h"
 
 
+// HBM Banks requirements
+#define MAX_HBM_BANKCOUNT 32
+#define BANK_NAME(n) n | XCL_MEM_TOPOLOGY
+const int bank[MAX_HBM_BANKCOUNT] = {
+    BANK_NAME(0),  BANK_NAME(1),  BANK_NAME(2),  BANK_NAME(3),  BANK_NAME(4),
+    BANK_NAME(5),  BANK_NAME(6),  BANK_NAME(7),  BANK_NAME(8),  BANK_NAME(9),
+    BANK_NAME(10), BANK_NAME(11), BANK_NAME(12), BANK_NAME(13), BANK_NAME(14),
+    BANK_NAME(15), BANK_NAME(16), BANK_NAME(17), BANK_NAME(18), BANK_NAME(19),
+    BANK_NAME(20), BANK_NAME(21), BANK_NAME(22), BANK_NAME(23), BANK_NAME(24),
+    BANK_NAME(25), BANK_NAME(26), BANK_NAME(27), BANK_NAME(28), BANK_NAME(29),
+    BANK_NAME(30), BANK_NAME(31)};
+
+
 #define PARTITION_DDR       (he_get_attr_by_cu(cuIndex))
 #define CU_DDR              (he_get_attr_by_cu(cuIndex))
 
@@ -21,6 +34,9 @@ static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, in
     gsItem->prop[0].attr = CU_DDR;
     gsItem->prop[0].unit_size = sizeof(int);
     gsItem->prop[0].size_attr = SIZE_IN_VERTEX;
+
+    gsItem->prop[0].ext_attr.flags = bank[5 * cuIndex + 2];
+
     he_mem_init(context, &gsItem->prop[0]);
     memcpy(gsItem->prop[0].data, data, gsItem->prop[0].size);
 
@@ -29,15 +45,11 @@ static void gs_mem_init(cl_context &context, gatherScatterDescriptor *gsItem, in
     gsItem->prop[1].attr = CU_DDR;
     gsItem->prop[1].unit_size = sizeof(int);
     gsItem->prop[1].size_attr = SIZE_IN_VERTEX;
+
+    gsItem->prop[1].ext_attr.flags = bank[5 * cuIndex + 2];
+
     he_mem_init(context, &gsItem->prop[1]);
     memcpy(gsItem->prop[1].data, data, gsItem->prop[1].size);
-
-    gsItem->tmpProp.id =  MEM_ID_GS_BASE + cuIndex * MEM_ID_GS_OFFSET + 1;
-    gsItem->tmpProp.name = "cu output tmpProp";
-    gsItem->tmpProp.attr = CU_DDR;
-    gsItem->tmpProp.unit_size = sizeof(int);
-    gsItem->tmpProp.size_attr = SIZE_IN_VERTEX;
-    he_mem_init(context, &gsItem->tmpProp);
 }
 
 
@@ -61,6 +73,9 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
         partitionItem->edgeTail.attr = PARTITION_DDR;
         partitionItem->edgeTail.unit_size = size * sizeof(int);
         partitionItem->edgeTail.size_attr = SIZE_USER_DEFINE;
+
+        partitionItem->edgeTail.ext_attr.flags = bank[5 * cuIndex + 1];
+
         he_mem_init(context, &partitionItem->edgeTail);
 
         partitionItem->edgeHead.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 1;
@@ -68,6 +83,9 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
         partitionItem->edgeHead.attr = PARTITION_DDR;
         partitionItem->edgeHead.unit_size = size * sizeof(int);
         partitionItem->edgeHead.size_attr = SIZE_USER_DEFINE;
+
+        partitionItem->edgeHead.ext_attr.flags = bank[5 * cuIndex + 0];
+
         he_mem_init(context, &partitionItem->edgeHead);
 
         partitionItem->edgeProp.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 2;
@@ -79,6 +97,9 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
 #endif
         partitionItem->edgeProp.unit_size = size * sizeof(int);
         partitionItem->edgeProp.size_attr = SIZE_USER_DEFINE;
+
+        partitionItem->edgeProp.ext_attr.flags = bank[5 * cuIndex + 0]; // marked as unused
+
         he_mem_init(context, &partitionItem->edgeProp);
 
         partitionItem->tmpProp.id = MEM_ID_PARTITION_BASE + i * MEM_ID_PARTITION_OFFSET + 3;
@@ -86,6 +107,9 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
         partitionItem->tmpProp.attr = PARTITION_DDR;
         partitionItem->tmpProp.unit_size = MAX_VERTICES_IN_ONE_PARTITION * sizeof(int);
         partitionItem->tmpProp.size_attr = SIZE_USER_DEFINE;
+
+        partitionItem->tmpProp.ext_attr.flags = bank[5 * cuIndex + 3];
+
         he_mem_init(context, &partitionItem->tmpProp);
     }
 }

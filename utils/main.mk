@@ -1,5 +1,3 @@
-$(shell ./utils/automation.sh $(app) > generator.log)
-
 SHELL          := /bin/bash
 TARGET         := $(TARGETS)
 DEVICE         := $(DEVICES)
@@ -7,8 +5,6 @@ DEVICE         := $(DEVICES)
 COMMON_REPO     = ./
 ABS_COMMON_REPO = $(shell readlink -f $(COMMON_REPO))
 UTILS_PATH      = ./utils
-
-
 
 .PHONY:all clean exe hwemuprepare $(EXECUTABLE) emconfig
 all: precheck
@@ -40,9 +36,9 @@ include $(UTILS_PATH)/bitstream.mk
 include $(UTILS_PATH)/clean.mk
 
 
-all:  code_gen  $(EXECUTABLE) $(BINARY_CONTAINERS) emconfig
+all:  $(BINARY_CONTAINERS) emconfig
 
-
+# $(EXECUTABLE)
 exe: $(EXECUTABLE)
 
 

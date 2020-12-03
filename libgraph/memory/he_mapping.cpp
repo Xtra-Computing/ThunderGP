@@ -21,23 +21,23 @@ const attr_lut_t attr_mapping[] =
 {
     {
         .interface_id = 0,
-        .mem_id       = XCL_MEM_DDR_BANK0,
+        .mem_id       = 0 | XCL_MEM_TOPOLOGY,
         .he_attr_id   = ATTR_PL_DDR0,
     },
     {
         .interface_id = 1,
-        .mem_id       = XCL_MEM_DDR_BANK1,
+        .mem_id       = 1 | XCL_MEM_TOPOLOGY,
         .he_attr_id   = ATTR_PL_DDR1,
     },
     {
         .interface_id = 2,
-        .mem_id       = XCL_MEM_DDR_BANK2,
+        .mem_id       = 2 | XCL_MEM_TOPOLOGY,
         .he_attr_id   = ATTR_PL_DDR2,
     },
 
     {
         .interface_id = 3,
-        .mem_id       = XCL_MEM_DDR_BANK3,
+        .mem_id       = 3 | XCL_MEM_TOPOLOGY,
         .he_attr_id   = ATTR_PL_DDR3,
     },
 };
