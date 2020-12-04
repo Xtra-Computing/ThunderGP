@@ -16,7 +16,7 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
 
 ## Prerequisites
 * The gcc-4.8 or above
-* Tools:
+* Development environment:
     * Vitis 2020.1 Design Suite
     * SDAccel 2018.3 Design Suite
     * SDAccel 2019.2 Design Suite
@@ -27,7 +27,7 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
     * Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
 
     
-## Work with the build-in graph processing applications
+## Work with Build-in Graph Processing Applications
 ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
 
 The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command.   
@@ -90,9 +90,8 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on U25
 
 * [More Results](docs/results.md)
 
-## APIs (programmability) 
+## Build Your Own Graph processing Accelerators with ThunderGP
 ![auto](docs/images/automation.png)
-
 
 Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
