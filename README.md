@@ -24,11 +24,12 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
     * Alveo U50 Data Center Accelerator Card (Vitis 2020.1)
     * Alveo U200 Data Center Accelerator Card (SDAccel 2019.2)
     * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
-    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
+    * Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
 
     
-## Run the code
-Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR, SpMV, BFS and SSSP.  
+## Work with the build-in graph processing applications
+ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
+
 The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command.   
 The below table is for quick reference of this argument.
 
@@ -42,7 +43,7 @@ The below table is for quick reference of this argument.
 | ```app=ar``` | ArticleRank  (AR)|
 | ```app=wcc``` | Weakly Connected Component  (WCC)|
 
-Here is an example of implementing PR algorithm. 
+Here is an example of implementing an accelerator for PR. 
 ```sh
 $ cd ./
 $ make cleanall
