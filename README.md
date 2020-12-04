@@ -1,43 +1,31 @@
-![logo](docs/images/ThunderGP_logo.png)
+![logo](docs/images/ThunderGP.png)
 
 [![GitHub license](https://img.shields.io/badge/license-apache2-yellowgreen)](./LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs.svg)](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/issues)
 
-# ThunderGP: Fast Graph Processing for HLS-based FPGAs
+# ThunderGP: HLS-based Graph Processing Framework on FPGAs
 
 ## What's new?
 
-ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/)
+ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based graph processing without compromising ***programmability***. ***To our best knowledge and experiments, this is the fastest graph processing framework on HLS-based FPGAs.***  
 
-ThunderGP is featured at [Xilinx Apps and Libraries](https://www.xilinx.com/products/apps-and-libraries.html)
-
-
-ThunderGP was presented at [XACC@NUS Workshop Series 2020: Reconfigurable Computing Systems](https://xaccnus.github.io/). see [Slides](https://xaccnus.github.io/slides/ThunderGP_Fast_Graph_Processing_for_HLS-based_FPGAs.pdf), [Video/Youtube](https://youtu.be/zqxLevJiCpk), [Video/bilibili](https://www.bilibili.com/video/BV1kD4y1m7r8/).
+ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
 
 
-## Introduction
-
-ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based graph processing without compromising ***programmability***. ***To our best knowledge and experiments, this is the fastest graph processing framework on HLS-based FPGAs.***
-
-Two aspacts make the ThunderGP deliver superior performance.
-On the one hand, ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platforms. 
-
-ThunderGP can run on both Xilinx and Intel platforms:
-
-* [Check the implementation on Intel platform out.](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/)
-
-* On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art.
-
+## Get Started with ThunderGP
 
 ## Prerequisites
 * The gcc-4.8 or above
 * Tools:
-    * SDAccel 2018.3 Design Suit
-    * SDAccel 2019.2 Design Suit
+    * Vitis 2020.1 Design Suite
+    * SDAccel 2018.3 Design Suite
+    * SDAccel 2019.2 Design Suite
 * Evaluated platforms from Xilinx:
-    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
+    * Alveo U50 Data Center Accelerator Card (Vitis 2020.1)
     * Alveo U200 Data Center Accelerator Card (SDAccel 2019.2)
     * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
+    * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
+
     
 ## Run the code
 Currently, ThunderGP supports four build-in graph analytic algorithms, namely PR, SpMV, BFS and SSSP.  
@@ -152,26 +140,3 @@ As shown in the above diagram, The edges in one partition are streamed into **Sc
 * Hardware-accelerated query engine.
 * Cycle-precision software simulation for the verification of dynamic modules(Cache, etc.) and channel depth tuning.
 * Optimization for large scale graph. (distributed processing or HBM-based memory hierarchy)
-
-
-## Related publications
-* Xinyu Chen*, Ronak Bajaj^, Yao Chen, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [On-The-Fly Parallel Data Shuffling for Graph Processing on OpenCL-based FPGAs](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf). FPL, 2019.
-* Xinyu Chen*, Yao Chen^, Ronak Bajaj, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [Is FPGA useful for hash joins](https://www.comp.nus.edu.sg/~hebs/pub/cidr20-join.pdf). CIDR 2020: Conference on Innovative Data Systems Research
-
-
-## Related systems
-* Graph systems on GPU: [G3](https://github.com/Xtra-Computing/G3) | [Medusa](https://github.com/Xtra-Computing/Medusa)
-* Other Thunder-series systems in Xtra NUS: [ThunderGBM](https://github.com/Xtra-Computing/thundergbm) | [ThunderSVM](https://github.com/Xtra-Computing/thundersvm)
-
-
-## Key members
-* Hongshi Tan, Xinyu Chen (NUS)
-* Advisor: [Bingsheng He](https://www.comp.nus.edu.sg/~hebs/) and [Weng-Fai Wong](https://www.comp.nus.edu.sg/~wongwf/), NUS
-* Collaborators: [Yao Chen (ADSC)](https://microideax.github.io/) and [Deming Chen (UIUC)](http://dchen.ece.illinois.edu/)
-
-
-## Acknowledgement
-* [Xilinx Adaptive Compute Clusters (XACC) program](https://www.xilinx.com/support/university/XUP-XACC.html)
-* Singapore MoE Tier 2 grant (MOE2017-T2-1-122).
- 
-
