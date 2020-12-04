@@ -1,7 +1,8 @@
 ![logo](docs/images/ThunderGP.png)
 
 [![GitHub license](https://img.shields.io/badge/license-apache2-yellowgreen)](./LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs.svg)](https://github.com/Xtra-Computing/On-the-fly-data-shuffling-for-OpenCL-based-FPGAs/issues)
+[![GitHub issues](https://img.shields.io/github/issues/Xtra-Computing/ThunderGP.svg)](https://github.com/Xtra-Computing/ThunderGP/issues)
+[![DOI](https://zenodo.org/badge/254307005.svg)](https://zenodo.org/badge/latestdoi/254307005)
 
 # ThunderGP: HLS-based Graph Processing Framework on FPGAs
 
