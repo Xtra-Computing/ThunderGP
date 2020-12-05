@@ -43,11 +43,14 @@ The below table is for quick reference.
 
 Here is the example of implementing the accelerator for PageRank on Alevo U50 platform with Vitis 2020.1. 
 ```sh
-$ git clone ThunderGP
+$ git clone https://github.com/Xtra-Computing/ThunderGP.git
+$ git checkout develop_u50
 $ cd ./
-$ vim ThunderGP.mk # configure the DEVICE as DEVICES := xilinx_u50_gen3x16_xdma_201920_3; configure TARGETS := hw
-$ make app=pr clean
+$ vim ThunderGP.mk 
+$ # configure the DEVICE as DEVICES := xilinx_u50_gen3x16_xdma_201920_3; configure TARGETS := hw
+$ make app=pr clean 
 $ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
+# execute on the hardware. The path of graph dataset needs to be provided by the user. 
 $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md); [Performance of Seven Applications on Different Xilinx Platforms](docs/results.md)
