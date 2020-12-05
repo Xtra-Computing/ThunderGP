@@ -28,8 +28,7 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
     
 ### Work with Build-in Graph Processing Applications
 ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
-The desired application can be implemented by passing argument ```app=[the algorithm]``` to ``` make ``` command.   
-The below table is for quick reference.
+The desired application can be implemented by passing argument ```app=[the algorithm]``` to ``` make ``` command. The below table is for quick reference.
 
 | Argument    | Accelerated algorithm  |
 |--------------|--------------|
@@ -41,7 +40,7 @@ The below table is for quick reference.
 | ```app=ar``` | ArticleRank  (AR)|
 | ```app=wcc``` | Weakly Connected Component  (WCC)|
 
-Here is the example of implementing the accelerator for PageRank on Alevo U50 platform with Vitis 2020.1. 
+#### Here is the example of implementing the accelerator for PageRank on Alevo U50 platform with Vitis 2020.1. 
 ```sh
 $ git clone https://github.com/Xtra-Computing/ThunderGP.git
 $ git checkout develop_u50
