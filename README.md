@@ -55,20 +55,15 @@ $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.
 ### Build Your Own Graph processing Accelerators with ThunderGP
 ThunderGP provides two sets of C++ based APIs: accelerator APIs (Acc-APIs) for customizing accelerators for graph algorithms and Host-APIs for accelerator deployment and execution.
 
-* Acc-APIs provide hooks for mapping graph processing algorithms.  [Unfold the Detialed Instructions in Customize New Graph Accelerators with Acc-APIs](docs/algorithm_mapping.md)  
+* Acc-APIs provide hooks for mapping graph processing algorithms.  [Unfold the Detailed Instructions in Customize New Graph Accelerators with Acc-APIs](docs/algorithm_mapping.md)  
 
-* Host-APIs deploy or control the graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), It also wraps the partition scheduling and memory management interface for multiple SLRs. For detaiils, please check the following links. 
-
-** [Memory Management](docs/memory.md) 
-
-** [Scheduling across Multi SLRs](docs/scheduling.md) 
-
-** [Verification](docs/verification.md)
+* Host-APIs deploy or control the graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), It also wraps the partition scheduling and memory management interface for multiple SLRs. For detaiils, please check the following links. [Memory Management](docs/memory.md); [Scheduling across Multi SLRs](docs/scheduling.md)
+; [Verification](docs/verification.md)
 
 #### More details: [ThunderGP APIs ](docs/api_details.md)
 
 
-## Framework Details
+## ThunderGP Design Details
 ![auto](docs/images/automation.png)  
 
 The overview of ThunderGP is shown in the above figure. We briefly illustrate the main building blocks as follows.
