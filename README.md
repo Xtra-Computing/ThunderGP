@@ -14,7 +14,7 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
 
 ## Get Started with ThunderGP
 
-## Prerequisites
+### Prerequisites
 * The gcc-4.8 or above
 * Development environment:
     * Vitis 2020.1 Design Suite
@@ -25,12 +25,10 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
     * Alveo U200 Data Center Accelerator Card (SDAccel 2019.2)
     * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
     * Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
-
     
-## Work with Build-in Graph Processing Applications
+### Work with Build-in Graph Processing Applications
 ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
-
-The wanted application can be implemented by passing argument ```app=[the wanted algorithm]``` to ``` make ``` command.   
+The desired application can be implemented by passing argument ```app=[the algorithm]``` to ``` make ``` command.   
 The below table is for quick reference of this argument.
 
 | Argument    | Accelerated algorithm  |
@@ -46,9 +44,9 @@ The below table is for quick reference of this argument.
 Here is an example of implementing an accelerator for PR. 
 ```sh
 $ cd ./
-$ make cleanall
+$ make app=pr clean
 $ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
-$ ./host [bitfile] [graph name] #e.g., ./host_graph_fpga _x/link/int/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
+$ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
 
@@ -90,8 +88,7 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on U25
 
 * [More Results](docs/results.md)
 
-## Build Your Own Graph processing Accelerators with ThunderGP
-![auto](docs/images/automation.png)
+### Build Your Own Graph processing Accelerators with ThunderGP
 
 Benefiting from the high level abstraction of HLS, our APIs natively support C/C++ languages.  
 ThunderGraph covers three levels of API for implementation or further exploration. 
@@ -113,8 +110,8 @@ APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host
 * More details: [ThunderGP APIs ](docs/api_details.md)
 
 
-## Framework Overview
-
+## Framework Details
+![auto](docs/images/automation.png)
 ### The Adopted Computation Model
 The Gather-Apply-Scatter (GAS) model is widely used for FPGA-based graph processing frameworks as computation model due to its extensibility to various graph processing algorithms. ThunderGP adopts a simplified version of GAS model by following work [*On-the-fly-data-shuffling-for-OpenCL-based-FPGAs*](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf).
 This model updates the vertex property by propagating from source vertex to destination vertex. The input for the model is an unordered set of directed edges of the graph. Undirected edges in a graph can be represented by a pair of directed edges. 
