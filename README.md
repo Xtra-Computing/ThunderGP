@@ -48,8 +48,8 @@ $ cd ./
 $ vim ThunderGP.mk 
 $ # configure the DEVICE as DEVICES := xilinx_u50_gen3x16_xdma_201920_3; configure TARGETS := hw
 $ make app=pr clean 
-$ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
-# execute on the hardware. The path of graph dataset needs to be provided by the user. 
+$ make app=pr all # make the host execution program and the FPGA bitstream. It takes time :)
+# For execution on real hardware. The path of graph dataset needs to be provided by the user. 
 $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md); [Performance of Seven Applications on Different Xilinx Platforms](docs/results.md)
@@ -94,7 +94,7 @@ The process per iteration mainly contains three stages: **Scatter**, **Gather**,
 
 As shown in the above diagram, the edges in one partition are streamed into **Scatter** stage, For each edges, the property of source vertices will be fetched from the global memory by the per-fetching and the cache module, at the same time, the property of corresponding edge, or the weight of edge is loaded from global memory in stream, then these two value go through an *__algorithm-specific processing__* which return an update of the property of the destination vertex, finally, at the end of scatter stage, this update value and the destination of this edge is combined to create a update tuple. The update tuples are streamed into the shuffle stage which dispatches the tuples to corresponding gather processing engines(PEs). The **Gather** PEs *__accumulates__* the update value in local on-chip memory which is caching the property of destination vertices. After all the edges in this partition are processed, the cached data in gather PEs will be aggregated to the global memory. and the **Apply** stage which calls *__algorithm-specific function__* updates all the vertices for the next iteration.
 
-### Future Work
+## Future Work
 * Application wrapper for high level platform (Spark, etc.)
 * Hardware-accelerated query engine.
 * Cycle-precision software simulation for the verification of dynamic modules(Cache, etc.) and channel depth tuning.
