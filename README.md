@@ -53,11 +53,12 @@ $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.
 #### [Performance of Seven Applications on Different Xilinx Platforms](docs/results.md)
 
 ### Build Your Own Graph processing Accelerators with ThunderGP
+ThunderGP provides two sets of C++ based APIs: accelerator APIs (Acc-APIs) for customizing accelerators for graph algorithms and Host-APIs for accelerator deployment and execution.
 
 * Acc-APIs provide hooks for mapping graph processing algorithms. 
     * [Mapping new graph analytic algorithms with Acc-APIs](docs/algorithm_mapping.md)  
 
-* L3 provides the high-level APIs on host side to deploy or control graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
+* Host-APIs deploy or control the graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
 
     * [Memory Management](docs/memory.md) 
 
@@ -70,7 +71,14 @@ $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.
 
 ## Framework Details
 ![auto](docs/images/automation.png)
-### The Adopted Computation Model
+The overview of ThunderGP is shown in the above figure. We briefly illustrate the main building blocks as follows.
+* **Build-in accelerator template.** ThunderGP adopts the Gather-Apply-Scatter (GAS) model as the abstraction of various graph algorithms and realizes the model by a build-in highly-paralleled and memory-efficient accelerator template.
+* **Automated accelerator generation.** The automated accelerator generation produces synthesizable accelerators with unleashing the full potentials of the underlying FPGA platform. In addition to the build-in accelerator template, it takes the user-defined functions (UDFs) of the scatter, the gather, and the apply stages (from the GAS model) of the graph algorithm and the FPGA platform model (e.g., U50)  from developers as inputs.
+* **Graph partitioning and scheduling.** ThunderGP adopts a vertical partitioning method based on destination vertex without introducing heavy preprocessing operations such as edge-sorting to enable vertex buffering with on-chip RAMs.
+* **High-level APIs.** ThunderGP provides two sets of C++ based APIs: accelerator APIs (Acc-APIs) for customizing accelerators for graph algorithms and Host-APIs for accelerator deployment and execution.
+
+
+### The GAS Model
 The Gather-Apply-Scatter (GAS) model is widely used for FPGA-based graph processing frameworks as computation model due to its extensibility to various graph processing algorithms. ThunderGP adopts a simplified version of GAS model by following work [*On-the-fly-data-shuffling-for-OpenCL-based-FPGAs*](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf).
 This model updates the vertex property by propagating from source vertex to destination vertex. The input for the model is an unordered set of directed edges of the graph. Undirected edges in a graph can be represented by a pair of directed edges. 
 
@@ -89,7 +97,6 @@ The process per iteration mainly contains three stages: **Scatter**, **Gather**,
 As shown in the above diagram, The edges in one partition are streamed into **Scatter** stage, For each edges, the property of source vertices will be fetched from the global memory by the per-fetching and the cache module, at the same time, the property of corresponding edge, or the weight of edge is loaded from global memory in stream, then these two value go through an *__algorithm-specific processing__* which return an update of the property of the destination vertex, finally, at the end of scatter stage, this update value and the destination of this edge is combined to create a update tuple. The update tuples are streamed into the shuffle stage which dispatches the tuples to corresponding gather processing engines(PEs). The **Gather** PEs *__accumulates__* the update value in local on-chip memory which is caching the property of destination vertices. After all the edges in this partition are processed, the cached data in gather PEs will be aggregated to the global memory. and the **Apply** stage which calls *__algorithm-specific function__* updates all the vertices for the next iteration.
 
 ### Future Work
-
 * Application wrapper for high level platform (Spark, etc.)
 * Hardware-accelerated query engine.
 * Cycle-precision software simulation for the verification of dynamic modules(Cache, etc.) and channel depth tuning.
