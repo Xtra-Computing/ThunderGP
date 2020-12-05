@@ -41,24 +41,21 @@ The below table is for quick reference of this argument.
 | ```app=ar``` | ArticleRank  (AR)|
 | ```app=wcc``` | Weakly Connected Component  (WCC)|
 
-Here is an example of implementing an accelerator for PR. 
+Here is the example of implementing the accelerator for PageRank. 
 ```sh
 $ cd ./
 $ make app=pr clean
 $ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
 $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
 ```
-#### More details: [Compiling ThunderGP ](docs/compile_arch.md)
+#### More details: 
+#### [Compiling ThunderGP ](docs/compile_arch.md)
 #### [Performance of Seven Applications on Different Xilinx Platforms](docs/results.md)
 
 ### Build Your Own Graph processing Accelerators with ThunderGP
-ThunderGraph covers three levels of API for implementation or further exploration. 
-APIs in L1 and L2 are for building the accelerators, and APIs of L3 are for host program. Details are as below:
 
-* L1 is used to construct the basic modules to build the compute kernels and the dataflow. 
-
-* L2 provides hooks for mapping graph processing algorithms. 
-    * [Mapping new graph analytic algorithms](docs/algorithm_mapping.md)  
+* Acc-APIs provide hooks for mapping graph processing algorithms. 
+    * [Mapping new graph analytic algorithms with Acc-APIs](docs/algorithm_mapping.md)  
 
 * L3 provides the high-level APIs on host side to deploy or control graph processing accelerator. Since recent FPGAs usually consist of multiple (SLRs), L3 also wraps the partition scheduling and memory management interface for multiple SLRs. 
 
