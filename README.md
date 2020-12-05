@@ -40,7 +40,7 @@ The desired application can be implemented by passing argument ```app=[the algor
 | ```app=ar``` | ArticleRank  (AR)|
 | ```app=wcc``` | Weakly Connected Component  (WCC)|
 
-#### Here is the example of implementing the accelerator for PageRank on Alevo U50 platform with Vitis 2020.1. 
+#### Here is the example of implementing the accelerator for PageRank on Alveo U50 platform with Vitis 2020.1. 
 ```sh
 $ git clone https://github.com/Xtra-Computing/ThunderGP.git
 $ git checkout develop_u50
