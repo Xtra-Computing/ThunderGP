@@ -29,7 +29,7 @@ ThunderGP is accepted to appear in [FPGA 2021](https://isfpga.org/)
 ### Work with Build-in Graph Processing Applications
 ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
 The desired application can be implemented by passing argument ```app=[the algorithm]``` to ``` make ``` command.   
-The below table is for quick reference of this argument.
+The below table is for quick reference.
 
 | Argument    | Accelerated algorithm  |
 |--------------|--------------|
@@ -41,16 +41,16 @@ The below table is for quick reference of this argument.
 | ```app=ar``` | ArticleRank  (AR)|
 | ```app=wcc``` | Weakly Connected Component  (WCC)|
 
-Here is the example of implementing the accelerator for PageRank. 
+Here is the example of implementing the accelerator for PageRank on Alevo U50 platform with Vitis 2020.1. 
 ```sh
+$ git clone ThunderGP
 $ cd ./
+$ vim ThunderGP.mk # configure the DEVICE as DEVICES := xilinx_u50_gen3x16_xdma_201920_3; configure TARGETS := hw
 $ make app=pr clean
 $ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
 $ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
 ```
-#### More details: 
-#### [Compiling ThunderGP ](docs/compile_arch.md)
-#### [Performance of Seven Applications on Different Xilinx Platforms](docs/results.md)
+#### More details: [Compiling ThunderGP ](docs/compile_arch.md); [Performance of Seven Applications on Different Xilinx Platforms](docs/results.md)
 
 ### Build Your Own Graph processing Accelerators with ThunderGP
 ThunderGP provides two sets of C++ based APIs: accelerator APIs (Acc-APIs) for customizing accelerators for graph algorithms and Host-APIs for accelerator deployment and execution.
