@@ -70,7 +70,8 @@ ThunderGP provides two sets of C++ based APIs: accelerator APIs (Acc-APIs) for c
 
 
 ## Framework Details
-![auto](docs/images/automation.png)
+![auto](docs/images/automation.png)  
+
 The overview of ThunderGP is shown in the above figure. We briefly illustrate the main building blocks as follows.
 * **Build-in accelerator template.** ThunderGP adopts the Gather-Apply-Scatter (GAS) model as the abstraction of various graph algorithms and realizes the model by a build-in highly-paralleled and memory-efficient accelerator template.
 * **Automated accelerator generation.** The automated accelerator generation produces synthesizable accelerators with unleashing the full potentials of the underlying FPGA platform. In addition to the build-in accelerator template, it takes the user-defined functions (UDFs) of the scatter, the gather, and the apply stages (from the GAS model) of the graph algorithm and the FPGA platform model (e.g., U50)  from developers as inputs.
