@@ -16,6 +16,7 @@ ifeq ($(TARGET),$(filter $(TARGET), hw_emu))
 	@echo "prepare for hw_emu"
 	$(CP) $(EMCONFIG_DIR)/emconfig.json .
 	$(CP) $(UTILS_PATH)/sdaccel.ini .
+	$(CP) $(UTILS_PATH)/xrt.ini .
 	source $(UTILS_PATH)/hw_emu.sh
 else
 	@echo "prepare for hw"
@@ -24,7 +25,7 @@ endif
 check: all
 ifeq ($(TARGET),$(filter $(TARGET),sw_emu hw_emu))
 	$(CP) $(EMCONFIG_DIR)/emconfig.json .
-	XCL_EMULATION_MODE=$(TARGET) ./$(EXECUTABLE) 
+	XCL_EMULATION_MODE=$(TARGET) ./$(EXECUTABLE)
 else
 	 ./$(EXECUTABLE)
 endif

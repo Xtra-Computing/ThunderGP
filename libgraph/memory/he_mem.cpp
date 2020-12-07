@@ -135,22 +135,12 @@ int he_mem_init(cl_context &dev_context, he_mem_t * item)
 #else
         item->ext_attr.obj =  item->data;
         item->ext_attr.param = 0;
-        //item->ext_attr.flags = he_get_mem_attr(item->attr);
-        // switch (item->attr)
-        // {
-        // case ATTR_PL_DDR0:
-        //     item->ext_attr.flags = 0 | XCL_MEM_TOPOLOGY; //XCL_MEM_DDR_BANK0;
-        //     break;
-        // case ATTR_PL_DDR1:
-        //     item->ext_attr.flags = 1 | XCL_MEM_TOPOLOGY; //XCL_MEM_DDR_BANK1;
-        //     break;
-        // case ATTR_PL_DDR2:
-        //     item->ext_attr.flags = 2 | XCL_MEM_TOPOLOGY; //XCL_MEM_DDR_BANK2;
-        //     break;
-        // case ATTR_PL_DDR3:
-        //     item->ext_attr.flags = 3 | XCL_MEM_TOPOLOGY; //XCL_MEM_DDR_BANK3;
-        //     break;
-        // } 
+
+        // hardcode the bank for the outdeg variable... 
+        if((strcmp (item->name, "outDeg") == 0) || (strcmp (item->name, "error") == 0)) item->ext_attr.flags = (5 | XCL_MEM_TOPOLOGY);
+
+        std::cout << item->name << " is banked to " << std::hex << item->ext_attr.flags << std::endl; 
+
         item->device = clCreateBuffer(dev_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR |  CL_MEM_EXT_PTR_XILINX,
                                       item->size  , &item->ext_attr, &status);
         

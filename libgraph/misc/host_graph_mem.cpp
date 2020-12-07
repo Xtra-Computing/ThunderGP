@@ -98,7 +98,7 @@ void partition_mem_init(cl_context &context, int blkIndex, int size, int cuIndex
         partitionItem->edgeProp.unit_size = size * sizeof(int);
         partitionItem->edgeProp.size_attr = SIZE_USER_DEFINE;
 
-        partitionItem->edgeProp.ext_attr.flags = bank[5 * cuIndex + 0]; // marked as unused
+        partitionItem->edgeProp.ext_attr.flags = bank[5 * cuIndex + 5]; // marked as unused
 
         he_mem_init(context, &partitionItem->edgeProp);
 

@@ -14,6 +14,7 @@ xclbin*
 *.protoinst
 *.csv
 sdaccel.ini
+xrt.ini
 .run
 csr
 *.xclbin
@@ -23,3 +24,6 @@ tmp_para
 code_gen
 para_gen
 makefile_gen
+*.report
+*.out
+*.run_summary

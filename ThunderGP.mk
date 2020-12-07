@@ -1,4 +1,4 @@
-TARGETS := hw_emu
+TARGETS := hw
 # emu or acc:
 #   hw
 #   hw_emu
