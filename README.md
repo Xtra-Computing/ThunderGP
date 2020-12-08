@@ -98,4 +98,4 @@ As shown in the above diagram, the edges in one partition are streamed into **Sc
 * Application wrapper for high level platform (Spark, etc.)
 * Hardware-accelerated query engine.
 * Cycle-precision software simulation for the verification of dynamic modules(Cache, etc.) and channel depth tuning.
-* Optimization for large scale graph. (distributed processing or HBM-based memory hierarchy)
+* Optimization for large scale graph. (distributed processing)
