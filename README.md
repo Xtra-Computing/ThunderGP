@@ -36,8 +36,8 @@ On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance ca
     * SDAccel 2019.2 Design Suit
 * Evaluated platforms from Xilinx:
     * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
-    * Alveo U200 Data Center Accelerator Card (SDAccel 2019.2)
-    * Alveo U250 Data Center Accelerator Card (SDAccel 2019.2)
+    * Alveo U200 Data Center Accelerator Card (SDAccel 2019.1)
+    * Alveo U250 Data Center Accelerator Card (SDAccel 2019.1)
     
 ## Run the code
 ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
