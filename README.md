@@ -30,10 +30,10 @@ On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance ca
 
 
 ## Prerequisites
-* The gcc-4.8 or above
+* The gcc-9.3
 * Tools:
     * SDAccel 2018.3 Design Suit
-    * SDAccel 2019.2 Design Suit
+    * SDAccel 2019.1 Design Suit
 * Evaluated platforms from Xilinx:
     * Xilinx Virtex UltraScale+ FPGA VCU1525 Acceleration Development Kit (SDAccel 2018.3)
     * Alveo U200 Data Center Accelerator Card (SDAccel 2019.1)
