@@ -53,17 +53,15 @@ The desired application can be implemented by passing argument ```app=[the algor
 | ```app=ar``` | ArticleRank  (AR)|
 | ```app=wcc``` | Weakly Connected Component  (WCC)|
 
-#### Here is the example of implementing the accelerator for PageRank on Alveo U50 platform with Vitis 2020.1. 
+#### Here is the example of implementing the accelerator for PageRank on Alveo U250 platform with SDAccel 2019.1. 
 ```sh
 $ git clone https://github.com/Xtra-Computing/ThunderGP.git
-$ git checkout develop_u50
 $ cd ./
 $ vim ThunderGP.mk 
-$ # configure the DEVICE as DEVICES := xilinx_u50_gen3x16_xdma_201920_3; configure TARGETS := hw
-$ make app=pr clean 
+$ # configure the DEVICE as DEVICES := xilinx_u250_xdma_201830_2; configure TARGETS := hw
 $ make app=pr all # make the host execution program and the FPGA bitstream. It takes time :)
 # For execution on real hardware. The path of graph dataset needs to be provided by the user. 
-$ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
+$ ./host_graph_fpga_pr xclbin_pr/*.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
 
