@@ -8,7 +8,7 @@
 
 ## What's new?
 
-ThunderGP won the third place in [Xilinx Adaptive Computing Developer Contest](https://www.hackster.io/contests/xilinxadaptivecomputing).
+ThunderGP won the third place in [2020 Xilinx Adaptive Computing Developer Contest](https://www.hackster.io/contests/xilinxadaptivecomputing), top 9 out of 79 teams.
 
 ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/).
 
