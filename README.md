@@ -24,7 +24,9 @@ ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based g
 Two aspacts make the ThunderGP deliver superior performance.
 On the one hand, ThunderGP embraces an improved execution flow to better exploit the pipeline parallelism of FPGA and alleviate the data access amount to the global memory. On the other hand, the memory accesses are highly optimized to fully utilize the memory bandwidth capacity of the hardware platforms. 
 
-On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art. For HBM-based version, please check the branch "develop_u50".
+On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art.  
+
+***For HBM-based version, please check the branch "develop_u50".***
 
 
 ## Prerequisites
