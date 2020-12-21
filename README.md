@@ -61,7 +61,7 @@ $ vim ThunderGP.mk
 $ # configure the DEVICE as DEVICES := xilinx_u250_xdma_201830_2; configure TARGETS := hw
 $ make app=pr all # make the host execution program and the FPGA bitstream. It takes time :)
 # For execution on real hardware. The path of graph dataset needs to be provided by the user. 
-$ ./host_graph_fpga_pr xclbin_pr/*.xclbin wiki-talk
+$ ./host_graph_fpga_pr xclbin_pr/*.xclbin ./dataset/rmat-14-32.txt
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
 
