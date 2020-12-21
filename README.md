@@ -101,7 +101,7 @@ Throughput (MTEPS) of different graph processing algorithms over datasets on U25
 
 
 
-* [More Results](docs/results.md)
+* [Datasets and More Results](docs/results.md)
 
 ## APIs (programmability) 
 ![auto](docs/images/automation.png)
