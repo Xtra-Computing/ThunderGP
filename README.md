@@ -12,6 +12,7 @@ ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/)
 
 ThunderGP is featured at [Xilinx Apps and Libraries](https://www.xilinx.com/products/apps-and-libraries.html)
 
+ThunderGP won the third place in [Xilinx Adaptive Computing Developer Contest](https://www.hackster.io/contests/xilinxadaptivecomputing)
 
 ThunderGP was presented at [XACC@NUS Workshop Series 2020: Reconfigurable Computing Systems](https://xaccnus.github.io/). see [Slides](https://xaccnus.github.io/slides/ThunderGP_Fast_Graph_Processing_for_HLS-based_FPGAs.pdf), [Video/Youtube](https://youtu.be/zqxLevJiCpk), [Video/bilibili](https://www.bilibili.com/video/BV1kD4y1m7r8/).
 
@@ -53,10 +54,15 @@ The below table is for quick reference of this argument.
 
 Here is an example of implementing PR algorithm. 
 ```sh
+$ git clone https://github.com/Xtra-Computing/ThunderGP.git
+$ git checkout develop_u50
 $ cd ./
-$ make app=pr clean
-$ make app=pr all # make the host execution program and FPGA execution program for pagerank application. It takes time.
-$ ./host_graph_fpga_pr ./xclbin_pr/graph_fpga.hw.xilinx_vcu1525_xdma_201830_1.xclbin wiki-talk
+$ vim ThunderGP.mk 
+$ # configure the DEVICE as DEVICES := xilinx_u50_gen3x16_xdma_201920_3; configure TARGETS := hw
+$ make app=pr clean 
+$ make app=pr all # make the host execution program and the FPGA bitstream. It takes time :)
+# For execution on real hardware. The path of graph dataset needs to be provided by the user. 
+$ ./host_graph_fpga_pr xclbin_pr/graph_fpga.hw.xilinx_u50_gen3x16_xdma_201920_3.xclbin wiki-talk
 ```
 #### More details: [Compiling ThunderGP ](docs/compile_arch.md)
 
