@@ -10,7 +10,7 @@
 
 ThunderGP won the third place in [2020 Xilinx Adaptive Computing Developer Contest](https://www.hackster.io/contests/xilinxadaptivecomputing), top 9 out of 79 teams.
 
-ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/).
+ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/). Read [the paper](https://github.com/Xtra-Computing/ThunderGP/blob/master/ThunderGP_camera_ready-pdfa.pdf).
 
 ThunderGP is featured at [Xilinx Apps and Libraries](https://www.xilinx.com/products/apps-and-libraries.html).
 
