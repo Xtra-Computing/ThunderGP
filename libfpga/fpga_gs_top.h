@@ -101,7 +101,7 @@ const int stream_depth_memory = QUEUE_SIZE_MEMORY;
 #pragma HLS ARRAY_PARTITION variable=filter dim=0 complete
 
     uchar opcode[PE_NUM];
-#pragma HLS ARRAY_PARTITION variable=opcodep dim=0 complete
+#pragma HLS ARRAY_PARTITION variable=opcode dim=0 complete
 
     shuffled_type shuff_ifo[PE_NUM];
 #pragma HLS ARRAY_PARTITION variable=shuff_ifo dim=0 complete
