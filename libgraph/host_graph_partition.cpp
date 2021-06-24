@@ -92,11 +92,15 @@ static void partitionTransfer(graphInfo *info)
     transfer_data_to_pl(acc->context, acc->device, base_mem_id, ARRAY_SIZE(base_mem_id));
     DEBUG_PRINTF("%s", "transfer subPartitions mem\n");
     for (int i = 0; i < info->blkNum; i ++) {
-        int mem_id[3];
-        mem_id[0] = getSubPartition(i)->edgeTail.id;
-        mem_id[1] = getSubPartition(i)->edgeHead.id;
-        mem_id[2] = getSubPartition(i)->edgeProp.id;
-        transfer_data_to_pl(acc->context, acc->device, mem_id, ARRAY_SIZE(mem_id));
+        for (int k = 0; k < SUB_PARTITION_NUM; k++ )
+        {
+            //partition->sub[k] = getSubPartition(i * SUB_PARTITION_NUM + k);
+            int mem_id[3];
+            mem_id[0] = getSubPartition(i * SUB_PARTITION_NUM + k)->edgeTail.id;
+            mem_id[1] = getSubPartition(i * SUB_PARTITION_NUM + k)->edgeHead.id;
+            mem_id[2] = getSubPartition(i * SUB_PARTITION_NUM + k)->edgeProp.id;
+            transfer_data_to_pl(acc->context, acc->device, mem_id, ARRAY_SIZE(mem_id));
+        }
     }
 
     DEBUG_PRINTF("%s", "transfer cu mem\n");
