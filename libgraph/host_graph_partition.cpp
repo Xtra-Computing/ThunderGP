@@ -257,7 +257,7 @@ void partitionFunction(graphInfo *info)
             int subPartitionSize = partition->subPartitionSize;
             int reOrderIndex = partition->finalOrder[subIndex];
 
-            unsigned int bound = subPartitionSize * (reOrderIndex + 1);
+            unsigned int bound = subPartitionSize * (reOrderIndex + 1) + SUB_PARTITION_NUM * ALIGN_SIZE;
 
             partition->sub[subIndex]->listStart =  0;
             partition->sub[subIndex]->listEnd = (bound > partition->totalEdge) ? (partition->totalEdge - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
