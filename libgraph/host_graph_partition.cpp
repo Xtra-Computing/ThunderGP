@@ -260,7 +260,7 @@ void partitionFunction(graphInfo *info)
             unsigned int bound = subPartitionSize * (reOrderIndex + 1) + SUB_PARTITION_NUM * ALIGN_SIZE;
 
             partition->sub[subIndex]->listStart =  0;
-            partition->sub[subIndex]->listEnd = (bound > partition->totalEdge) ? (partition->totalEdge - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
+            partition->sub[subIndex]->listEnd = (bound > partition->totalEdge && reOrderIndex == (SUB_PARTITION_NUM - 1)) ? (partition->totalEdge - (subPartitionSize * reOrderIndex)) : (subPartitionSize);
             partition->sub[subIndex]->mapedTotalIndex = mapedSourceIndex;
             partition->sub[subIndex]->srcVertexStart =  edgePartitionHeadArray[subPartitionSize * reOrderIndex];
             partition->sub[subIndex]->srcVertexEnd   =  edgePartitionHeadArray[subPartitionSize * (reOrderIndex + 1) - 1];
