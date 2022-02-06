@@ -158,6 +158,20 @@ As shown in the above diagram, The edges in one partition are streamed into **Sc
 * Optimization for large scale graph. (distributed processing or HBM-based memory hierarchy)
 
 
+## How to cite **ThunderGP** 
+If you use **ThunderGP**  in your paper, please cite our work ([full version](https://github.com/Xtra-Computing/ThunderGP/blob/master/ThunderGP_camera_ready-pdfa.pdf)).
+```
+@inbook{10.1145/3431920.3439290,
+author = {Chen, Xinyu and Tan, Hongshi and Chen, Yao and He, Bingsheng and Wong, Weng-Fai and Chen, Deming},
+title = {ThunderGP: HLS-Based Graph Processing Framework on FPGAs},
+year = {2021},
+url = {https://doi.org/10.1145/3431920.3439290},
+booktitle = {The 2021 ACM/SIGDA International Symposium on Field-Programmable Gate Arrays},
+pages = {69–80},
+numpages = {12}
+}
+```
+
 ## Related publications
 * Xinyu Chen*, Ronak Bajaj^, Yao Chen, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [On-The-Fly Parallel Data Shuffling for Graph Processing on OpenCL-based FPGAs](https://www.comp.nus.edu.sg/~hebs/pub/fpl19-graph.pdf). FPL, 2019.
 * Xinyu Chen*, Yao Chen^, Ronak Bajaj, Jiong He, Bingsheng He, Weng-Fai Wong and Deming Chen. [Is FPGA useful for hash joins](https://www.comp.nus.edu.sg/~hebs/pub/cidr20-join.pdf). CIDR 2020: Conference on Innovative Data Systems Research
