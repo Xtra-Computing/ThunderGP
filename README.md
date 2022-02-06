@@ -8,6 +8,8 @@
 
 ## What's new?
 
+ThunderGP has been published in ACM Transactions on Reconfigurable Technology and Systems (TRETS), as one of "Best Papers in FPGA 2021". 
+
 ThunderGP won the third place in [2020 Xilinx Adaptive Computing Developer Contest](https://www.hackster.io/contests/xilinxadaptivecomputing), top 9 out of 79 teams.
 
 ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/). Read [the paper](https://github.com/Xtra-Computing/ThunderGP/blob/master/ThunderGP_camera_ready-pdfa.pdf).
