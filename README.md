@@ -8,7 +8,7 @@
 
 ## What's new?
 
-ThunderGP for HBM-Enabled FPGA platforms has been released. Please see the [branch](https://github.com/Xtra-Computing/ThunderGP/tree/v_HBM).
+***ThunderGP for HBM-Enabled FPGA platforms has been released. Please see the [branch](https://github.com/Xtra-Computing/ThunderGP/tree/v_HBM).***
 
 ThunderGP has been published in ACM Transactions on Reconfigurable Technology and Systems (TRETS), as one of "Best Papers in FPGA 2021". 
 
