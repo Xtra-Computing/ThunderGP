@@ -5,10 +5,11 @@ ThunderGP for HBM-Enabled platforms.
 ## Prerequisites
 * The gcc-9.3
 * Tools:
-    * Vitis 2020.2 Design Suit
+    * Xilinx Vitis 2020.2 Design Suit
 * Evaluated platforms from Xilinx:
-    * Alveo U280 Data Center Accelerator Card
-    
+    * Xilinx Alveo U280 Data Center Accelerator Card
+    * Xilinx Alveo U50 Data Center Accelerator Card
+
 ## Run the code
 ThunderGP currently has seven build-in graph algorithms: PageRank (PR), Sparse Matrix-Vector Multiplication (SpMV), Breadth-First Search (BFS), Single Source Shortest Path (SSSP), Closeness Centrality (CC), ArticleRank (AR), and Weakly Connected Component (WCC). 
 The desired application can be implemented by passing argument ```app=[the algorithm]``` to ``` make ``` command. The below table is for quick reference.
