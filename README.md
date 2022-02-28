@@ -1,24 +1,3 @@
-![logo](docs/images/ThunderGP.png)
-
-[![GitHub license](https://img.shields.io/badge/license-apache2-yellowgreen)](./LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/Xtra-Computing/ThunderGP.svg)](https://github.com/Xtra-Computing/ThunderGP/issues)
-[![DOI](https://zenodo.org/badge/254307005.svg)](https://zenodo.org/badge/latestdoi/254307005)
-
-# ThunderGP: HLS-based Graph Processing Framework on FPGAs
-
-## What's new?
-
-ThunderGP has been published in ACM Transactions on Reconfigurable Technology and Systems (TRETS), as one of "Best Papers in FPGA 2021". 
-
-ThunderGP won the third place in [2020 Xilinx Adaptive Computing Developer Contest](https://www.hackster.io/contests/xilinxadaptivecomputing), top 9 out of 79 teams.
-
-ThunderGP is accepted to be [FPGA 2021](https://isfpga.org/). Read [the paper](https://github.com/Xtra-Computing/ThunderGP/blob/master/ThunderGP_camera_ready-pdfa.pdf).
-
-ThunderGP is featured at [Xilinx Apps and Libraries](https://www.xilinx.com/products/apps-and-libraries.html).
-
-ThunderGP was presented at [XACC@NUS Workshop Series 2020: Reconfigurable Computing Systems](https://xaccnus.github.io/). see [Slides](https://xaccnus.github.io/slides/ThunderGP_Fast_Graph_Processing_for_HLS-based_FPGAs.pdf), [Video/Youtube](https://youtu.be/zqxLevJiCpk), [Video/bilibili](https://www.bilibili.com/video/BV1kD4y1m7r8/).
-
-
 ## Introduction
 
 ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based graph processing without compromising ***programmability***. ***To our best knowledge and experiments, this is the fastest graph processing framework on HLS-based FPGAs.***
