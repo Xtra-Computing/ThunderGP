@@ -28,9 +28,6 @@ On the one hand, ThunderGP embraces an improved execution flow to better exploit
 
 On Xilinx multi-SLR based FPGAs, it is running at 250Mhz, and the performance can be up to ***6400 MTEPS (million traversed edges per second)***, or a ***2.9 times speedup*** over the state-of-the-art.  
 
-***For HBM-based version, please check the branch "develop_u50".***
-
-
 ## Prerequisites
 * The gcc-9.3
 * Tools:
