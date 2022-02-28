@@ -27,8 +27,9 @@ The desired application can be implemented by passing argument ```app=[the algor
 ```sh
 $ git clone https://github.com/Xtra-Computing/ThunderGP.git
 $ cd ./
+$ git checkout -b v_HBM
 $ vim ThunderGP.mk 
-$ # configure the DEVICE as DEVICES := xilinx_u280_xdma_201830_2; configure TARGETS := hw
+$ # configure the DEVICE as DEVICES := xilinx_u280_xdma_201920_3; configure TARGETS := hw
 $ make app=pr all # make the host execution program and the FPGA bitstream. It takes time :)
 # For execution on real hardware. The path of graph dataset needs to be provided by the user. 
 $ ./host_graph_fpga_pr xclbin_pr/*.xclbin ./dataset/rmat-14-32.txt
