@@ -1,6 +1,6 @@
 ## Introduction
 
-ThunderGP enables data scientists to enjoy the ***performance*** of FPGA-based graph processing without compromising ***programmability***. ***To our best knowledge and experiments, this is the fastest graph processing framework on HLS-based FPGAs.***
+ThunderGP for HBM-Enabled platforms. 
 
 ## Prerequisites
 * The gcc-9.3
