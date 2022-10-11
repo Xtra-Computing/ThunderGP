@@ -160,6 +160,21 @@ As shown in the above diagram, The edges in one partition are streamed into **Sc
 ## How to cite **ThunderGP** 
 If you use **ThunderGP**  in your paper, please cite our work ([full version](https://github.com/Xtra-Computing/ThunderGP/blob/master/ThunderGP_camera_ready-pdfa.pdf)).
 ```
+@article{10.1145/3517141,
+author = {Chen, Xinyu and Cheng, Feng and Tan, Hongshi and Chen, Yao and He, Bingsheng and Wong, Weng-Fai and Chen, Deming},
+title = {ThunderGP: Resource-Efficient Graph Processing Framework on FPGAs with HLS},
+year = {2022},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+issn = {1936-7406},
+url = {https://doi.org/10.1145/3517141},
+doi = {10.1145/3517141},
+note = {Just Accepted},
+journal = {ACM Trans. Reconfigurable Technol. Syst.},
+month = {feb},
+keywords = {FPGA; HBM; HLS; Graph Processing; Framework}
+}
+
 @inbook{10.1145/3431920.3439290,
 author = {Chen, Xinyu and Tan, Hongshi and Chen, Yao and He, Bingsheng and Wong, Weng-Fai and Chen, Deming},
 title = {ThunderGP: HLS-Based Graph Processing Framework on FPGAs},
